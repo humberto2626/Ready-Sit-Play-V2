@@ -1035,7 +1035,7 @@ This is when the timer starts."
     border: 1px solid rgba(255, 255, 255, 0.2);
     animation: instructions-slide-up 1.2s ease-out 0.3s both;
    width: 80%;
-   max-height: calc(100vh - 2rem);
+   max-height: calc(100vh - 4rem);
    overflow-y: auto;
    display: flex;
    flex-direction: column;
