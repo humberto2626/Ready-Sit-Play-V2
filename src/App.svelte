@@ -138,11 +138,11 @@
       2. Set Up: You get the two balls on your turn, the timer starts the moment you toss the first ball.
 *to count the throw has to be at least three times the length of ${dogName || 'your dog'}.
 *to count the fetch ${dogName || 'your dog'} has to come to where you can pick up the ball without moving one of your feet.
-      3. How to Play: While keeping one foot glued where your are standing, throw the first ball, once ${dogName || 'your dog'} brings it back, show the second one, when ${dogName || 'your dog'} drops it, throw the second one.
-      4. Tie Breaker: Each player has a ball, standing next to eachother you both throw it at the same time, the ball that gets fetched wins.
+      3. How to Play: While keeping one foot glued where you are standing, throw the first ball, once ${dogName || 'your dog'} brings it back, show the second one, when ${dogName || 'your dog'} drops it, throw the second one.
+      4. Tie Breaker: Each player has a ball, standing next to each other you both throw it at the same time, the ball that gets fetched wins.
     `,
     'Sniff and Choose': `
-      1. Win by: Having ${dogName || 'your dog'} choose your treat over your opponent's.
+      1. Win by: Having ${dogName || 'your dog'} choose your hand over your opponent's.
       2. Set Up: Each player hides a treat in their closed fist. Both players kneel down facing each other about 3 feet apart.
       3. How to Play: Present both closed fists to ${dogName || 'your dog'} simultaneously. ${dogName || 'Your dog'} will sniff and choose one fist by pawing, licking, or nudging it.
       4. Tie Breaker: N/A
@@ -169,7 +169,7 @@ This is when the timer starts.
     'Pawathon': `
       1. Win by: Being the player to whom ${dogName || 'your dog'} gives the most paws under 30 seconds.
       2. Set Up: Players take turns standing in front of ${dogName || 'your dog'} to offer their hand repeatedly without rewarding until the end of the 30 seconds. *Both players reward at the end of their turn as to not discourage ${dogName || 'your dog'}.
-      3. How to Play: ${dogName || 'Your dog'} sits and each player ask for paw repeatedly. *only one paw at a time, double paws or high 10s don't count.
+      3. How to Play: ${dogName || 'Your dog'} sits and each player asks for paw repeatedly. *only one paw at a time, double paws or high 10s don't count.
       4. Tie Breaker: Both players stand in front of the sitting dog, they both ask for Paw at the same time. whoever gets the paw wins.
     `,
     'Treasure Hunt': `
@@ -181,7 +181,7 @@ This is when the timer starts."
     `,
     'Dog Roll': `
       1. Win by: Getting ${dogName || 'your dog'} to complete the most rolls in a row under 30 seconds.
-      2. Set Up: Each player positions ${dogName || 'your dog'} in the "down" position on a soft surface like grass or carpet.
+      2. Set Up: Each player positions ${dogName || 'your dog'} in the "Down" position on a soft surface like grass or carpet.
       3. How to Play: Players take turns commanding ${dogName || 'your dog'} to "roll over." Count consecutive successful rolls until ${dogName || 'your dog'} stops or gets up.
       4. Tie Breaker: If both dogs achieve the same number of rolls, go into a Roll face off, where you take turns asking ${dogName || 'your dog'} to roll in sudden death format.
     `,
@@ -192,7 +192,7 @@ This is when the timer starts."
       4. Tie Breaker: If tied, each player gets 3 additional tosses in sudden death format.
     `,
      'Give Me, Drop it, Leave it!': `
-      1. Win by: Collecting the most amount of points from  ${dogName || 'your dog'} giving you, droping or leaviang a toy under 30 seconds.
+      1. Win by: Collecting the most points from  ${dogName || 'your dog'} giving you, dropping or leaving a toy under 30 seconds.
       2. Set Up: Each player starts by holding the toy in front of ${dogName || 'your dog'}. Players take turns and ask the canine player to "Give me" for 1 point, "Drop it" 2 points and "Leave it" for 3 points.
       3. How to Play: Toss the toy, after each time ${dogName || 'your dog'} performs one of the behaviors, toss it again, Count successful behaviors. After all players complete their turns, compare scores.
       4. Tie Breaker: If tied, each player gets 3 additional tosses in sudden death format.
@@ -404,7 +404,7 @@ This is when the timer starts."
       case 2:
         return "You have won the Rain Coat Advantage, with which you can block and eliminate a Challenge Card used against you.";
       case 3:
-        return "You have won the Kitchen Thieve Advantage, which allows you to steal an action card from your opponent.";
+        return "You have won the Kitchen Thieve Advantage, which allows you to steal an Action Card from your opponent.";
       default:
         return "";
     }
