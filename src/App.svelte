@@ -155,7 +155,7 @@
     `,
     'Hide and Seek': `
       1. Win by: If hiding, not being found, if seeking, having ${dogName || 'your dog'} finding the other player under 30 seconds.
-      2. Set Up: "The player that picked the card hides while the other player takes ${dogName || 'your dog'} to a different room and asks them to Sit for a count of 10 out loud.
+      2. Set Up: "The player that picked the card hides while the other player takes ${dogName || 'your dog'} to a different room and asks them to "Sit" for a count of 10 out loud.
 This is when the timer starts. 
       3. How to Play: The player holding ${dogName || 'your dog'} releases them and says "Find (Name of the player)!" ${dogName || 'Your dog'} will search for the hidden player.
       4. Tie Breaker: N/A
@@ -1805,7 +1805,7 @@ This is when the timer starts."
     <div
       class="winner-overlay"
       on:click={animateShuffle}
-      title="Click to restart"
+      title="Tap to restart"
     >
       <div class="instructions-content">
         <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
@@ -1842,7 +1842,7 @@ This is when the timer starts."
   <div class="advantage-message">
     <div>{currentAdvantageMessage}</div>
     <button on:click={dismissAdvantageOverlay} style="margin-top: 1rem; padding: 0.75rem 1.5rem; font-size: 1rem; background: #ff6b35; color: white; border: none; border-radius: 8px; cursor: pointer;">
-      Click to Continue
+      Tap to Continue
     </button>
   </div>
 {/if}
