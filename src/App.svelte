@@ -1405,7 +1405,7 @@ This is when the timer starts."
   <div class="instructions-overlay">
     <div class="instructions-content">
       <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
-      <div style="text-align: center; font-size: 0.9rem; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+      <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
         Balancedog
       </div>
       
@@ -1809,7 +1809,7 @@ This is when the timer starts."
     >
       <div class="instructions-content">
         <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
-        <div style="text-align: center; font-size: 0.9rem; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+        <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
           Balancedog
         </div>
          <div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);">
