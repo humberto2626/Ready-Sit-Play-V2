@@ -1817,7 +1817,7 @@ This is when the timer starts."
       </div>
         <h1 class="instructions-title">🎉 {#if winner === 1}{player1Name || 'Player 1'}{:else if winner === 2}{player2Name || 'Player 2'}{:else}{player3Name || 'Player 3'}{/if} Wins 🎉</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p>Congratulations on your amazing teamwork with {dogName || 'your dog'}!</p>
+          <p>Congratulations on the amazing teamwork with {dogName || 'your dog'}!</p>
           <p>Tap anywhere to play again.</p>
         </div>
       </div>
