@@ -1257,21 +1257,21 @@ This is when the timer starts."
     color: white;
   }
 
-  .turn-indicator.player1 {
+   .turn-indicator.player1 {
     text-shadow: 
-      0 4px 4px  #22c55e,
+      0 2px 4px #22c55e,
       0 2px 4px rgba(0,0,0,0.3);
   }
 
   .turn-indicator.player2 {
     text-shadow: 
-      0 4px 4px  #1d4ed8,
+      0 2px 4px #1d4ed8,
       0 2px 4px rgba(0,0,0,0.3);
   }
 
   .turn-indicator.player3 {
     text-shadow: 
-      0 4px 4px  #dc2626,
+      0 2px 4px #dc2626,
       0 2px 4px rgba(0,0,0,0.3);
   }
 
