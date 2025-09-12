@@ -1259,28 +1259,19 @@ This is when the timer starts."
 
   .turn-indicator.player1 {
     text-shadow: 
-      -2px -2px 0 #22c55e,
-      2px -2px 0 #22c55e,
-      -2px 2px 0 #22c55e,
-      2px 2px 0 #22c55e,
+      0 4px 4px  #22c55e,
       0 2px 4px rgba(0,0,0,0.3);
   }
 
   .turn-indicator.player2 {
     text-shadow: 
-      -2px -2px 0 #1d4ed8,
-      2px -2px 0 #1d4ed8,
-      -2px 2px 0 #1d4ed8,
-      2px 2px 0 #1d4ed8,
+      0 4px 4px  #1d4ed8,
       0 2px 4px rgba(0,0,0,0.3);
   }
 
   .turn-indicator.player3 {
     text-shadow: 
-      -2px -2px 0 #dc2626,
-      2px -2px 0 #dc2626,
-      -2px 2px 0 #dc2626,
-      2px 2px 0 #dc2626,
+      0 4px 4px  #dc2626,
       0 2px 4px rgba(0,0,0,0.3);
   }
 
