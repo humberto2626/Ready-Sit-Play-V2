@@ -225,6 +225,16 @@ This is when the timer starts."
     }
   }
   function hideActionInstruction() {
+    if (actionTooltipCard && actionTooltipCard.category === 'Challenge') {
+      if (currentTurn === 'player1') {
+        player1Cards = [actionTooltipCard, ...player1Cards];
+      } else if (currentTurn === 'player2') {
+        player2Cards = [actionTooltipCard, ...player2Cards];
+      }
+      activeCard = null;
+      currentTurn = getNextTurn(currentTurn);
+    }
+    
     showActionTooltip = false;
     actionTooltipContent = '';
     actionTooltipCard = null;
@@ -383,8 +393,7 @@ This is when the timer starts."
           }
           
           // Clear the active card and switch turn
-          activeCard = null;
-          currentTurn = getNextTurn(currentTurn);
+          showChallengeInstruction(activeCard);
         }
       }, 3000);
     }
