@@ -120,7 +120,7 @@
     'Down': `With a treat in your hand, grace ${dogName || 'your dog'}'s chin and chest as you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
     'Back': `With ${dogName || 'your dog'} sitting, hold a treat in your hand just above the top of ${dogName || 'your dog'}'s head, putting your foot in between their front paws, move your hand towards their tail, waiting for them to move back.`,
     'Stay': `With ${dogName || 'your dog'} sitting or laying down, show the palm of your hand and slowly take at least three steps backwards, return and reward ${dogName || 'your dog'}'s self-control.`,
-    'Place': `With a towel on the floor, guide ${dogName || 'your dog'} near it and drop a treat in the towel the moment they step on it, praise them and reward them again.`
+    'Place': `With a towel on the floor, guide ${dogName || 'your dog'} near it and drop a treat in the towel the moment they step on it, praise and reward them again.`
   };
 
   const challengeInstructions: Record<string, string> = {
