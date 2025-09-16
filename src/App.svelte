@@ -825,8 +825,8 @@ This is when the timer starts."
   }
 
   .card-back {
-    width: 140px;
-    height: 180px;
+    width: 70px;
+    height: 90px;
     border-radius: 12px;
     border: 2px solid #000;
     box-shadow: 0 0 8px rgba(0,0,0,0.4);
