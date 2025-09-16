@@ -883,7 +883,7 @@ This is when the timer starts."
 
   .small-card {
     width: 90px;
-    height: 120px;
+    height: 125px;
     overflow: hidden;
   }
 
@@ -1288,7 +1288,7 @@ This is when the timer starts."
 
   .tiny-card {
     width: 70px;
-    height: 90px;
+    height: 95px;
     border: 2px solid #333;
     border-radius: 12px;
     background: #fefefe;
