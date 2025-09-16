@@ -1513,7 +1513,7 @@ This is when the timer starts."
       </div> <h1 class="instructions-title">It's a Tie!</h1>
       <div class="instructions-section" style="--delay: 0.5s">
         <p>Congratulations! You both are amazing at communicating with your dog!</p>
-        <p>To settle this game and declare a winner, make sure to be standing at the opposite sides of the room and at an equal distance from {dogName || 'your dog'} call their name at the same time.</p>
+        <p>To settle this game and declare a winner, make sure to be standing at the opposite sides of the room with {dogName || 'your dog'} in the middle, call their name at the same time.</p>
       </div>
       
       <div style="text-align: center;">
