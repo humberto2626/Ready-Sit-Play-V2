@@ -889,7 +889,7 @@ This is when the timer starts."
 
   .active-card-container {
     position: relative;
-    min-height: 240px;
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
