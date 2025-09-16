@@ -1306,8 +1306,8 @@ This is when the timer starts."
     position: fixed;
     top: 1rem;
     right: 1rem;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
+    padding: 0.12.5rem 0.25rem;
+    font-size: 0.4rem;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #ccc;
     border-radius: 4px;
