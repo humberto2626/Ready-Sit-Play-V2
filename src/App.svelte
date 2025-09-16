@@ -809,7 +809,7 @@ This is when the timer starts."
 
   .card {
     width: 140px;
-    height: 180px;
+    height: 190px;
     border: 2px solid #333;
     border-radius: 12px;
     background-color: transparent;
