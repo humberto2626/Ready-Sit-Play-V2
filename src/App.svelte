@@ -1460,7 +1460,7 @@ This is when the timer starts."
           </div>
           <p>Guide {dogName || 'your dog'} to complete the action shown.</p>
           <p><strong>Success:</strong> Reward {dogName || 'your dog'} with a treat and keep the card.</p>
-          <p><strong>Fail:</strong> The card is placedd at the bottom of the deck.</p>
+          <p><strong>Fail:</strong> The card is placed at the bottom of the deck.</p>
           <p>Your turn ends.</p>
         </div>
       {/if}
