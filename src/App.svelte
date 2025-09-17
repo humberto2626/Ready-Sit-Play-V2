@@ -1473,7 +1473,7 @@ This is when the timer starts."
           <div class="card small-card edge-challenge" style="margin: 1rem auto;">
             <img src="/card-images/11.png" class="card-image" />
           </div>
-           <div style="text-align: center; font-size: 0.5rem; font-weight: italic; color: grey; margin-bottom: 1rem; margin-top: -1rem;">
+           <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem;">
        "Toss a ball to create a distraction"
       </div>
           <p>Keep it until the right moment.</p>
