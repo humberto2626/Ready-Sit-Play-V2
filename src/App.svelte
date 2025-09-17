@@ -1470,10 +1470,15 @@ This is when the timer starts."
       {#if currentStep === 5}
         <h1 class="instructions-title">Challenge Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
+          <div class="card small-card edge-challenge" style="margin: 1rem auto;">
+            <img src="/card-images/11.png" class="card-image" />
+          </div>
+           <div style="text-align: center; font-size: 0.5rem; font-weight: italic; color: grey; margin-bottom: 1rem; margin-top: -1rem;">
+       "Toss a ball to create a distraction"
+      </div>
           <p>Keep it until the right moment.</p>
           <p>Your turn ends.</p>
-          <p>Play it as your opponent draws an Action Card.</p>
-          <p>From your reserve, tap on it to trigger its effect.</p>
+          <p>Play Challenge Cards from your reserve to make opponents' Action Cards harder, tap on it to trigger its effect.</p>
         </div>
       {/if}
 
