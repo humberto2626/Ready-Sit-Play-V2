@@ -1448,21 +1448,19 @@ This is when the timer starts."
         <div class="instructions-section" style="--delay: 0.5s">
           <p>In order to win, be the first player to collect {player3Name.trim() ? 'four' : 'six'} Action Cards by successfully completing dog training tasks.</p>
           <p>Your turn begins by picking up the card facing down at the top of the deck.</p>
-          <p>Action Cards: Training commands to perform with your dog.</p>
-          <p>Challenge Cards: Make Action Cards harder for opponents.</p>
-          <p>Mini Games: Competitive challenges that earn special advantages.</p>
         </div>
       {/if}
 
       {#if currentStep === 4}
         <h1 class="instructions-title">Action Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
+          <p><strong>Training commands to perform with your dog.</strong></p>
           <div class="card small-card edge-action" style="margin: 1rem auto;">
             <img src="/card-images/6.png" class="card-image" />
           </div>
           <p>Guide {dogName || 'your dog'} to complete the action shown.</p>
           <p><strong>Success:</strong> Reward {dogName || 'your dog'} with a treat and keep the card.</p>
-          <p><strong>Fail:</strong> Place the card at the bottom of the deck.</p>
+          <p><strong>Fail:</strong> The card is placedd at the bottom of the deck.</p>
           <p>Your turn ends.</p>
         </div>
       {/if}
@@ -1470,6 +1468,7 @@ This is when the timer starts."
       {#if currentStep === 5}
         <h1 class="instructions-title">Challenge Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
+           <p><strong>Make Action Cards harder for opponents.</strong></p>
           <div class="card small-card edge-challenge" style="margin: 1rem auto;">
             <img src="/card-images/11.png" class="card-image" />
           </div>
@@ -1485,6 +1484,7 @@ This is when the timer starts."
       {#if currentStep === 6}
         <h1 class="instructions-title">Mini-Game Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
+          <p><strong>Mini Games: Competitive challenges that earn special advantages.</strong></p>
            <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/19.png" class="card-image" />
           </div>
