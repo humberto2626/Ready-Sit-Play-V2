@@ -1484,7 +1484,7 @@ This is when the timer starts."
       {#if currentStep === 6}
         <h1 class="instructions-title">Mini-Game Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>Competitive challenges that earn special advantages.</strong></p>
+          <p><strong>Competitive challenges that earn you special advantages.</strong></p>
            <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/19.png" class="card-image" />
           </div>
