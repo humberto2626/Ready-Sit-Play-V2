@@ -1457,6 +1457,9 @@ This is when the timer starts."
       {#if currentStep === 4}
         <h1 class="instructions-title">Action Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
+          <div class="card small-card edge-action" style="margin: 1rem auto;">
+            <img src="/card-images/6.png" class="card-image" />
+          </div>
           <p>Guide {dogName || 'your dog'} to complete the action shown.</p>
           <p><strong>Success:</strong> Reward {dogName || 'your dog'} with a treat and keep the card.</p>
           <p><strong>Fail:</strong> Place the card at the bottom of the deck.</p>
