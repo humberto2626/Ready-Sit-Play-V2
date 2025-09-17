@@ -201,7 +201,7 @@ This is when the timer starts."
 
   let showInstructions = true;
   let currentStep = 1;
-  const totalSteps = 6;
+  const totalSteps = 8;
 
   function reviewInstructions() {
     showInstructions = true;
@@ -1489,14 +1489,14 @@ This is when the timer starts."
             <img src="/card-images/19.png" class="card-image" />
           </div>
           <p>Play the mini-game drawn. The winner earns a special advantage.</p>
-         <p>Keep it until the right moment.</p>
+          <p>Keep it until the right moment.</p>
           <p>Your turn ends.</p>
           <p>From your reserve, tap on it to trigger its effect.</p>
         </div>
       {/if}
 
          {#if currentStep === 7}
-        <h1 class="instructions-title">Advantages</h1>
+        <h1 class="instructions-title">Mini-Game Advantages</h1>
         <div class="instructions-section" style="--delay: 0.5s">
            <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/27.png" class="card-image" />
@@ -1516,6 +1516,20 @@ This is when the timer starts."
         </div>
       {/if}
       
+      {#if currentStep === 8}
+        <h1 class="instructions-title">You're All Set!</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+          <p>Remember: The goal is to have fun training with your dog while playing a competitive game.</p>
+          <p>Good luck, and may the best trainer win!</p>
+          </div>
+          <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+        Ready, Sit, Play!
+      </div>
+         <div style="text-align: center; font-size: 0.5rem; color: white; margin-bottom: 1rem; margin-top: -1rem;">
+        Need Help? Use the "Review Instructions" button anytime during the game.
+      </div> 
+        {/if}
+        
       <div class="step-dots">
         {#each Array(totalSteps) as _, i}
           <div class="step-dot {currentStep === i + 1 ? 'active' : ''}"></div>
