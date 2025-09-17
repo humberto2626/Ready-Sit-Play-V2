@@ -1164,26 +1164,13 @@ This is when the timer starts."
     transform: scale(1.05);
   }
 
-  .golden-bone {
-    position: absolute;
-    top: -60px;
-    left: 50%;
-    transform: translateX(-50%);
+  .golden-bone-active-illustration {
+    display: block;
+    margin: 0 auto;
     width: 80px;
-    height: 60px;
-    z-index: 10;
-    animation: golden-glow 2s ease-in-out infinite alternate;
-  }
-
-  @keyframes golden-glow {
-    0% {
-      filter: drop-shadow(0 0 10px #ffd700) drop-shadow(0 0 20px #ffd700) brightness(1);
-      transform: translateX(-50%) scale(1);
-    }
-    100% {
-      filter: drop-shadow(0 0 20px #ffd700) drop-shadow(0 0 30px #ffd700) brightness(1.2);
-      transform: translateX(-50%) scale(1.1);
-    }
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px #ffd700);
   }
 
   @keyframes instructions-fade-in {
@@ -1599,6 +1586,13 @@ This is when the timer starts."
     </div>
   {/if}
 
+  <!-- Golden Bone Illustration -->
+  {#if goldenBoneActive}
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <img src="/golden-bone-illustration.png" class="golden-bone-active-illustration" />
+    </div>
+  {/if}
+
   <div
     class="deck-container"
     on:click={revealNextCard}
@@ -1625,9 +1619,6 @@ This is when the timer starts."
         <div class="card open edge-{activeCard.category.toLowerCase().replace(' ', '-')}" 
              class:flying-left={flying && flyingDirection === 'left'}
              class:flying-right={flying && flyingDirection === 'right'}>
-          {#if goldenBoneActive && activeCard.category === 'Action'}
-            <div class="golden-bone">🦴</div>
-          {/if}
           <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
         </div>
 
