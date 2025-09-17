@@ -1522,10 +1522,10 @@ This is when the timer starts."
           <p>Remember: The goal is to have fun training with your dog while playing a competitive game.</p>
           <p>Good luck, and may the best trainer win!</p>
           </div>
-          <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+          <div style="text-align: center; font-size: 3rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
         Ready, Sit, Play!
       </div>
-         <div style="text-align: center; font-size: 0.5rem; color: white; margin-bottom: 1rem; margin-top: -1rem;">
+         <div style="text-align: center; font-size: 0.7rem; color: white; margin-bottom: 1rem; margin-top: -1rem;">
         Need Help? Use the "Review Instructions" button anytime during the game.
       </div> 
         {/if}
