@@ -1477,7 +1477,7 @@ This is when the timer starts."
       </div>
           <p>Keep it until the right moment.</p>
           <p>Your turn ends.</p>
-          <p>Play Challenge Cards from your reserve to make opponents' Action Cards harder, tap on it to trigger its effect.</p>
+          <p>Play Challenge Cards from your reserve to make opponents' turns more difficult.</p>
         </div>
       {/if}
 
