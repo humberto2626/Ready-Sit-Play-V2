@@ -126,9 +126,9 @@
   const challengeInstructions: Record<string, string> = {
     'Squirrel': 'Toss a ball to create a distraction',
     'Do it Twice': 'Self explanatory',
-    'Cat Ate Your Tongue': 'Perform the Action Card without saying a word',
-    'Pirate Leg': 'Perform the Action Card while standing only on one leg',
-    'Hands Behind Your Back': 'Perform the Action Card without any gestures',
+    'Cat Ate Your Tongue': 'Guide your dog to perform the Action Card without saying a word',
+    'Pirate Leg': 'Guide your dog to perform the Action Card while standing only on one leg',
+    'Hands Behind Your Back': 'Guide your dog to perform the Action Card without any gestures',
     'Long Distance Call': `Perform the Action Card at least five steps away from ${dogName || 'your dog'}`
   };
   // Instructions walkthrough state
@@ -1484,11 +1484,11 @@ This is when the timer starts."
       {#if currentStep === 6}
         <h1 class="instructions-title">Mini-Game Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>Mini Games: Competitive challenges that earn special advantages.</strong></p>
+          <p><strong>Competitive challenges that earn special advantages.</strong></p>
            <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/19.png" class="card-image" />
           </div>
-          <p>Play the mini-game drawn. The winner earns a special advantage.</p>
+          <p>Play the Mini-Game drawn. The winner earns a special advantage.</p>
           <p>Keep it until the right moment.</p>
           <p>Your turn ends.</p>
           <p>From your reserve, tap on it to trigger its effect.</p>
@@ -1501,18 +1501,18 @@ This is when the timer starts."
            <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/27.png" class="card-image" />
           </div>
-          <p>Awarded to the first Mini-Game winner</p>
+          <p><strong>Awarded to the first Mini-Game winner</strong></p>
           <p>A one-time higher value treat.</p>
           <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/28.png" class="card-image" />
           </div>
-          <p>Awarded to the second Mini-Game winner</p>
-          <p>with which you can block and eliminate a Challenge Card used against you.</p>
+          <p><strong>Awarded to the second Mini-Game winner</strong></p>
+          <p>With which you can block and eliminate a Challenge Card used against you.</p>
           <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/29.png" class="card-image" />
           </div>
-          <p>Awarded to the third Mini-Game winner</p>
-          <p>which allows you to steal an Action Card from an opponent.</p>
+          <p><strong>Awarded to the third Mini-Game winner</strong></p>
+          <p>Which allows you to steal an Action Card from an opponent.</p>
         </div>
       {/if}
       
