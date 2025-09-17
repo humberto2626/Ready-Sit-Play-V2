@@ -129,7 +129,7 @@
     'Cat Ate Your Tongue': 'Guide your dog to perform the Action Card without saying a word',
     'Pirate Leg': 'Guide your dog to perform the Action Card while standing only on one leg',
     'Hands Behind Your Back': 'Guide your dog to perform the Action Card without any gestures',
-    'Long Distance Call': `Perform the Action Card at least five steps away from ${dogName || 'your dog'}`
+    'Long Distance Call': `Guide your dog to perform the Action Card standing at least five steps away from them`
   };
   // Instructions walkthrough state
   const miniGameExplanations: Record<string, string> = {
