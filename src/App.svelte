@@ -1446,10 +1446,11 @@ This is when the timer starts."
       {#if currentStep === 3}
         <h1 class="instructions-title">How to Play</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p>Game Objective: Be the first player to collect {player3Name.trim() ? 'four' : 'six'} Action Cards by successfully completing dog training tasks.</p>
+          <p>In order to win be the first player to collect {player3Name.trim() ? 'four' : 'six'} Action Cards by successfully completing dog training tasks.</p>
           <p>Your turn begins by picking up the card at the top of the deck.</p>
-          <p>Depending on whether that card is an Action, Challenge or Mini-Game card, the turn unfolds differently.</p>
-          <p>Each card type has its own rules and strategies for winning the game.</p>
+          <p>Action Cards: Training commands to perform with your dog
+Challenge Cards: Make Action Cards harder for opponents
+Mini Games: Competitive challenges that earn special advantages</p>
         </div>
       {/if}
 
