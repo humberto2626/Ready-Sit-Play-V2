@@ -413,7 +413,7 @@ This is when the timer starts."
       case 2:
         return "You have won the Rain Coat Advantage, with which you can block and eliminate a Challenge Card used against you.";
       case 3:
-        return "You have won the Kitchen Thieve Advantage, which allows you to steal an Action Card from your opponent.";
+        return "You have won the Kitchen Thieve Advantage, which allows you to steal an Action Card from an opponent.";
       default:
         return "";
     }
@@ -1485,6 +1485,9 @@ This is when the timer starts."
       {#if currentStep === 6}
         <h1 class="instructions-title">Mini-Game Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
+           <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
+            <img src="/card-images/19.png" class="card-image" />
+          </div>
           <p>Play the mini-game drawn. The winner earns a special advantage.</p>
          <p>Keep it until the right moment.</p>
           <p>Your turn ends.</p>
@@ -1492,6 +1495,27 @@ This is when the timer starts."
         </div>
       {/if}
 
+         {#if currentStep === 7}
+        <h1 class="instructions-title">Advantages</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+           <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
+            <img src="/card-images/27.png" class="card-image" />
+          </div>
+          <p>Awarded to the first Mini-Game winner</p>
+          <p>A one-time higher value treat.</p>
+          <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
+            <img src="/card-images/28.png" class="card-image" />
+          </div>
+          <p>Awarded to the second Mini-Game winner</p>
+          <p>with which you can block and eliminate a Challenge Card used against you.</p>
+          <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
+            <img src="/card-images/29.png" class="card-image" />
+          </div>
+          <p>Awarded to the third Mini-Game winner</p>
+          <p>which allows you to steal an Action Card from an opponent.</p>
+        </div>
+      {/if}
+      
       <div class="step-dots">
         {#each Array(totalSteps) as _, i}
           <div class="step-dot {currentStep === i + 1 ? 'active' : ''}"></div>
