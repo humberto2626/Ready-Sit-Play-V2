@@ -1433,7 +1433,7 @@ This is when the timer starts."
       {#if currentStep === 3}
         <h1 class="instructions-title">How to Play</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong><p>In order to win, be the first player to collect {player3Name.trim() ? 'four' : 'six'} Action Cards by successfully completing dog training tasks.</p></strong>
+          <p><strong>In order to win, be the first player to collect {player3Name.trim() ? 'four' : 'six'} Action Cards by successfully completing dog training tasks.</strong></p>
           <p>Your turn begins by picking up the card facing down at the top of the deck.</p>
         </div>
       {/if}
