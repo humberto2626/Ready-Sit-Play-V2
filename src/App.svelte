@@ -1470,8 +1470,7 @@ This is when the timer starts."
            <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/19.png" class="card-image" />
           </div>
-          <p>Play the Mini-Game drawn. The winner earns a special advantage.</p>
-          <p>Keep it until the right moment.</p>
+          <p>Once a Mini-Game card is revealed, all players compete following the unique rules of that card. The winner earns a special advantage.</p
           <p>From your reserve, tap on it to trigger its effect.</p>
         </div>
       {/if}
