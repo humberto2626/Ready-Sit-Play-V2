@@ -1459,12 +1459,8 @@ This is when the timer starts."
           <div class="card small-card edge-challenge" style="margin: 1rem auto;">
             <img src="/card-images/11.png" class="card-image" />
           </div>
-           <div style="text-align: center; font-size: 0.7rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem;">
-       "Toss a ball to create a distraction"
-      </div>
-          <p>Keep it until the right moment.</p>
-          <p>Your turn ends.</p>
-          <p>Play Challenge Cards from your reserve to make opponents' turns more difficult.</p>
+          
+          <p>As opponents reveal an Action Card, you can play your Challenge Card to make their turn more difficult.</p>
         </div>
       {/if}
 
