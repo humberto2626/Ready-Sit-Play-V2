@@ -1262,15 +1262,15 @@ This is when the timer starts."
 
   .turn-indicator.player2 {
     text-shadow: 
-     0 -2px 4px #1d4ed8,
-     0 2px 4px #1d4ed8,
+     0 -1px 2px #1d4ed8,
+     0 1px 2px #1d4ed8,
       0 2px 4px rgba(0,0,0,0.3);
   }
 
   .turn-indicator.player3 {
     text-shadow: 
-      0 -2px 4px #dc2626,
-      0 2px 4px #dc2626,
+      0 -1px 2px #dc2626,
+      0 1px 2px #dc2626,
       0 2px 4px rgba(0,0,0,0.3);
   }
 
