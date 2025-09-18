@@ -1408,7 +1408,7 @@ This is when the timer starts."
       {/if}
 
       {#if currentStep === 2}
-        <h1 class="instructions-title">Player's Setup</h1>
+        <h1 class="instructions-title">Player Setup</h1>
         <div class="instructions-section" style="--delay: 0.5s">
           <p>Let's get you and your furry friend ready to play!</p>
           <div style="margin-top: 1rem;">
