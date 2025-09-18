@@ -1448,7 +1448,6 @@ This is when the timer starts."
           <p>Guide {dogName || 'your dog'} to complete the action shown.</p>
           <p><strong>Success:</strong> Reward {dogName || 'your dog'} with a treat and keep the card.</p>
           <p><strong>Fail:</strong> The card is placed at the bottom of the deck.</p>
-          <p>Your turn ends.</p>
         </div>
       {/if}
 
@@ -1459,8 +1458,8 @@ This is when the timer starts."
           <div class="card small-card edge-challenge" style="margin: 1rem auto;">
             <img src="/card-images/11.png" class="card-image" />
           </div>
-          
-          <p>As opponents reveal an Action Card, you can play your Challenge Card to make their turn more difficult.</p>
+         <p>As an opponent reveals an Action Card, you can play your Challenge Card to make their turn more difficult.</p>
+           <p>From your reserve, tap on it to trigger its effect.</p>
         </div>
       {/if}
 
@@ -1473,7 +1472,6 @@ This is when the timer starts."
           </div>
           <p>Play the Mini-Game drawn. The winner earns a special advantage.</p>
           <p>Keep it until the right moment.</p>
-          <p>Your turn ends.</p>
           <p>From your reserve, tap on it to trigger its effect.</p>
         </div>
       {/if}
