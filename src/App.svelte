@@ -1410,7 +1410,7 @@ This is when the timer starts."
       {#if currentStep === 2}
         <h1 class="instructions-title">Player's Setup</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p>Lets get you and your furry friend ready to play!</p>
+          <p>Let's get you and your furry friend ready to play!</p>
           <div style="margin-top: 1rem;">
             <label for="player1Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 1:</label>
             <input type="text" id="player1Name" bind:value={player1Name} placeholder="Enter Player 1's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
