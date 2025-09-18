@@ -1166,7 +1166,7 @@ This is when the timer starts."
 
   .golden-bone-active-illustration {
     display: block;
-    margin: -2rem;
+    margin: -1rem;
     width: 40px;
     height: 40px;
     object-fit: contain ;
