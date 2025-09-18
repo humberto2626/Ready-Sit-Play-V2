@@ -1169,7 +1169,7 @@ This is when the timer starts."
     margin: -2rem;
     width: 40px;
     height: 40px;
-    object-fit: center ;
+    object-fit: contain ;
     filter: drop-shadow(0 0 10px #ffd700);
   }
 
