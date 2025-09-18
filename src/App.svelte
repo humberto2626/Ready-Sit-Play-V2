@@ -850,7 +850,7 @@ This is when the timer starts."
     height: 60px;
     object-fit: contain;
     z-index: 2;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
   }
 
   .back-action {
@@ -1056,7 +1056,7 @@ This is when the timer starts."
     object-fit: contain;
     margin: 0 auto 1.5rem auto;
     display: block;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
    flex-shrink: 0;
   }
 
