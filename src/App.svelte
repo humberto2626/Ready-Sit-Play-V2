@@ -1441,7 +1441,7 @@ This is when the timer starts."
       {#if currentStep === 4}
         <h1 class="instructions-title">Action Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>Training commands to perform with your dog.</strong></p>
+          <p><strong>Training commands to perform with your dog</strong></p>
           <div class="card small-card edge-action" style="margin: 1rem auto;">
             <img src="/card-images/6.png" class="card-image" />
           </div>
@@ -1455,7 +1455,7 @@ This is when the timer starts."
       {#if currentStep === 5}
         <h1 class="instructions-title">Challenge Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-           <p><strong>Make Action Cards harder for opponents.</strong></p>
+           <p><strong>Make Action Cards harder for opponents</strong></p>
           <div class="card small-card edge-challenge" style="margin: 1rem auto;">
             <img src="/card-images/11.png" class="card-image" />
           </div>
@@ -1471,7 +1471,7 @@ This is when the timer starts."
       {#if currentStep === 6}
         <h1 class="instructions-title">Mini-Game Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>Competitive challenges that earn you special advantages.</strong></p>
+          <p><strong>Competitive challenges that earn you special advantages</strong></p>
            <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/19.png" class="card-image" />
           </div>
