@@ -1255,8 +1255,8 @@ This is when the timer starts."
 
    .turn-indicator.player1 {
     text-shadow: 
-      0 -3px 6px #22c55e,
-      0 3px 6px #22c55e,
+      0 -1px 2px #22c55e,
+      0 1px 2px #22c55e,
       0 2px 4px rgba(0,0,0,0.3);
   }
 
