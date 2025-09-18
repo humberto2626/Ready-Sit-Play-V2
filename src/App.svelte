@@ -1169,8 +1169,8 @@ This is when the timer starts."
     margin: -1rem;
     width: 80px;
     height: 80px;
-    object-fit: flex ;
-    filter: drop-shadow(0 0 10px #ffd700);
+    object-fit: contain ;
+    filter: drop-shadow(0 0 6px #ffd700);
   }
 
   @keyframes instructions-fade-in {
