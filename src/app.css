@@ -158,7 +158,6 @@ button:focus-visible {
   color: white;
   border: none;
   border-radius: 8px;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.25s;
 }
