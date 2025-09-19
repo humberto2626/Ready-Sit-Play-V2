@@ -101,13 +101,8 @@
   let goldenBoneActive = false;
   let kitchenThiefActive = false;
 
-  // Undo state for challenge and advantage card activations
-  let lastUndoableAction: {
-    type: 'challenge' | 'advantage';
-    player: 1 | 2 | 3;
-    card: Card | { id: string, message: string };
-    previousState?: any;
-  } | null = null;
+  // State history for undo functionality (limited to last 3 steps)
+  let stateHistory: any[] = [];
 
   // Mini-game explanation overlay state
   let showMiniGameExplanation = false;
@@ -264,19 +259,64 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   let selectedChallengeCard: Card | null = null;
   let challengeCardPlayer: 1 | 2 | 3 | null = null;
 
+  // Save current state for undo functionality
+  function saveCurrentState() {
+    const currentState = {
+      player1Cards: structuredClone(player1Cards),
+      player2Cards: structuredClone(player2Cards),
+      player3Cards: structuredClone(player3Cards),
+      player1AdvantageCards: structuredClone(player1AdvantageCards),
+      player2AdvantageCards: structuredClone(player2AdvantageCards),
+      player3AdvantageCards: structuredClone(player3AdvantageCards),
+      goldenBoneActive: goldenBoneActive,
+      kitchenThiefActive: kitchenThiefActive,
+      selectedChallengeCard: selectedChallengeCard,
+      challengeCardPlayer: challengeCardPlayer,
+      currentTurn: currentTurn,
+      globalMiniGameCount: globalMiniGameCount,
+      shuffledDeck: structuredClone(shuffledDeck),
+      activeCard: activeCard,
+      gameOver: gameOver,
+      winner: winner
+    };
+    
+    stateHistory.push(currentState);
+    
+    // Limit history to last 3 steps
+    if (stateHistory.length > 3) {
+      stateHistory.shift();
+    }
+  }
+
+  // Undo last step
+  function undoLastStep() {
+    if (stateHistory.length === 0) return;
+    
+    const previousState = stateHistory.pop();
+    
+    // Restore all state variables
+    player1Cards = previousState.player1Cards;
+    player2Cards = previousState.player2Cards;
+    player3Cards = previousState.player3Cards;
+    player1AdvantageCards = previousState.player1AdvantageCards;
+    player2AdvantageCards = previousState.player2AdvantageCards;
+    player3AdvantageCards = previousState.player3AdvantageCards;
+    goldenBoneActive = previousState.goldenBoneActive;
+    kitchenThiefActive = previousState.kitchenThiefActive;
+    selectedChallengeCard = previousState.selectedChallengeCard;
+    challengeCardPlayer = previousState.challengeCardPlayer;
+    currentTurn = previousState.currentTurn;
+    globalMiniGameCount = previousState.globalMiniGameCount;
+    shuffledDeck = previousState.shuffledDeck;
+    activeCard = previousState.activeCard;
+    gameOver = previousState.gameOver;
+    winner = previousState.winner;
+  }
+
   function activateChallengeCard(card: Card, player: 1 | 2 | 3) {
     if (selectedChallengeCard) return; // Only one active challenge card allowed
     
-    // Store undo information before making changes
-    lastUndoableAction = {
-      type: 'challenge',
-      player: player,
-      card: card,
-      previousState: {
-        selectedChallengeCard: selectedChallengeCard,
-        challengeCardPlayer: challengeCardPlayer
-      }
-    };
+    saveCurrentState();
     
     selectedChallengeCard = card;
     challengeCardPlayer = player;
@@ -289,45 +329,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     } else if (player === 3) {
       player3Cards = player3Cards.filter(c => c.id !== card.id);
     }
-  }
-
-  function undoLastActivation() {
-    if (!lastUndoableAction) return;
-
-    const { type, player, card, previousState } = lastUndoableAction;
-
-    if (type === 'challenge') {
-      // Return the challenge card to the player's hand
-      if (player === 1) {
-        player1Cards = [...player1Cards, card];
-      } else if (player === 2) {
-        player2Cards = [...player2Cards, card];
-      } else if (player === 3) {
-        player3Cards = [...player3Cards, card];
-      }
-
-      // Clear the active challenge card
-      selectedChallengeCard = null;
-      challengeCardPlayer = null;
-    } else if (type === 'advantage') {
-      // Return the advantage card to the player's hand
-      if (player === 1) {
-        player1AdvantageCards = [...player1AdvantageCards, card];
-      } else if (player === 2) {
-        player2AdvantageCards = [...player2AdvantageCards, card];
-      } else if (player === 3) {
-        player3AdvantageCards = [...player3AdvantageCards, card];
-      }
-
-      // Restore previous state
-      goldenBoneActive = previousState.goldenBoneActive;
-      kitchenThiefActive = previousState.kitchenThiefActive;
-      selectedChallengeCard = previousState.selectedChallengeCard;
-      challengeCardPlayer = previousState.challengeCardPlayer;
-    }
-
-    // Clear the undo action
-    lastUndoableAction = null;
   }
 
   function shuffleDeck() {
@@ -384,6 +385,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     currentTurn = 1;
 
+    // Clear state history when resetting game
+    stateHistory = [];
+
     shuffleDeck();
 
     await tick();
@@ -400,6 +404,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   function revealNextCard() {
     if (isShuffling || activeCard !== null || shuffledDeck.length === 0 || gameOver) return;
+
+    saveCurrentState();
 
     console.log('Drawing card. Deck before draw:', shuffledDeck.map(c => c.category));
     console.log('Selected challenge card:', selectedChallengeCard);
@@ -497,26 +503,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   function useAdvantageCard(cardId: string, player: 1 | 2 | 3) {
+    saveCurrentState();
+    
     // Find the advantage card to determine its type
     const playerAdvantageCards = player === 1 ? player1AdvantageCards : 
                                  player === 2 ? player2AdvantageCards : 
                                  player3AdvantageCards;
     const advantageCard = playerAdvantageCards.find(card => card.id === cardId);
-    
-    // Store undo state before applying effects
-    if (advantageCard) {
-      lastUndoableAction = {
-        type: 'advantage',
-        player: player,
-        card: advantageCard,
-        previousState: {
-          goldenBoneActive: goldenBoneActive,
-          kitchenThiefActive: kitchenThiefActive,
-          selectedChallengeCard: selectedChallengeCard,
-          challengeCardPlayer: challengeCardPlayer
-        }
-      };
-    }
     
     if (advantageCard && advantageCard.message.includes("Golden Bone")) {
       goldenBoneActive = true;
@@ -667,6 +660,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   async function playerWins(player: 1 | 2 | 3) {
     if (!activeCard || gameOver) return;
 
+    saveCurrentState();
+
     // Only mini-games use the playerWins function now
     if (activeCard.category === 'Mini Game') {
       globalMiniGameCount++;
@@ -712,6 +707,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   async function actionCompleted() {
     if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
 
+    saveCurrentState();
+
     // Action card goes to current player
     if (currentTurn === 1) {
       player1Cards = [activeCard, ...player1Cards];
@@ -750,6 +747,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   async function actionCardFailed() {
     if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
+
+    saveCurrentState();
 
     // Put the action card at the bottom of the deck
     shuffledDeck = [activeCard, ...shuffledDeck];
@@ -1642,10 +1641,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   
   <button 
     class="undo-btn" 
-    onclick={undoLastActivation}
-    disabled={!lastUndoableAction || isShuffling || gameOver}
+    onclick={undoLastStep}
+    disabled={stateHistory.length === 0 || isShuffling || gameOver}
   >
-    Undo Last Activation
+    Undo Last Step
   </button>
 
   <!-- Turn indicator above the deck -->
