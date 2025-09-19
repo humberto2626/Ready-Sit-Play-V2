@@ -1597,15 +1597,15 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           </button>
         {/if}
         {#if currentStep === 2}
-          <button class="start-button" on:click={startGame}>
+          <button class="start-button" onclick={startGame}>
             Next
           </button>
         {:else}
-          <button class="start-button" on:click={startGame}>
+          <button class="start-button" onclick={startGame}>
             {currentStep < totalSteps ? 'Next' : 'Start Playing!'}
           </button>
         {/if}
-        <button class="skip-button" on:click={skipInstructions}>
+        <button class="skip-button" onclick={skipInstructions}>
           Skip Instructions
         </button>
       </div>
@@ -1627,7 +1627,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       </div>
       
       <div style="text-align: center;">
-        <button class="start-button" on:click={animateShuffle}>
+        <button class="start-button" onclick={animateShuffle}>
           Restart Game
         </button>
       </div>
@@ -1636,7 +1636,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 {/if}
 
 <div class="deck-area">
-  <button class="review-button" on:click={reviewInstructions} disabled={isShuffling || gameOver}>
+  <button class="review-button" onclick={reviewInstructions} disabled={isShuffling || gameOver}>
     Review Instructions
   </button>
   
@@ -1670,7 +1670,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   <div
     class="deck-container"
-    on:click={revealNextCard}
+    onclick={revealNextCard}
     title="Click to draw the next card"
     style="pointer-events: {isShuffling || activeCard !== null || gameOver ? 'none' : 'auto'}"
   >
@@ -1713,31 +1713,31 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   {#if activeCard}
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.1rem;">
       {#if canStartTimer()}
-        <button on:click={startTimer}>
+        <button onclick={startTimer}>
           Start Timer ({getTimerDuration()}s)
         </button>
       {/if}
       
       {#if activeCard.category === 'Action'}
-        <button on:click={() => showActionInstruction(activeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
+        <button onclick={() => showActionInstruction(activeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
           Show Instructions
         </button>
-        <button on:click={actionCompleted} disabled={flying || gameOver} style="font-size: 0.9rem; padding: 0.25rem 0.5rem; background: #22c55e; color: white;">
+        <button onclick={actionCompleted} disabled={flying || gameOver} style="font-size: 0.9rem; padding: 0.25rem 0.5rem; background: #22c55e; color: white;">
           Action Completed
         </button>
-        <button on:click={actionCardFailed} disabled={flying || gameOver} style="font-size: 0.9rem; padding: 0.25rem 0.5rem; background: #ff6b6b; color: white;">
+        <button onclick={actionCardFailed} disabled={flying || gameOver} style="font-size: 0.9rem; padding: 0.25rem 0.5rem; background: #ff6b6b; color: white;">
           Action Failed
         </button>
       {/if}
       
       {#if selectedChallengeCard}
-        <button on:click={() => showChallengeInstruction(selectedChallengeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
+        <button onclick={() => showChallengeInstruction(selectedChallengeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
           Show Challenge Instructions
         </button>
       {/if}
       
       {#if activeCard.category === 'Mini Game'}
-        <button on:click={() => showMiniGameInstruction(activeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
+        <button onclick={() => showMiniGameInstruction(activeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
           Show Mini Game Rules
         </button>
       {/if}
@@ -1755,7 +1755,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <!-- Player 1 Cards -->
     <div>
       {#if activeCard && activeCard.category === 'Mini Game'}
-        <button on:click={() => playerWins(1)} disabled={flying || gameOver} style="margin-bottom: 0.5rem;">
+        <button onclick={() => playerWins(1)} disabled={flying || gameOver} style="margin-bottom: 0.5rem;">
           {player1Name || 'Player 1'} Wins This Round
         </button>
       {/if}
@@ -1767,7 +1767,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         {#each player1Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
           <div
             class="card tiny-card edge-{card.category.toLowerCase()}"
-            on:click={() => {
+            onclick={() => {
               if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver) {
                 activateChallengeCard(card, 1);
               }
@@ -1783,7 +1783,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         {#each player1AdvantageCards as advantageCard (advantageCard.id)}
           <div
             class="card tiny-card edge-advantage"
-            on:click={() => {
+            onclick={() => {
               if (currentTurn === 1) {
                 useAdvantageCard(advantageCard.id, 1);
               }
@@ -1809,7 +1809,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <!-- Player 2 Cards -->
     <div>
       {#if activeCard && activeCard.category === 'Mini Game'}
-        <button on:click={() => playerWins(2)} disabled={flying || gameOver} style="margin-bottom: 0.5rem;">
+        <button onclick={() => playerWins(2)} disabled={flying || gameOver} style="margin-bottom: 0.5rem;">
           {player2Name || 'Player 2'} Wins This Round
         </button>
       {/if}
@@ -1821,7 +1821,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         {#each player2Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
           <div
             class="card tiny-card edge-{card.category.toLowerCase()}"
-            on:click={() => {
+            onclick={() => {
               if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver) {
                 activateChallengeCard(card, 2);
               }
@@ -1837,7 +1837,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         {#each player2AdvantageCards as advantageCard (advantageCard.id)}
           <div
             class="card tiny-card edge-advantage"
-            on:click={() => {
+            onclick={() => {
               if (currentTurn === 2) {
                 useAdvantageCard(advantageCard.id, 2);
               }
@@ -1864,7 +1864,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     {#if player3Name}
       <div>
         {#if activeCard && activeCard.category === 'Mini Game'}
-          <button on:click={() => playerWins(3)} disabled={flying || gameOver} style="margin-bottom: 0.5rem;">
+          <button onclick={() => playerWins(3)} disabled={flying || gameOver} style="margin-bottom: 0.5rem;">
             {player3Name} Wins This Round
           </button>
         {/if}
@@ -1876,7 +1876,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           {#each player3Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
             <div
               class="card tiny-card edge-{card.category.toLowerCase()}"
-              on:click={() => {
+              onclick={() => {
                 if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver) {
                   activateChallengeCard(card, 3);
                 }
@@ -1892,7 +1892,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           {#each player3AdvantageCards as advantageCard (advantageCard.id)}
             <div
               class="card tiny-card edge-advantage"
-              on:click={() => {
+              onclick={() => {
                 if (currentTurn === 3) {
                   useAdvantageCard(advantageCard.id, 3);
                 }
@@ -1920,7 +1920,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
    {#if gameOver && winner !== null}
     <div
       class="winner-overlay"
-      on:click={animateShuffle}
+      onclick={animateShuffle}
       title="Tap to restart"
     >
       <div class="instructions-content">
@@ -1942,11 +1942,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 </div>
 
 {#if showMiniGameExplanation}
-<div class="mini-game-explanation" on:click={hideMiniGameInstruction}>
+<div class="mini-game-explanation" onclick={hideMiniGameInstruction}>
   <h4>{activeCard?.label} Rules</h4>
   <div>{currentMiniGameExplanation}</div>
   <button 
-    on:click={hideMiniGameInstruction} 
+    onclick={hideMiniGameInstruction} 
     style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ffd700; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: block; margin-left: auto; margin-right: auto;"
   >
     Got it!
@@ -1957,7 +1957,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 {#if showAdvantageOverlay}
   <div class="advantage-message">
     <div>{currentAdvantageMessage}</div>
-    <button on:click={dismissAdvantageOverlay} style="margin-top: 1rem; padding: 0.75rem 1.5rem; font-size: 1rem; background: #ff6b35; color: white; border: none; border-radius: 8px; cursor: pointer;">
+    <button onclick={dismissAdvantageOverlay} style="margin-top: 1rem; padding: 0.75rem 1.5rem; font-size: 1rem; background: #ff6b35; color: white; border: none; border-radius: 8px; cursor: pointer;">
       Tap to Continue
     </button>
   </div>
@@ -1968,7 +1968,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <h4>{actionTooltipCard.label}</h4>
     <p>{actionTooltipContent}</p>
     <button 
-      on:click={hideActionInstruction} 
+      onclick={hideActionInstruction} 
       style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ffd700; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;"
     >
       Got it!
