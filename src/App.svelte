@@ -1639,6 +1639,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   <button class="review-button" on:click={reviewInstructions} disabled={isShuffling || gameOver}>
     Review Instructions
   </button>
+  <button 
+    onclick={undoLastActivation} 
+    disabled={!lastUndoableAction || isShuffling || gameOver}
+    style="position: absolute; top: 20px; left: 20px; z-index: 1000;"
+  >
+    Undo Last Activation
+  </button>
 
   <!-- Turn indicator above the deck -->
   {#if !gameOver && !isShuffling}
