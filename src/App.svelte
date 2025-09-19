@@ -464,6 +464,21 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
                                  player3AdvantageCards;
     const advantageCard = playerAdvantageCards.find(card => card.id === cardId);
     
+    // Store undo state before applying effects
+    if (advantageCard) {
+      lastUndoableAction = {
+        type: 'advantage',
+        player: player,
+        card: advantageCard,
+        previousState: {
+          goldenBoneActive: goldenBoneActive,
+          kitchenThiefActive: kitchenThiefActive,
+          selectedChallengeCard: selectedChallengeCard,
+          challengeCardPlayer: challengeCardPlayer
+        }
+      };
+    }
+    
     if (advantageCard && advantageCard.message.includes("Golden Bone")) {
       goldenBoneActive = true;
     }
