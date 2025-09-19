@@ -190,7 +190,7 @@
       1. Win by: Getting the canine player to complete the most rolls in a row under 30 seconds.
       2. Set Up: Each player positions the canine player in the "Down" position on a soft surface like grass or carpet.
       3. How to Play: Each player guides the canine player to "Roll Over." Count consecutive successful rolls until the canine player stops or gets up.
-      4. Tie Breaker: If both dogs achieve the same number of rolls, go into a “Roll face off”, where you take turns guiding the canine player to roll in sudden death format.
+      4. Tie Breaker: If both dogs achieve the same number of rolls, go into a "Roll face off", where you take turns guiding the canine player to roll in sudden death format.
     `,
     'The Catcher': `
       1. Win by: Having the canine player catch the most treats out of 5 tosses.
@@ -289,6 +289,45 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     } else if (player === 3) {
       player3Cards = player3Cards.filter(c => c.id !== card.id);
     }
+  }
+
+  function undoLastActivation() {
+    if (!lastUndoableAction) return;
+
+    const { type, player, card, previousState } = lastUndoableAction;
+
+    if (type === 'challenge') {
+      // Return the challenge card to the player's hand
+      if (player === 1) {
+        player1Cards = [...player1Cards, card];
+      } else if (player === 2) {
+        player2Cards = [...player2Cards, card];
+      } else if (player === 3) {
+        player3Cards = [...player3Cards, card];
+      }
+
+      // Clear the active challenge card
+      selectedChallengeCard = null;
+      challengeCardPlayer = null;
+    } else if (type === 'advantage') {
+      // Return the advantage card to the player's hand
+      if (player === 1) {
+        player1AdvantageCards = [...player1AdvantageCards, card];
+      } else if (player === 2) {
+        player2AdvantageCards = [...player2AdvantageCards, card];
+      } else if (player === 3) {
+        player3AdvantageCards = [...player3AdvantageCards, card];
+      }
+
+      // Restore previous state
+      goldenBoneActive = previousState.goldenBoneActive;
+      kitchenThiefActive = previousState.kitchenThiefActive;
+      selectedChallengeCard = previousState.selectedChallengeCard;
+      challengeCardPlayer = previousState.challengeCardPlayer;
+    }
+
+    // Clear the undo action
+    lastUndoableAction = null;
   }
 
   function shuffleDeck() {
