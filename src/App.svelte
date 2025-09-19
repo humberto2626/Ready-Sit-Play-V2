@@ -1592,7 +1592,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
      <div class="instructions-footer" style="text-align: center;">
         {#if currentStep > 1}
-          <button class="skip-button" on:click={goBack} style="margin-right: 1rem;">
+          <button class="skip-button" onclick={goBack} style="margin-right: 1rem;">
             Back
           </button>
         {/if}
