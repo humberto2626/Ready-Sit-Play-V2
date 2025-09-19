@@ -101,6 +101,14 @@
   let goldenBoneActive = false;
   let kitchenThiefActive = false;
 
+  // Undo state for challenge and advantage card activations
+  let lastUndoableAction: {
+    type: 'challenge' | 'advantage';
+    player: 1 | 2 | 3;
+    card: Card | { id: string, message: string };
+    previousState?: any;
+  } | null = null;
+
   // Mini-game explanation overlay state
   let showMiniGameExplanation = false;
   let currentMiniGameExplanation = '';
