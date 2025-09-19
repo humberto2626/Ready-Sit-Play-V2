@@ -266,6 +266,18 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   function activateChallengeCard(card: Card, player: 1 | 2 | 3) {
     if (selectedChallengeCard) return; // Only one active challenge card allowed
+    
+    // Store undo information before making changes
+    lastUndoableAction = {
+      type: 'challenge',
+      player: player,
+      card: card,
+      previousState: {
+        selectedChallengeCard: selectedChallengeCard,
+        challengeCardPlayer: challengeCardPlayer
+      }
+    };
+    
     selectedChallengeCard = card;
     challengeCardPlayer = player;
 
