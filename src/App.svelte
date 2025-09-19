@@ -1964,7 +1964,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 {/if}
 
 {#if showActionTooltip && actionTooltipCard}
-  <div class="action-tooltip" on:click={hideActionInstruction}>
+  <div class="action-tooltip" onclick={hideActionInstruction}>
     <h4>{actionTooltipCard.label}</h4>
     <p>{actionTooltipContent}</p>
     <button 
