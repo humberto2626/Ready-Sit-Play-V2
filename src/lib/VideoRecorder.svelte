@@ -364,16 +364,11 @@
       <div class="recording-controls">
         <div class="camera-selection">
           <button class="camera-switch-btn" on:click={selectCamera}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 3l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M20 7H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M8 21l-4-4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 9L12 4L17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M17 15L12 20L7 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
-        </div>
-        <div class="countdown-display">
-          {countdown}s
         </div>
         <button class="stop-btn-container" on:click={stopRecording}>
           <div class="stop-btn-circle">
@@ -435,13 +430,6 @@
     width: 24px;
     height: 24px;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-  }
-
-  .countdown-display {
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-shadow: 0 0 5px rgba(0,0,0,0.5);
   }
 
   .record-btn {
@@ -540,7 +528,6 @@
     flex-direction: column;
     gap: 0.75rem;
     align-items: center;
-    justify-content: space-around; /* Adjust for spacing */
     background-color: rgba(0, 0, 0, 0.7);
     padding: 1rem 0.5rem;
     border-radius: 15px;
@@ -561,11 +548,6 @@
   .fullscreen-recording .camera-switch-btn svg {
     width: 20px;
     height: 20px;
-  }
-
-  .fullscreen-recording .countdown-display {
-    font-size: 2rem; /* Make it larger in fullscreen */
-    min-width: 60px; /* Ensure consistent width */
   }
 
   .fullscreen-recording .stop-btn-circle {
