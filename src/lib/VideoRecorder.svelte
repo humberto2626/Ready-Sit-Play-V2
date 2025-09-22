@@ -35,11 +35,16 @@
         videoStream = null;
       }
       
+      // Explicitly clear the video element's srcObject
+      if (liveVideoElement) {
+        liveVideoElement.srcObject = null;
+      }
+      
       // Reset state and start new recording
       recordedChunks = [];
       
-      // Small delay to ensure cleanup is complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Longer delay to ensure camera hardware is fully released
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Start recording with new camera
       await startRecording();
