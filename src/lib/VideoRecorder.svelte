@@ -370,6 +370,9 @@
             </svg>
           </button>
         </div>
+        <div class="countdown-display">
+          {countdown}s
+        </div>
         <button class="stop-btn-container" on:click={stopRecording}>
           <div class="stop-btn-circle">
             <div class="stop-btn-square"></div>
@@ -430,6 +433,13 @@
     width: 24px;
     height: 24px;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
+
+  .countdown-display {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
   }
 
   .record-btn {
@@ -528,6 +538,7 @@
     flex-direction: column;
     gap: 0.75rem;
     align-items: center;
+    justify-content: space-around; /* Adjust for spacing */
     background-color: rgba(0, 0, 0, 0.7);
     padding: 1rem 0.5rem;
     border-radius: 15px;
@@ -548,6 +559,11 @@
   .fullscreen-recording .camera-switch-btn svg {
     width: 20px;
     height: 20px;
+  }
+
+  .fullscreen-recording .countdown-display {
+    font-size: 2rem; /* Make it larger in fullscreen */
+    min-width: 60px; /* Ensure consistent width */
   }
 
   .fullscreen-recording .stop-btn-circle {
