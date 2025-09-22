@@ -474,7 +474,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   function getMiniGameAdvantageMessage(count: number): string {
     switch (count) {
       case 1:
-        return "You have won the Golden Bone Advantage, a one-time higher value treat.";
+        return "You have won the Infinite Time Advantage, with which your turn has no time limit.";
       case 2:
         return "You have won the Rain Coat Advantage, with which you can block and eliminate a Challenge Card used against you.";
       case 3:
@@ -1555,7 +1555,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             <img src="/card-images/27.png" class="card-image" />
           </div>
           <p><strong>Awarded to the first Mini-Game winner</strong></p>
-          <p>With which your turn has no time limit</p>
+          <p>With which your turn has no time limit.</p>
           <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/28.png" class="card-image" />
           </div>
