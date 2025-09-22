@@ -224,7 +224,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
   }
 
-  function showChallengeInstruction(card: Card) {
+  function showChallengeInstruction(card: Card, isReviewing = false) {
+    if (isReviewing) {
+      isReviewingInstructions = true;
+    }
     if (card.category === 'Challenge' && challengeInstructions[card.label]) {
       actionTooltipContent = challengeInstructions[card.label];
       actionTooltipCard = card;
