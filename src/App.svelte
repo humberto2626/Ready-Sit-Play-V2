@@ -1373,21 +1373,100 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .review-button {
+  .instructions-circle-btn {
     position: fixed;
-    top: .25rem;
-    right: .25rem;
-    padding: 0.13rem 0.25rem;
-    font-size: 0.6rem;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    top: 20px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #4a90e2, #357abd);
+    color: white;
+    border: none;
+    padding: 0;
+    font-weight: bold;
+    border-radius: 50%;
     cursor: pointer;
-    z-index: 100;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .review-button:hover {
-    background: rgba(255, 255, 255, 1);
+  .instructions-circle-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+  }
+
+  .instructions-circle-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .action-completed-circle-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #22c55e, #16a34a);
+    color: white;
+    border: none;
+    padding: 0;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-completed-circle-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+  }
+
+  .action-completed-circle-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .action-failed-circle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #ff6b6b, #dc2626);
+    color: white;
+    border: none;
+    padding: 0;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-failed-circle-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+  }
+
+  .action-failed-circle-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
   }
 
   .timer-button {
@@ -1678,13 +1757,19 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
 <div class="deck-area">
   <button class="review-button" onclick={reviewInstructions} disabled={isShuffling || gameOver}>
-    Review Instructions
+  <button class="instructions-circle-btn" onclick={reviewInstructions} disabled={isShuffling || gameOver}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 16v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
   </button>
   
   <button 
     class="undo-btn" 
     onclick={undoLastStep}
     disabled={stateHistory.length === 0 || isShuffling || gameOver}
+    style="top: 90px; left: 20px;"
   >
     Back
   </button>
@@ -1758,12 +1843,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         <button onclick={() => showActionInstruction(activeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
           Show Instructions
         </button>
-        <button onclick={actionCompleted} disabled={flying || gameOver} style="font-size: 0.9rem; padding: 0.25rem 0.5rem; background: #22c55e; color: white;">
-          Action Completed
-        </button>
-        <button onclick={actionCardFailed} disabled={flying || gameOver} style="font-size: 0.9rem; padding: 0.25rem 0.5rem; background: #ff6b6b; color: white;">
-          Action Failed
-        </button>
       {/if}
       
       {#if selectedChallengeCard}
@@ -1787,6 +1866,22 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       <!-- Video Recording for Action and Mini Game cards -->
       {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
         <VideoRecorder />
+      {/if}
+      
+      <!-- Action Completed and Failed buttons (only for Action cards) -->
+      {#if activeCard.category === 'Action'}
+        <button class="action-completed-circle-btn" onclick={actionCompleted} disabled={flying || gameOver}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        
+        <button class="action-failed-circle-btn" onclick={actionCardFailed} disabled={flying || gameOver}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            <path d="M6 6l12 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </button>
       {/if}
 
       <!-- Timer Button positioned below the recording button -->
