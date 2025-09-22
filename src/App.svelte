@@ -113,6 +113,7 @@
   let showActionTooltip = false;
   let actionTooltipContent = '';
   let actionTooltipCard: Card | null = null;
+  let isReviewingInstructions = false;
 
   // Track if instructions are being reviewed (vs automatic game flow)
   let isReviewingInstructions = false;
