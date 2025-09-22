@@ -1747,6 +1747,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           Timer: {timer}s
         </div>
       {/if}
+
+      <!-- Video Recording for Action and Mini Game cards -->
+      {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
+        <VideoRecorder />
+      {/if}
     </div>
   {/if}
   {/if}
