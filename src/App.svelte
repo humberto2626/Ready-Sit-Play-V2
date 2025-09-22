@@ -467,7 +467,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   function getTimerDuration() {
     if (!activeCard) return 0;
-    if (activeCard.category === 'Action') return 10;
+    if (activeCard.category === 'Action') return 30;
     if (activeCard.category === 'Mini Game') return 30;
     return 0;
   }
@@ -1426,8 +1426,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .timer-button svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
   }
 
@@ -1792,10 +1792,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       <!-- Timer Button positioned below the recording button -->
       {#if canStartTimer()}
         <button class="timer-button" onclick={startTimer} disabled={!canStartTimer()}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C13.1 2 14 2.9 14 4V5H16C17.1 5 18 5.9 18 7V19C18 20.1 17.1 21 16 21H8C6.9 21 6 20.1 6 19V7C6 5.9 6.9 5 8 5H10V4C10 2.9 10.9 2 12 2ZM12 4C11.4 4 11 4.4 11 5V6H13V5C13 4.4 12.6 4 12 4ZM8 7V19H16V7H8ZM12 8.5C12.8 8.5 13.5 9.2 13.5 10V14C13.5 14.8 12.8 15.5 12 15.5S10.5 14.8 10.5 14V10C10.5 9.2 11.2 8.5 12 8.5Z" fill="currentColor"/>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 2V4H16V2H8Z" fill="currentColor"/>
+            <path d="M7 6C7 5.44772 7.44772 5 8 5H16C16.5523 5 17 5.44772 17 6V7C17 7.55228 16.5523 8 16 8H15V9C15 10.1046 14.1046 11 13 11H12.5L16 14.5V16C16 17.1046 15.1046 18 14 18H10C8.89543 18 8 17.1046 8 16V14.5L11.5 11H11C9.89543 11 9 10.1046 9 9V8H8C7.44772 8 7 7.55228 7 7V6Z" fill="currentColor"/>
+            <path d="M8 19V20H16V19H8Z" fill="currentColor"/>
+            <circle cx="12" cy="14" r="1" fill="currentColor"/>
           </svg>
-          30s
         </button>
       {/if}
     </div>
