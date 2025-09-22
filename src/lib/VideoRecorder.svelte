@@ -384,13 +384,6 @@
     background-color: rgba(100, 108, 255, 0.1);
   }
 
-  .camera-selection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
   .camera-buttons {
     display: flex;
     gap: 0.5rem;
@@ -423,7 +416,7 @@
   .record-btn {
     position: fixed;
     top: 80px;
-    left: 20px;
+    right: 20px;
     width: 60px;
     height: 60px;
     background: linear-gradient(45deg, #ff6b35, #ffd700);
