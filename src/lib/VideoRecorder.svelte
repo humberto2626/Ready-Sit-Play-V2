@@ -12,9 +12,38 @@
   let liveVideoElement = null;
   let recordedVideoElement = null;
 
-  function selectCamera(mode) {
-    facingMode = mode;
-    console.log('Camera selected:', mode === 'user' ? 'Front' : 'Back');
+  async function selectCamera() {
+    // Toggle between front and back camera
+    facingMode = facingMode === 'user' ? 'environment' : 'user';
+    console.log('Camera switched to:', facingMode === 'user' ? 'Front' : 'Back');
+    
+    // If currently recording, restart with new camera
+    if (recordingStatus === 'recording') {
+      // Stop current recording
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+      
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      
+      // Stop current stream
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
+      }
+      
+      // Reset state and start new recording
+      recordedChunks = [];
+      
+      // Small delay to ensure cleanup is complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Start recording with new camera
+      await startRecording();
+    }
   }
 
   async function startRecording() {
@@ -326,24 +355,19 @@
       ></video>
       <div class="recording-controls">
         <div class="camera-selection">
-          <div class="camera-buttons">
-            <button 
-              class="camera-btn {facingMode === 'user' ? 'active' : ''}"
-              on:click={() => selectCamera('user')}
-            >
-              Front
-            </button>
-            <button 
-              class="camera-btn {facingMode === 'environment' ? 'active' : ''}"
-              on:click={() => selectCamera('environment')}
-            >
-              Back
-            </button>
-          </div>
+          <button class="camera-switch-btn" on:click={selectCamera}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9H15L13.5 7.5C13.1 7.1 12.6 6.9 12 6.9S10.9 7.1 10.5 7.5L9 9H3C1.9 9 1 9.9 1 11V19C1 20.1 1.9 21 3 21H21C22.1 21 23 20.1 23 19V11C23 9.9 22.1 9 21 9ZM12 18C9.8 18 8 16.2 8 14S9.8 10 12 10S16 11.8 16 14S14.2 18 12 18Z" fill="currentColor"/>
+              <path d="M16.5 12.5L14.5 10.5M14.5 10.5L12.5 12.5M14.5 10.5V14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7.5 15.5L9.5 17.5M9.5 17.5L11.5 15.5M9.5 17.5V11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </div>
         <div class="countdown">{countdown}s</div>
-        <button class="stop-btn" on:click={stopRecording}>
-          Stop Recording
+        <button class="stop-btn-container" on:click={stopRecording}>
+          <div class="stop-btn-circle">
+            <div class="stop-btn-square"></div>
+          </div>
         </button>
       </div>
     </div>
@@ -372,33 +396,34 @@
 </div>
 
 <style>
-  .camera-buttons {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .camera-btn {
+  .camera-switch-btn {
     background: rgba(255, 255, 255, 0.2);
     color: white;
     border: 2px solid rgba(255, 255, 255, 0.5);
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
+    padding: 0.75rem;
+    border-radius: 50%;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
   }
 
-  .camera-btn:hover {
+  .camera-switch-btn:hover {
     background: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.8);
     color: white;
+    transform: scale(1.05);
   }
 
-  .camera-btn.active {
-    background: rgba(100, 108, 255, 0.8);
-    border-color: rgba(100, 108, 255, 1);
-    color: white;
+  .camera-switch-btn svg {
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
   }
 
   .record-btn {
@@ -508,9 +533,15 @@
     margin-bottom: 0.5rem;
   }
 
-  .fullscreen-recording .camera-btn {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.8rem;
+  .fullscreen-recording .camera-switch-btn {
+    width: 52px;
+    height: 52px;
+    padding: 0.875rem;
+  }
+
+  .fullscreen-recording .camera-switch-btn svg {
+    width: 26px;
+    height: 26px;
   }
 
   .fullscreen-recording .countdown {
@@ -521,18 +552,15 @@
     font-weight: bold;
   }
 
-  .fullscreen-recording .stop-btn {
-    background: rgba(255, 107, 107, 0.9) !important;
-    color: white !important;
-    font-size: 1rem;
-    padding: 0.75rem 1.25rem;
-    border-radius: 20px;
-    border: 2px solid rgba(255, 107, 107, 1);
+  .fullscreen-recording .stop-btn-circle {
+    width: 48px;
+    height: 48px;
+    box-shadow: 0 3px 12px rgba(255, 68, 68, 0.5);
   }
 
-  .fullscreen-recording .stop-btn:hover {
-    background: rgba(255, 82, 82, 1) !important;
-    transform: scale(1.05);
+  .fullscreen-recording .stop-btn-square {
+    width: 18px;
+    height: 18px;
   }
 
   .fullscreen-recording .recorded-video {
@@ -604,7 +632,37 @@
     border: 2px solid #ff6b35;
   }
 
-  .stop-btn, .download-btn, .reset-btn {
+  .stop-btn-container {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease;
+  }
+
+  .stop-btn-container:hover {
+    transform: scale(1.05);
+  }
+
+  .stop-btn-circle {
+    width: 44px;
+    height: 44px;
+    background: #ff4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.4);
+  }
+
+  .stop-btn-square {
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 2px;
+  }
+
+  .download-btn, .reset-btn {
     background: #ff6b6b;
     color: white;
     border: none;
@@ -632,10 +690,6 @@
 
   .reset-btn {
     background: #646cff;
-  }
-
-  .stop-btn:hover {
-    background: #ff5252;
   }
 
   .download-btn:hover {
