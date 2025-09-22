@@ -522,16 +522,16 @@
 
   .fullscreen-recording .recording-controls {
     position: absolute;
-    bottom: 4rem;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 0.75rem;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.7);
-    padding: 0.5rem 1rem;
-    border-radius: 25px;
+    padding: 1rem 0.5rem;
+    border-radius: 15px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
@@ -584,16 +584,16 @@
 
   .fullscreen-recording .recorded-controls {
     position: absolute;
-    bottom: 4rem;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 1rem;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.7);
-    padding: 1rem 1.5rem;
-    border-radius: 25px;
+    padding: 1rem 0.5rem;
+    border-radius: 15px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
