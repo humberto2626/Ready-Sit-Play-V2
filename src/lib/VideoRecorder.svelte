@@ -514,7 +514,7 @@
     height: 100% !important;
     max-width: 100% !important;
     max-height: 100% !important;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 0 !important;
     border: none !important;
     background-color: black;
@@ -576,7 +576,7 @@
     height: 100% !important;
     max-width: 100% !important;
     max-height: 100% !important;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 0 !important;
     border: none !important;
     background-color: black;
