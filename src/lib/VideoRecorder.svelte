@@ -186,18 +186,18 @@
           class="camera-btn {facingMode === 'user' ? 'active' : ''}"
           on:click={() => selectCamera('user')}
         >
-          📱 Front
+          Front
         </button>
         <button 
           class="camera-btn {facingMode === 'environment' ? 'active' : ''}"
           on:click={() => selectCamera('environment')}
         >
-          📷 Back
+          Back
         </button>
       </div>
     </div>
     <button class="record-btn" on:click={startRecording}>
-      📹 Record Training Video
+      Record Training Video
     </button>
   {:else if recordingStatus === 'recording'}
     <div class="recording-container" class:fullscreen-recording={recordingStatus === 'recording'}>
@@ -209,9 +209,9 @@
         class="live-video"
       ></video>
       <div class="recording-controls">
-        <div class="countdown">⏱️ {countdown}s</div>
+        <div class="countdown">{countdown}s</div>
         <button class="stop-btn" on:click={stopRecording}>
-          ⏹️ Stop Recording
+          Stop Recording
         </button>
       </div>
     </div>
@@ -226,10 +226,10 @@
       ></video>
       <div class="recorded-controls">
         <button class="download-btn" on:click={downloadVideo}>
-          💾 Download Video
+          Download Video
         </button>
         <button class="reset-btn" on:click={resetRecording}>
-          🔄 Record Again
+          Record Again
         </button>
       </div>
     </div>
@@ -369,7 +369,7 @@
 
   .fullscreen-recording .recording-controls {
     position: absolute;
-    bottom: 2rem;
+    bottom: 4rem;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
