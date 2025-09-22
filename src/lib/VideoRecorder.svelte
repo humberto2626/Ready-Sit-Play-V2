@@ -364,10 +364,9 @@
       <div class="recording-controls">
         <div class="camera-selection">
           <button class="camera-switch-btn" on:click={selectCamera}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9H15L13.5 7.5C13.1 7.1 12.6 6.9 12 6.9S10.9 7.1 10.5 7.5L9 9H3C1.9 9 1 9.9 1 11V19C1 20.1 1.9 21 3 21H21C22.1 21 23 20.1 23 19V11C23 9.9 22.1 9 21 9ZM12 18C9.8 18 8 16.2 8 14S9.8 10 12 10S16 11.8 16 14S14.2 18 12 18Z" fill="currentColor"/>
-              <path d="M16.5 12.5L14.5 10.5M14.5 10.5L12.5 12.5M14.5 10.5V14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M7.5 15.5L9.5 17.5M9.5 17.5L11.5 15.5M9.5 17.5V11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 9L12 4L17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M17 15L12 20L7 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
         </div>
@@ -408,7 +407,7 @@
     background: rgba(255, 255, 255, 0.2);
     color: white;
     border: 2px solid rgba(255, 255, 255, 0.5);
-    padding: 0.75rem;
+    padding: 0.5rem;
     border-radius: 50%;
     cursor: pointer;
     font-weight: 500;
@@ -417,8 +416,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
   }
 
   .camera-switch-btn:hover {
@@ -527,48 +526,49 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    flex-direction: row;
+    gap: 0.75rem;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.7);
-    padding: 1rem 1.5rem;
+    padding: 0.5rem 1rem;
     border-radius: 25px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .fullscreen-recording .camera-selection {
-    margin-bottom: 0.5rem;
+    margin: 0;
   }
 
   .fullscreen-recording .camera-switch-btn {
-    width: 52px;
-    height: 52px;
-    padding: 0.875rem;
+    width: 40px;
+    height: 40px;
+    padding: 0.5rem;
   }
 
   .fullscreen-recording .camera-switch-btn svg {
-    width: 26px;
-    height: 26px;
+    width: 20px;
+    height: 20px;
   }
 
   .fullscreen-recording .countdown {
     color: white !important;
     background: rgba(255, 107, 53, 0.8) !important;
     border: 2px solid rgba(255, 107, 53, 1) !important;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
+    padding: 0.4rem 0.8rem;
   }
 
   .fullscreen-recording .stop-btn-circle {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     box-shadow: 0 3px 12px rgba(255, 68, 68, 0.5);
   }
 
   .fullscreen-recording .stop-btn-square {
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
   }
 
   .fullscreen-recording .recorded-video {
