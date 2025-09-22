@@ -584,11 +584,9 @@
 
   .fullscreen-recording .recorded-controls {
     position: absolute;
-    right: 20px;
     top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
+   display: flex;
+    flex-direction: row;
     gap: 1rem;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.7);
