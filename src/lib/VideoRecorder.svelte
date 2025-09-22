@@ -248,16 +248,19 @@
     }
   }
 
-  function resetRecording() {
+  async function resetRecording() {
     console.log('Resetting recording...');
-    recordingStatus = 'idle';
-    recordedVideoUrl = '';
-    recordedChunks = [];
-    countdown = 30;
     
     if (recordedVideoUrl) {
       URL.revokeObjectURL(recordedVideoUrl);
+      recordedVideoUrl = '';
     }
+    
+    recordedChunks = [];
+    countdown = 30;
+    
+    // Immediately start a new recording session
+    await startRecording();
   }
 
   function downloadVideo() {
