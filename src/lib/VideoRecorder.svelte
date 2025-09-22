@@ -584,7 +584,7 @@
 
   .fullscreen-recording .recorded-controls {
     position: absolute;
-    top: 80%;
+    top: 75%;
    display: flex;
     flex-direction: row;
     gap: 1rem;
