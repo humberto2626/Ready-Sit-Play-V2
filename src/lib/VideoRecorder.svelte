@@ -200,7 +200,7 @@
       📹 Record Training Video
     </button>
   {:else if recordingStatus === 'recording'}
-    <div class="recording-container">
+    <div class="recording-container" class:fullscreen-recording={recordingStatus === 'recording'}>
       <video 
         bind:this={liveVideoElement}
         autoplay 
@@ -335,6 +335,73 @@
   .recording-container, .recorded-container {
     width: 100%;
     max-width: 500px;
+  }
+
+  .fullscreen-recording {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    max-width: none !important;
+    gap: 0;
+  }
+
+  .fullscreen-recording .live-video {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain;
+    border-radius: 0 !important;
+    border: none !important;
+    background-color: black;
+  }
+
+  .fullscreen-recording .recording-controls {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 1rem 1.5rem;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .fullscreen-recording .countdown {
+    color: white !important;
+    background: rgba(255, 107, 53, 0.8) !important;
+    border: 2px solid rgba(255, 107, 53, 1) !important;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  .fullscreen-recording .stop-btn {
+    background: rgba(255, 107, 107, 0.9) !important;
+    color: white !important;
+    font-size: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 107, 107, 1);
+  }
+
+  .fullscreen-recording .stop-btn:hover {
+    background: rgba(255, 82, 82, 1) !important;
+    transform: scale(1.05);
   }
 
   .countdown {
