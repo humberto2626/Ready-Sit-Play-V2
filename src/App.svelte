@@ -109,9 +109,6 @@
   let showMiniGameExplanation = false;
   let currentMiniGameExplanation = '';
 
-  // Track if instructions are being reviewed (vs automatic game flow)
-  let isReviewingInstructions = false;
-
   // Action card instructions tooltip
   let showActionTooltip = false;
   let actionTooltipContent = '';
@@ -218,7 +215,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   function showActionInstruction(card: Card) {
-    isReviewingInstructions = true;
     if (card.category === 'Action' && actionInstructions[card.label]) {
       actionTooltipContent = actionInstructions[card.label];
       actionTooltipCard = card;
@@ -227,7 +223,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   function showChallengeInstruction(card: Card) {
-    isReviewingInstructions = true;
     if (card.category === 'Challenge' && challengeInstructions[card.label]) {
       actionTooltipContent = challengeInstructions[card.label];
       actionTooltipCard = card;
@@ -235,22 +230,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
   }
   function hideActionInstruction() {
-    if (actionTooltipCard && actionTooltipCard.category === 'Challenge' && !isReviewingInstructions) {
-      if (currentTurn === 1) {
-        player1Cards = [actionTooltipCard, ...player1Cards];
-      } else if (currentTurn === 2) {
-        player2Cards = [actionTooltipCard, ...player2Cards];
-      } else if (currentTurn === 3) {
-        player3Cards = [actionTooltipCard, ...player3Cards];
-      }
-      activeCard = null;
-      currentTurn = getNextTurn(currentTurn);
-    }
-    
     isReviewingInstructions = false;
     showActionTooltip = false;
     actionTooltipContent = '';
-    actionTooltipCard = null;
   }
 
   function showMiniGameInstruction(card: Card) {
@@ -458,17 +440,24 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     if (activeCard.category === 'Challenge') {
       setTimeout(async () => {
         if (activeCard && activeCard.category === 'Challenge') {
+          // Store the challenge card temporarily
+          const challengeCard = activeCard;
+          
           // Add challenge card to current player's reserve
           if (currentTurn === 1) {
-            player1Cards = [activeCard, ...player1Cards];
+            player1Cards = [challengeCard, ...player1Cards];
           } else if (currentTurn === 2) {
-            player2Cards = [activeCard, ...player2Cards];
+            player2Cards = [challengeCard, ...player2Cards];
           } else if (currentTurn === 3) {
-            player3Cards = [activeCard, ...player3Cards];
+            player3Cards = [challengeCard, ...player3Cards];
           }
           
-          // Clear the active card and switch turn
-          showChallengeInstruction(activeCard);
+          // Clear the active card and switch turn BEFORE showing instructions
+          activeCard = null;
+          currentTurn = getNextTurn(currentTurn);
+          
+          // Now show the challenge instructions
+          showChallengeInstruction(challengeCard);
         }
       }, 3000);
     }
