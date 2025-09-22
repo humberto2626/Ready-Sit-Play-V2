@@ -115,6 +115,7 @@
   let actionTooltipCard: Card | null = null;
 
   // Track if instructions are being reviewed (vs automatic game flow)
+  let isReviewingInstructions = false;
   const actionInstructions: Record<string, string> = {
    'Recall': `Call the canine player from as far as possible into a treat in your extended hand.`,
     'Sit': `With a treat in your hand, grace just above the canine player nose until they sit.`,
@@ -230,9 +231,19 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
   }
   function hideActionInstruction() {
-    isReviewingInstructions = false;
+    if (actionTooltipCard && actionTooltipCard.category === 'Challenge') {
+      if (currentTurn === 'player1') {
+        player1Cards = [actionTooltipCard, ...player1Cards];
+      } else if (currentTurn === 'player2') {
+        player2Cards = [actionTooltipCard, ...player2Cards];
+      }
+      activeCard = null;
+      currentTurn = getNextTurn(currentTurn);
+    }
+    
     showActionTooltip = false;
     actionTooltipContent = '';
+    actionTooltipCard = null;
   }
 
   function showMiniGameInstruction(card: Card) {
@@ -440,24 +451,17 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     if (activeCard.category === 'Challenge') {
       setTimeout(async () => {
         if (activeCard && activeCard.category === 'Challenge') {
-          // Store the challenge card temporarily
-          const challengeCard = activeCard;
-          
           // Add challenge card to current player's reserve
           if (currentTurn === 1) {
-            player1Cards = [challengeCard, ...player1Cards];
+            player1Cards = [activeCard, ...player1Cards];
           } else if (currentTurn === 2) {
-            player2Cards = [challengeCard, ...player2Cards];
+            player2Cards = [activeCard, ...player2Cards];
           } else if (currentTurn === 3) {
-            player3Cards = [challengeCard, ...player3Cards];
+            player3Cards = [activeCard, ...player3Cards];
           }
           
-          // Clear the active card and switch turn BEFORE showing instructions
-          activeCard = null;
-          currentTurn = getNextTurn(currentTurn);
-          
-          // Now show the challenge instructions
-          showChallengeInstruction(challengeCard);
+          // Clear the active card and switch turn
+          showChallengeInstruction(activeCard);
         }
       }, 3000);
     }
