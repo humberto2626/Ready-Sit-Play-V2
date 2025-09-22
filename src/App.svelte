@@ -116,7 +116,6 @@
   let isReviewingInstructions = false;
 
   // Track if instructions are being reviewed (vs automatic game flow)
-  let isReviewingInstructions = false;
   const actionInstructions: Record<string, string> = {
    'Recall': `Call the canine player from as far as possible into a treat in your extended hand.`,
     'Sit': `With a treat in your hand, grace just above the canine player nose until they sit.`,
