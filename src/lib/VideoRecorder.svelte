@@ -315,17 +315,26 @@
   }
 
   .live-video, .recorded-video {
-    width: 300px;
-    height: 200px;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 70vh;
+    min-height: 200px;
     border-radius: 8px;
     border: 2px solid #333;
-    object-fit: cover;
+    object-fit: contain;
+    background-color: #000;
   }
 
   .recording-controls, .recorded-controls {
     display: flex;
     gap: 1rem;
     align-items: center;
+  }
+
+  .recording-container, .recorded-container {
+    width: 100%;
+    max-width: 500px;
   }
 
   .countdown {
@@ -370,18 +379,40 @@
   }
 
   @media (max-width: 800px) {
-    .live-video, .recorded-video {
-      width: 250px;
-      height: 167px;
-    }
-
     .video-recorder {
       padding: 0.75rem;
+    }
+
+    .live-video, .recorded-video {
+      max-height: 60vh;
+      min-height: 150px;
     }
 
     .recording-controls, .recorded-controls {
       flex-direction: column;
       gap: 0.5rem;
+    }
+  }
+
+  @media (orientation: landscape) and (max-width: 800px) {
+    .live-video, .recorded-video {
+      max-height: 50vh;
+      max-width: 80vw;
+    }
+    
+    .recording-container, .recorded-container {
+      max-width: 80vw;
+    }
+  }
+
+  @media (orientation: portrait) and (max-width: 800px) {
+    .live-video, .recorded-video {
+      max-height: 40vh;
+      max-width: 90vw;
+    }
+    
+    .recording-container, .recorded-container {
+      max-width: 90vw;
     }
   }
 </style>
