@@ -312,23 +312,6 @@
 
 <div class="video-recorder">
   {#if recordingStatus === 'idle'}
-    <div class="camera-selection">
-      <h3>Select Camera:</h3>
-      <div class="camera-buttons">
-        <button 
-          class="camera-btn {facingMode === 'user' ? 'active' : ''}"
-          on:click={() => selectCamera('user')}
-        >
-          Front
-        </button>
-        <button 
-          class="camera-btn {facingMode === 'environment' ? 'active' : ''}"
-          on:click={() => selectCamera('environment')}
-        >
-          Back
-        </button>
-      </div>
-    </div>
     <button class="record-btn" on:click={startRecording}>
       Rec
     </button>
@@ -342,6 +325,22 @@
         class="live-video"
       ></video>
       <div class="recording-controls">
+        <div class="camera-selection">
+          <div class="camera-buttons">
+            <button 
+              class="camera-btn {facingMode === 'user' ? 'active' : ''}"
+              on:click={() => selectCamera('user')}
+            >
+              Front
+            </button>
+            <button 
+              class="camera-btn {facingMode === 'environment' ? 'active' : ''}"
+              on:click={() => selectCamera('environment')}
+            >
+              Back
+            </button>
+          </div>
+        </div>
         <div class="countdown">{countdown}s</div>
         <button class="stop-btn" on:click={stopRecording}>
           Stop Recording
@@ -390,13 +389,6 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .camera-selection h3 {
-    margin: 0;
-    font-size: 1rem;
-    color: #646cff;
   }
 
   .camera-buttons {
@@ -405,25 +397,27 @@
   }
 
   .camera-btn {
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
-    border: 2px solid #646cff;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
     padding: 0.5rem 1rem;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
   }
 
   .camera-btn:hover {
-    background: #646cff;
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
     color: white;
   }
 
   .camera-btn.active {
-    background: #646cff;
+    background: rgba(100, 108, 255, 0.8);
+    border-color: rgba(100, 108, 255, 1);
     color: white;
-    box-shadow: 0 0 10px rgba(100, 108, 255, 0.5);
   }
 
   .record-btn {
@@ -519,13 +513,23 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 1rem;
+    align-items: center;
     background-color: rgba(0, 0, 0, 0.7);
     padding: 1rem 1.5rem;
     border-radius: 25px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .fullscreen-recording .camera-selection {
+    margin-bottom: 0.5rem;
+  }
+
+  .fullscreen-recording .camera-btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
   }
 
   .fullscreen-recording .countdown {
