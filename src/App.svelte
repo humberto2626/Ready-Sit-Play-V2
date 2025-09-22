@@ -1390,6 +1390,47 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     background: rgba(255, 255, 255, 1);
   }
 
+  .timer-button {
+    position: fixed;
+    top: 160px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #333, #000);
+    color: #ffffff;
+    border: none;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .timer-button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  .timer-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .timer-button svg {
+    width: 20px;
+    height: 20px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
+
   @media (max-width: 800px) {
     .card { width: 120px; height: 150px; font-size: 1rem; }
     .small-card { width: 75px; height: 100px; }
@@ -1712,11 +1753,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <!-- Timer controls below the cards -->
   {#if activeCard}
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.1rem;">
-      {#if canStartTimer()}
-        <button onclick={startTimer}>
-          Start Timer ({getTimerDuration()}s)
-        </button>
-      {/if}
       
       {#if activeCard.category === 'Action'}
         <button onclick={() => showActionInstruction(activeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
@@ -1751,6 +1787,16 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       <!-- Video Recording for Action and Mini Game cards -->
       {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
         <VideoRecorder />
+      {/if}
+
+      <!-- Timer Button positioned below the recording button -->
+      {#if canStartTimer()}
+        <button class="timer-button" onclick={startTimer} disabled={!canStartTimer()}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C13.1 2 14 2.9 14 4V5H16C17.1 5 18 5.9 18 7V19C18 20.1 17.1 21 16 21H8C6.9 21 6 20.1 6 19V7C6 5.9 6.9 5 8 5H10V4C10 2.9 10.9 2 12 2ZM12 4C11.4 4 11 4.4 11 5V6H13V5C13 4.4 12.6 4 12 4ZM8 7V19H16V7H8ZM12 8.5C12.8 8.5 13.5 9.2 13.5 10V14C13.5 14.8 12.8 15.5 12 15.5S10.5 14.8 10.5 14V10C10.5 9.2 11.2 8.5 12 8.5Z" fill="currentColor"/>
+          </svg>
+          30s
+        </button>
       {/if}
     </div>
   {/if}
