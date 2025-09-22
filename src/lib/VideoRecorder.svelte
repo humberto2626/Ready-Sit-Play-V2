@@ -13,30 +13,67 @@
 
   async function startRecording() {
     try {
+      console.log('Starting recording process...');
       // Request camera and microphone access
       videoStream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'user' }, 
         audio: true 
       });
+      console.log('Video stream obtained:', videoStream);
+      console.log('Video tracks:', videoStream.getVideoTracks());
+      console.log('Audio tracks:', videoStream.getAudioTracks());
 
       // Display live feed
       if (liveVideoElement) {
         liveVideoElement.srcObject = videoStream;
+        console.log('Live video element srcObject set:', liveVideoElement.srcObject);
+      } else {
+        console.error('Live video element not found!');
       }
 
-      // Set up MediaRecorder
-      mediaRecorder = new MediaRecorder(videoStream);
+      // Determine best supported MIME type for better mobile compatibility
+      let mimeType = '';
+      const supportedTypes = [
+        'video/mp4',
+        'video/webm;codecs=h264',
+        'video/webm;codecs=vp8',
+        'video/webm'
+      ];
+      
+      for (const type of supportedTypes) {
+        if (MediaRecorder.isTypeSupported(type)) {
+          mimeType = type;
+          break;
+        }
+      }
+      
+      console.log('Selected MIME type:', mimeType);
+      
+      // Set up MediaRecorder with optimal MIME type
+      mediaRecorder = mimeType 
+        ? new MediaRecorder(videoStream, { mimeType })
+        : new MediaRecorder(videoStream);
+        
+      console.log('MediaRecorder created with state:', mediaRecorder.state);
       recordedChunks = [];
 
       mediaRecorder.ondataavailable = (event) => {
+        console.log('Data available, chunk size:', event.data.size);
         if (event.data.size > 0) {
           recordedChunks.push(event.data);
         }
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        console.log('Recording stopped, total chunks:', recordedChunks.length);
+        console.log('Total data size:', recordedChunks.reduce((sum, chunk) => sum + chunk.size, 0));
+        
+        const blobType = mimeType || 'video/webm';
+        const blob = new Blob(recordedChunks, { type: blobType });
+        console.log('Blob created:', blob.size, 'bytes, type:', blob.type);
+        
         recordedVideoUrl = URL.createObjectURL(blob);
+        console.log('Video URL created:', recordedVideoUrl);
         recordingStatus = 'recorded';
         
         // Stop all tracks
@@ -49,6 +86,7 @@
       // Start recording
       mediaRecorder.start();
       recordingStatus = 'recording';
+      console.log('Recording started, status:', recordingStatus);
       countdown = 30;
 
       // Start countdown
@@ -61,13 +99,16 @@
 
     } catch (error) {
       console.error('Error accessing camera:', error);
+      console.error('Error details:', error.name, error.message);
       alert('Unable to access camera. Please make sure you have granted camera permissions.');
     }
   }
 
   function stopRecording() {
+    console.log('Stopping recording...');
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       mediaRecorder.stop();
+      console.log('MediaRecorder stopped');
     }
     
     if (countdownInterval) {
@@ -77,6 +118,7 @@
   }
 
   function resetRecording() {
+    console.log('Resetting recording...');
     recordingStatus = 'idle';
     recordedVideoUrl = '';
     recordedChunks = [];
@@ -88,6 +130,7 @@
   }
 
   function downloadVideo() {
+    console.log('Downloading video:', recordedVideoUrl);
     if (recordedVideoUrl) {
       const a = document.createElement('a');
       a.href = recordedVideoUrl;
