@@ -731,7 +731,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     setTimeout(async () => {
       flying = false;
       activeCard = null;
-      goldenBoneActive = false; // Reset after action is completed
+      goldenBoneActive = false; // Res
+    }
+    )
+  }et after action is completed
       kitchenThiefActive = false;
       timer = 0;
       timerRunning = false;
