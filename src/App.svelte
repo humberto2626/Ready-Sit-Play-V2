@@ -1202,6 +1202,31 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     height: 16px;
   }
 
+  .instruction-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(100, 108, 255, 0.9);
+    color: white;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .instruction-icon:hover {
+    background: rgba(100, 108, 255, 1);
+    transform: scale(1.1);
+  }
+
   @media (max-width: 800px) {
     .mini-game-content {
       width: 95%;
@@ -1575,15 +1600,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
             <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email (Optional):</label>
             <input type="email" id="email" bind:value={email} placeholder="Enter your email" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-            {#if card.type === 'Challenge'}
-              <button 
-                class="instruction-icon" 
-                on:click|stopPropagation={() => handleInstructionIconClick(card)}
-                title="View instructions"
-              >
-                i
-              </button>
-            {/if}
           </div>
         </div>
       {/if}
