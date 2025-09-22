@@ -313,7 +313,7 @@
 <div class="video-recorder">
   {#if recordingStatus === 'idle'}
     <button class="record-btn" on:click={startRecording}>
-      Rec
+      Rec.
     </button>
   {:else if recordingStatus === 'recording'}
     <div class="recording-container" class:fullscreen-recording={recordingStatus === 'recording'}>
