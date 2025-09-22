@@ -348,7 +348,7 @@
       </div>
     </div>
   {:else if recordingStatus === 'recorded'}
-    <div class="recorded-container">
+    <div class="recorded-container fullscreen-recording">
       <video 
         bind:this={recordedVideoElement}
         src={recordedVideoUrl}
@@ -544,6 +544,65 @@
 
   .fullscreen-recording .stop-btn:hover {
     background: rgba(255, 82, 82, 1) !important;
+    transform: scale(1.05);
+  }
+
+  .fullscreen-recording .recorded-video {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain;
+    border-radius: 0 !important;
+    border: none !important;
+    background-color: black;
+  }
+
+  .fullscreen-recording .recorded-controls {
+    position: absolute;
+    bottom: 4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 1rem 1.5rem;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .fullscreen-recording .download-btn,
+  .fullscreen-recording .share-btn,
+  .fullscreen-recording .reset-btn {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+    padding: 0.75rem 1.25rem;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .fullscreen-recording .download-btn:hover {
+    background: rgba(34, 197, 94, 0.8) !important;
+    border-color: rgba(34, 197, 94, 1) !important;
+    transform: scale(1.05);
+  }
+
+  .fullscreen-recording .share-btn:hover {
+    background: rgba(59, 130, 246, 0.8) !important;
+    border-color: rgba(59, 130, 246, 1) !important;
+    transform: scale(1.05);
+  }
+
+  .fullscreen-recording .reset-btn:hover {
+    background: rgba(100, 108, 255, 0.8) !important;
+    border-color: rgba(100, 108, 255, 1) !important;
     transform: scale(1.05);
   }
 
