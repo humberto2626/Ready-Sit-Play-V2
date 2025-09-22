@@ -31,6 +31,12 @@
       console.log('Video tracks:', videoStream.getVideoTracks());
       console.log('Audio tracks:', videoStream.getAudioTracks());
       
+      // Set recording status to render the video element in DOM
+      recordingStatus = 'recording';
+      
+      // Wait for the next tick to ensure DOM is updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Check if tracks are active
       const videoTracks = videoStream.getVideoTracks();
       const audioTracks = videoStream.getAudioTracks();
@@ -182,7 +188,6 @@
 
       // Start recording
       mediaRecorder.start();
-      recordingStatus = 'recording';
       console.log('Recording started, status:', recordingStatus);
       countdown = 30;
 
