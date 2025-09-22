@@ -8,15 +8,21 @@
   let recordedVideoUrl = '';
   let countdown = 30;
   let countdownInterval = null;
+  let facingMode = 'environment'; // Default to back camera
   let liveVideoElement = null;
   let recordedVideoElement = null;
+
+  function selectCamera(mode) {
+    facingMode = mode;
+    console.log('Camera selected:', mode === 'user' ? 'Front' : 'Back');
+  }
 
   async function startRecording() {
     try {
       console.log('Starting recording process...');
       // Request camera and microphone access
       videoStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' }, 
+        video: { facingMode: facingMode }, 
         audio: true 
       });
       console.log('Video stream obtained:', videoStream);
@@ -26,7 +32,23 @@
       // Display live feed
       if (liveVideoElement) {
         liveVideoElement.srcObject = videoStream;
+        console.log('Live video element:', liveVideoElement);
         console.log('Live video element srcObject set:', liveVideoElement.srcObject);
+        console.log('Live video element dimensions:', {
+          width: liveVideoElement.offsetWidth,
+          height: liveVideoElement.offsetHeight,
+          clientWidth: liveVideoElement.clientWidth,
+          clientHeight: liveVideoElement.clientHeight
+        });
+        
+        // Explicitly try to play the video
+        try {
+          await liveVideoElement.play();
+          console.log('Live video play() succeeded');
+        } catch (playError) {
+          console.error('Live video play() failed:', playError);
+          console.error('Play error details:', playError.name, playError.message);
+        }
       } else {
         console.error('Live video element not found!');
       }
@@ -157,6 +179,23 @@
 
 <div class="video-recorder">
   {#if recordingStatus === 'idle'}
+    <div class="camera-selection">
+      <h3>Select Camera:</h3>
+      <div class="camera-buttons">
+        <button 
+          class="camera-btn {facingMode === 'user' ? 'active' : ''}"
+          on:click={() => selectCamera('user')}
+        >
+          📱 Front
+        </button>
+        <button 
+          class="camera-btn {facingMode === 'environment' ? 'active' : ''}"
+          on:click={() => selectCamera('environment')}
+        >
+          📷 Back
+        </button>
+      </div>
+    </div>
     <button class="record-btn" on:click={startRecording}>
       📹 Record Training Video
     </button>
@@ -208,6 +247,47 @@
     border: 2px solid #646cff;
     border-radius: 12px;
     background-color: rgba(100, 108, 255, 0.1);
+  }
+
+  .camera-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .camera-selection h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #646cff;
+  }
+
+  .camera-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .camera-btn {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: 2px solid #646cff;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .camera-btn:hover {
+    background: #646cff;
+    color: white;
+  }
+
+  .camera-btn.active {
+    background: #646cff;
+    color: white;
+    box-shadow: 0 0 10px rgba(100, 108, 255, 0.5);
   }
 
   .record-btn {
