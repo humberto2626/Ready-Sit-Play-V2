@@ -419,7 +419,7 @@
     right: 20px;
     width: 60px;
     height: 60px;
-    background: linear-gradient(45deg, #ffd700, #ff6b35);
+    background: linear-gradient(45deg, #ff6b35, #ffd700);
     color: #ffffff;
     border: none;
     padding: 0;
