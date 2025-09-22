@@ -372,18 +372,6 @@
 </div>
 
 <style>
-  .video-recorder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1rem;
-    padding: 1rem;
-    border: 2px solid #646cff;
-    border-radius: 12px;
-    background-color: rgba(100, 108, 255, 0.1);
-  }
-
   .camera-buttons {
     display: flex;
     gap: 0.5rem;
