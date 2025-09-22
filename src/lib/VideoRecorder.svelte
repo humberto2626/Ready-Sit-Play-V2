@@ -370,9 +370,6 @@
             </svg>
           </button>
         </div>
-        <div class="countdown-display">
-          {countdown}s
-        </div>
         <button class="stop-btn-container" on:click={stopRecording}>
           <div class="stop-btn-circle">
             <div class="stop-btn-square"></div>
@@ -649,17 +646,6 @@
     height: 16px;
     background: white;
     border-radius: 2px;
-  }
-
-  .countdown-display {
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
   }
 
   .download-btn, .reset-btn {
