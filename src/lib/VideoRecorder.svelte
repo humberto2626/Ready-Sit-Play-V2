@@ -330,7 +330,7 @@
       </div>
     </div>
     <button class="record-btn" on:click={startRecording}>
-      Record Training Video
+      Rec
     </button>
   {:else if recordingStatus === 'recording'}
     <div class="recording-container" class:fullscreen-recording={recordingStatus === 'recording'}>
@@ -427,20 +427,30 @@
   }
 
   .record-btn {
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
     background: linear-gradient(45deg, #ff6b35, #ffd700);
     color: #333;
     border: none;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+    padding: 0;
+    font-size: 0.9rem;
     font-weight: bold;
-    border-radius: 25px;
+    border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .record-btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(255, 107, 53, 0.5);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
   }
 
   .recording-container, .recorded-container {
