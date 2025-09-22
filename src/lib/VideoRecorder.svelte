@@ -243,6 +243,59 @@
     }
   }
 
+  async function shareVideo() {
+    console.log('Attempting to share video...');
+    
+    if (!navigator.share) {
+      alert('Sharing is not supported on this browser. You can download the video instead.');
+      return;
+    }
+
+    if (!recordedChunks.length) {
+      alert('No video to share. Please record a video first.');
+      return;
+    }
+
+    try {
+      // Determine the MIME type and file extension
+      const mimeType = recordedChunks[0].type || 'video/mp4';
+      const extension = mimeType.includes('webm') ? 'webm' : 'mp4';
+      
+      // Create a File object from the recorded chunks
+      const videoBlob = new Blob(recordedChunks, { type: mimeType });
+      const videoFile = new File(
+        [videoBlob], 
+        `training-video-${new Date().toISOString().slice(0, 19)}.${extension}`, 
+        { type: mimeType }
+      );
+
+      console.log('Sharing file:', videoFile.name, 'Size:', videoFile.size, 'Type:', videoFile.type);
+
+      // Check if the browser supports sharing files
+      if (navigator.canShare && !navigator.canShare({ files: [videoFile] })) {
+        alert('Your browser supports sharing, but not video files. You can download the video instead.');
+        return;
+      }
+
+      // Share the video file
+      await navigator.share({
+        title: 'Dog Training Video',
+        text: 'Check out this dog training video from Ready, Sit, Play!',
+        files: [videoFile]
+      });
+
+      console.log('Video shared successfully');
+    } catch (error) {
+      console.error('Error sharing video:', error);
+      
+      if (error.name === 'AbortError') {
+        console.log('User cancelled the share');
+      } else {
+        alert('Failed to share video. You can download it instead.');
+      }
+    }
+  }
+
   onDestroy(() => {
     // Clean up resources
     if (videoStream) {
@@ -307,6 +360,9 @@
       <div class="recorded-controls">
         <button class="download-btn" on:click={downloadVideo}>
           Download Video
+        </button>
+        <button class="share-btn" on:click={shareVideo}>
+          Share Video
         </button>
         <button class="reset-btn" on:click={resetRecording}>
           Record Again
@@ -509,6 +565,17 @@
     background: #22c55e;
   }
 
+  .share-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease;
+  }
+
   .reset-btn {
     background: #646cff;
   }
@@ -519,6 +586,10 @@
 
   .download-btn:hover {
     background: #16a34a;
+  }
+
+  .share-btn:hover {
+    background: #2563eb;
   }
 
   .reset-btn:hover {
