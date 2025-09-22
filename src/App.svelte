@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import VideoRecorder from './lib/VideoRecorder.svelte';
 
   type Card = {
     id: number;
