@@ -1168,6 +1168,37 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
    flex-shrink: 0;
  }
 
+  .card-info-icon {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+  }
+
+  .card-info-icon:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+  }
+
+  .card-info-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
   @media (max-width: 800px) {
     .mini-game-content {
       width: 95%;
@@ -1736,12 +1767,38 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
              class:flying-left={flying && flyingDirection === 'left'}
              class:flying-right={flying && flyingDirection === 'right'}>
           <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
+          <button 
+            class="card-info-icon"
+            onclick={() => {
+              if (activeCard.category === 'Action') {
+                showActionInstruction(activeCard);
+              } else if (activeCard.category === 'Challenge') {
+                showChallengeInstruction(activeCard);
+              } else if (activeCard.category === 'Mini Game') {
+                showMiniGameInstruction(activeCard);
+              }
+            }}
+            title="Show instructions for this card"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+            </svg>
+          </button>
         </div>
 
         <!-- If challenge card active, show it side by side -->
         {#if selectedChallengeCard}
           <div class="card open edge-challenge">
           <img src="/card-images/{selectedChallengeCard.id}.png" alt="Card {selectedChallengeCard.id}" class="card-image" />
+            <button 
+              class="card-info-icon"
+              onclick={() => showChallengeInstruction(selectedChallengeCard)}
+              title="Show instructions for this challenge card"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+              </svg>
+            </button>
             <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
               (Challenge Card Active)
             </div>
@@ -1755,9 +1812,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.1rem;">
       
       {#if activeCard.category === 'Action'}
-        <button onclick={() => showActionInstruction(activeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
-          Show Instructions
-        </button>
         <button onclick={actionCompleted} disabled={flying || gameOver} style="font-size: 0.9rem; padding: 0.25rem 0.5rem; background: #22c55e; color: white;">
           Action Completed
         </button>
@@ -1766,18 +1820,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         </button>
       {/if}
       
-      {#if selectedChallengeCard}
-        <button onclick={() => showChallengeInstruction(selectedChallengeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
-          Show Challenge Instructions
-        </button>
-      {/if}
-      
-      {#if activeCard.category === 'Mini Game'}
-        <button onclick={() => showMiniGameInstruction(activeCard)} style="font-size: 0.9rem; padding: 0.25rem 0.5rem;">
-          Show Mini Game Rules
-        </button>
-      {/if}
-
       {#if timerRunning}
         <div style="font-weight: bold; font-size: 1.2rem; color: #ff6b35;">
           Timer: {timer}s
