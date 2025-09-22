@@ -418,10 +418,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       const actionIndex = shuffledDeck.findIndex(c => c.category === 'Action');
       console.log('Action index found:', actionIndex);
       if (actionIndex === -1) {
-  
-      }
-    }
-  }      // No action card left: put back challenge card to player's pile and draw next normally
+        // No action card left: put back challenge card to player's pile and draw next normally
         if (challengeCardPlayer === 1) {
           player1Cards = [selectedChallengeCard, ...player1Cards];
         } else if (challengeCardPlayer === 2) {
@@ -1775,6 +1772,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           <button 
             class="card-info-icon"
             onclick={() => {
+              isReviewingInstructions = true;
+              isReviewingInstructions = true;
               if (activeCard.category === 'Action') {
                 showActionInstruction(activeCard);
               } else if (activeCard.category === 'Challenge') {
