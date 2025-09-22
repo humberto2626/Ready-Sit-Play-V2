@@ -407,7 +407,7 @@
     right: 20px;
     width: 60px;
     height: 60px;
-    background: linear-gradient(45deg, #ff6b35, #ff6b35);
+    background: linear-gradient(45deg, #ff6b35, #ff3535);
     color: #ffffff;
     border: none;
     padding: 0;
