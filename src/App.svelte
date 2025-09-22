@@ -1555,7 +1555,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             <img src="/card-images/27.png" class="card-image" />
           </div>
           <p><strong>Awarded to the first Mini-Game winner</strong></p>
-          <p>A one-time higher value treat.</p>
+          <p>With which your turn has no time limit</p>
           <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/28.png" class="card-image" />
           </div>
