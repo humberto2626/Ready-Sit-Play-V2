@@ -370,7 +370,11 @@
             </svg>
           </button>
         </div>
-        <div class="countdown">{countdown}s</div>
+        <button class="hourglass-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
         <button class="stop-btn-container" on:click={stopRecording}>
           <div class="stop-btn-circle">
             <div class="stop-btn-square"></div>
@@ -430,6 +434,29 @@
   .camera-switch-btn svg {
     width: 24px;
     height: 24px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
+
+  .hourglass-btn {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: default;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+  }
+
+  .hourglass-btn svg {
+    width: 20px;
+    height: 20px;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
   }
 
@@ -551,15 +578,6 @@
     height: 20px;
   }
 
-  .fullscreen-recording .countdown {
-    color: white !important;
-    background: rgba(255, 107, 53, 0.8) !important;
-    border: 2px solid rgba(255, 107, 53, 1) !important;
-    font-size: 1rem;
-    font-weight: bold;
-    padding: 0.4rem 0.8rem;
-  }
-
   .fullscreen-recording .stop-btn-circle {
     width: 40px;
     height: 40px;
@@ -626,16 +644,6 @@
     background: rgba(100, 108, 255, 0.8) !important;
     border-color: rgba(100, 108, 255, 1) !important;
     transform: scale(1.05);
-  }
-
-  .countdown {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #ff6b35;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    border: 2px solid #ff6b35;
   }
 
   .stop-btn-container {
