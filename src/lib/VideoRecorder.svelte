@@ -419,8 +419,8 @@
     right: 20px;
     width: 60px;
     height: 60px;
-    background: linear-gradient(45deg, #ff6b35, #ffd700);
-    color: #333;
+    background: linear-gradient(45deg, #ffd700, #ff6b35);
+    color: #ffffff;
     border: none;
     padding: 0;
     font-size: 0.9rem;
