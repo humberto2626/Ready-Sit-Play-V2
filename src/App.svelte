@@ -224,10 +224,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
   }
 
-  function showChallengeInstruction(card: Card, isReviewing = false) {
-    if (isReviewing) {
-      isReviewingInstructions = true;
-    }
+  function showChallengeInstruction(card: Card) {
     if (card.category === 'Challenge' && challengeInstructions[card.label]) {
       actionTooltipContent = challengeInstructions[card.label];
       actionTooltipCard = card;
@@ -1578,6 +1575,15 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
             <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email (Optional):</label>
             <input type="email" id="email" bind:value={email} placeholder="Enter your email" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+            {#if card.type === 'Challenge'}
+              <button 
+                class="instruction-icon" 
+                on:click|stopPropagation={() => handleInstructionIconClick(card)}
+                title="View instructions"
+              >
+                i
+              </button>
+            {/if}
           </div>
         </div>
       {/if}
