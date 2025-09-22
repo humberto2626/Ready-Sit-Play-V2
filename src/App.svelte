@@ -789,7 +789,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       currentStep++;
     } else {
       showInstructions = false;
-      currentStep = 1; // Reset for next time
+      current
+    }
+  }Step = 1; // Reset for next time
       // Only auto-start the game if it hasn't been started yet
       if (shuffledDeck.length === 0 && player1Cards.length === 0 && player2Cards.length === 0) {
         animateShuffle();
