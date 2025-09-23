@@ -341,7 +341,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     selectedMiniGames = [...miniGames].sort(() => Math.random() - 0.5).slice(0, 3);
     miniGameReserve = miniGames.filter(card => !selectedMiniGames.includes(card));
 
-    shuffledDeck = [...actionAndChallenge, ...selectedMiniGames];
+    shuffledDeck =
+    ]
+  } [...actionAndChallenge, ...selectedMiniGames];
 
     for (let i = shuffledDeck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -1489,6 +1491,72 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
   }
 
+  .action-completed-btn {
+    position: fixed;
+    top: 240px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(45deg, #22c55e, #16a34a);
+    color: #ffffff;
+    border: none;
+    padding: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-completed-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+  }
+
+  .action-completed-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .action-failed-btn {
+    position: fixed;
+    top: 300px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(45deg, #ef4444, #dc2626);
+    color: #ffffff;
+    border: none;
+    padding: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-failed-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  }
+
+  .action-failed-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   @media (max-width: 800px) {
     .card { width: 120px; height: 150px; font-size: 1rem; }
     .small-card { width: 75px; height: 100px; }
@@ -1841,11 +1909,19 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.1rem;">
       
       {#if activeCard.category === 'Action'}
-        <button onclick={actionCompleted} disabled={flying || gameOver} style="font-size: 0.9rem; padding: 0.25rem 0.5rem; background: #22c55e; color: white;">
-          Action Completed
+        <button 
+          class="action-completed-btn" 
+          onclick={actionCompleted} 
+          disabled={flying || gameOver}
+        >
+          ✓
         </button>
-        <button onclick={actionCardFailed} disabled={flying || gameOver} style="font-size: 0.9rem; padding: 0.25rem 0.5rem; background: #ff6b6b; color: white;">
-          Action Failed
+        <button 
+          class="action-failed-btn" 
+          onclick={actionCardFailed} 
+          disabled={flying || gameOver}
+        >
+          ✗
         </button>
       {/if}
       
