@@ -2,6 +2,8 @@
   import { tick } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
 
+  let showVideoRecorder = false;
+
   type Card = {
     id: number;
     category: 'Action' | 'Challenge' | 'Mini Game';
