@@ -126,8 +126,7 @@
     'Down': `With a treat in your hand, grace the canine player chin and chest as you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
     'Back': `With the canine player sitting, hold a treat in your hand just above the top of the canine player head, putting your foot in between their front paws, move your hand towards their tail, waiting for them to move back.`,
     'Stay': `With the canine player sitting or laying down, show the palm of your hand and slowly take at least three steps backwards, return and reward the canine player self-control.`,
-    'Place': `With a towel on the floor, guide the canine player near it and 
-  }drop a treat in the towel, the moment they step on it, praise and reward them again.`
+    'Place': `With a towel on the floor, guide the canine player near it and drop a treat in the towel, the moment they step on it, praise and reward them again.`
 
   };
 
@@ -169,7 +168,8 @@
       1. Win by: Keeping the canine player sitting the longest time possible up to 30 seconds.
       2. Set Up: Each player positions the canine player in a "Sit" about 3 feet away from them, the timer starts the moment the canine player's bottom touches the floor.
       3. How to Play: Each player gets a 30 second turn, as the canine player sits the human players count out loud the seconds.
-      4. Tie Breaker: if both players reach the exact same count, repeat the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
+      4. Tie Breaker: if both players reach the exact same count, repeat
+  } the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
     `,
     'Pawathon': `
       1. Win by: Being the player to whom the canine player gives the most paws under 30 seconds.
