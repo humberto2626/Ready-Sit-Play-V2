@@ -1555,20 +1555,60 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     transform: none;
   }
 
+  .player-section {
+    border: 2px solid #646cff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    background-color: rgba(100, 108, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .player-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .player-cards-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .advantage-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
   .mini-game-win-btn {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    border-radius: 8px;
+    border: none;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.25s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
-    font-weight: bold;
     color: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: 1rem;
-    border: none;
+    white-space: nowrap;
   }
 
   .mini-game-win-btn-p1 {
