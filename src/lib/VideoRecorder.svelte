@@ -558,36 +558,28 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
-  .fullscreen-recording .download-btn,
-  .fullscreen-recording .share-btn,
-  .fullscreen-recording .reset-btn {
-    background: rgba(255, 255, 255, 0.2) !important;
-    color: white !important;
-    border: 2px solid rgba(255, 255, 255, 0.5) !important;
-    padding: 0.75rem 1.25rem;
-    border-radius: 20px;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
+  .fullscreen-recording .action-completed-btn,
+  .fullscreen-recording .action-failed-btn,
+  .fullscreen-recording .record-again-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
-  .fullscreen-recording .download-btn:hover {
-    background: rgba(34, 197, 94, 0.8) !important;
-    border-color: rgba(34, 197, 94, 1) !important;
-    transform: scale(1.05);
+  .fullscreen-recording .action-completed-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
   }
 
-  .fullscreen-recording .share-btn:hover {
-    background: rgba(59, 130, 246, 0.8) !important;
-    border-color: rgba(59, 130, 246, 1) !important;
-    transform: scale(1.05);
+  .fullscreen-recording .action-failed-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
   }
 
-  .fullscreen-recording .reset-btn:hover {
-    background: rgba(100, 108, 255, 0.8) !important;
-    border-color: rgba(100, 108, 255, 1) !important;
-    transform: scale(1.05);
+  .fullscreen-recording .record-again-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
   }
 
   .stop-btn-container {
@@ -620,46 +612,70 @@
     border-radius: 2px;
   }
 
-  .download-btn, .reset-btn {
-    background: #ff6b6b;
+  .action-completed-btn {
+    background: #22c55e;
     color: white;
     border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
+    padding: 0.75rem;
+    border-radius: 50%;
     cursor: pointer;
     font-weight: 500;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
   }
 
-  .download-btn {
-    background: #22c55e;
+  .action-completed-btn:hover {
+    background: #16a34a;
+    transform: scale(1.05);
   }
 
-  .share-btn {
+  .action-failed-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+
+  .action-failed-btn:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+  }
+
+  .record-again-btn {
     background: #3b82f6;
     color: white;
     border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
+    padding: 0.75rem;
+    border-radius: 50%;
     cursor: pointer;
     font-weight: 500;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
   }
 
-  .reset-btn {
-    background: #646cff;
-  }
-
-  .download-btn:hover {
-    background: #16a34a;
-  }
-
-  .share-btn:hover {
+  .record-again-btn:hover {
     background: #2563eb;
-  }
-
-  .reset-btn:hover {
-    background: #535bf2;
+    transform: scale(1.05);
   }
 
   @media (max-width: 800px) {
