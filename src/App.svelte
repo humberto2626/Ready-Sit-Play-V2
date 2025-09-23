@@ -187,4 +187,6 @@
     'Dog Roll': `
       1. Win by: Getting the canine player to complete the most rolls in a row under 30 seconds.
       2. Set Up: Each player positions the canine player in the "Down" position on a soft surface like grass or carpet.
-      3. How to Play: Each player guides the canine player to "Roll Over." Count consecutive successful rolls until the canine player stops
+      3. How to Play: Each player guides the canine player to "Roll Over." Count consecutive successful rolls until the canine player stops.
+    `
+  };
