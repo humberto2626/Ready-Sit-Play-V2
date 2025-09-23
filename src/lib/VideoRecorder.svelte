@@ -263,11 +263,35 @@
       recordedVideoUrl = '';
     }
     
+    // Stop video stream if it exists
+    if (videoStream) {
+      videoStream.getTracks().forEach(track => track.stop());
+      videoStream = null;
+    }
+    
     recordedChunks = [];
     countdown = 30;
+    recordingStatus = 'idle';
     
-    // Immediately start a new recording session
-    await startRecording();
+    // Don't automatically start recording - let user decide
+  }
+
+  function handleVideoCompleted() {
+    console.log('Video completed, dispatching event...');
+    dispatch('videoAction', {
+      url: recordedVideoUrl,
+      status: 'completed'
+    });
+    resetRecording();
+  }
+
+  function handleVideoFailed() {
+    console.log('Video failed, dispatching event...');
+    dispatch('videoAction', {
+      url: recordedVideoUrl,
+      status: 'failed'
+    });
+    resetRecording();
   }
 
   onDestroy(() => {
