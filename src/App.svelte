@@ -143,7 +143,8 @@
     'Two Ball Fetch': `
       1. Win by: Getting more balls fetched under 30 seconds.
       2. Set Up: You get the two balls on your turn, the timer starts the moment you toss the first one.
-*The throw has to be at least three times the length of the canine player.
+*The thro
+  }w has to be at least three times the length of the canine player.
 *For the fetch to count the canine player has to come to where you can pick up the ball without moving one of your feet.
       3. How to Play: While keeping one foot glued where you are standing, throw the first ball, once the canine player brings it back, show the second one, when the canine player drops the first ball, throw the second one.
       4. Tie Breaker: Each player has a ball, standing next to each other, both throw it at the same time, the ball that gets fetched wins.
@@ -461,26 +462,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           }
           
           // Clear the active card and switch turn
-          // Store the card before clearing activeCard
-          const processedCard = activeCard;
-          
-          // Perform all game state updates immediately
-          if (currentTurn === 1) {
-            player1Hand = [...player1Hand, processedCard];
-          } else if (currentTurn === 2) {
-            player2Hand = [...player2Hand, processedCard];
-          } else if (currentTurn === 3) {
-            player3Hand = [...player3Hand, processedCard];
-          }
-          
-          // Clear the active card
-          activeCard = null;
-          
-          // Advance to next player
-          currentTurn = currentTurn === 3 ? 1 : currentTurn + 1;
-          
-          // Then show the instruction tooltip (without affecting game state)
-          showChallengeInstruction(processedCard, false);
+          showChallengeInstruction(activeCard);
         }
       }, 3000);
     }
