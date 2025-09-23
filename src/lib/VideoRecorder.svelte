@@ -359,9 +359,6 @@
         <button class="action-failed-btn" on:click={handleVideoFailed}>
           ✗
         </button>
-        <button class="record-again-btn" on:click={resetRecording}>
-          🔄
-        </button>
       </div>
     </div>
   {/if}
@@ -559,8 +556,7 @@
   }
 
   .fullscreen-recording .action-completed-btn,
-  .fullscreen-recording .action-failed-btn,
-  .fullscreen-recording .record-again-btn {
+  .fullscreen-recording .action-failed-btn {
     width: 60px;
     height: 60px;
     font-size: 1.5rem;
@@ -575,11 +571,6 @@
   .fullscreen-recording .action-failed-btn:hover {
     transform: scale(1.1);
     box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-  }
-
-  .fullscreen-recording .record-again-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
   }
 
   .stop-btn-container {
@@ -653,28 +644,6 @@
 
   .action-failed-btn:hover {
     background: #dc2626;
-    transform: scale(1.05);
-  }
-
-  .record-again-btn {
-    background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 0.75rem;
-    border-radius: 50%;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-  }
-
-  .record-again-btn:hover {
-    background: #2563eb;
     transform: scale(1.05);
   }
 
