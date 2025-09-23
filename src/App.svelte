@@ -797,6 +797,16 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     showVideoRecorder = false;
   }
 
+  function handleCardSuccess() {
+    // TODO: Add your success logic here
+    console.log('Card action: Success');
+  }
+
+  function handleCardFailure() {
+    // TODO: Add your failure logic here
+    console.log('Card action: Failed');
+  }
+
   function startGame() {
     if (currentStep === 2) {
       if (!player1Name.trim() || !player2Name.trim() || !dogName.trim()) {
