@@ -1932,10 +1932,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             class="mini-game-win-btn mini-game-win-btn-p1" 
             on:click={() => handleMiniGameWin(1)}
           >
-            {player1Name || 'Player 1'} Wins This Round
+            {player1Name || 'Player 1'} Wins
           </button>
         </div>
-                <button class="remove-card-btn" on:click={() => removeCard(1, index)">×</button>
+      <button class="remove-card-btn" on:click={() => removeCard(1,index)">×</button>
               </div>
             {/each}
           </div>
