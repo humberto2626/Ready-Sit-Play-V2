@@ -272,7 +272,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       player1AdvantageCards: structuredClone(player1AdvantageCards),
       player2AdvantageCards: structuredClone(player2AdvantageCards),
       player3AdvantageCards: structuredClone(player3AdvantageCards),
-      InfiniteTimeActive: InfiniteTimeActive,
+      goldenBoneActive: InfiniteTimeActive,
       kitchenThiefActive: kitchenThiefActive,
       selectedChallengeCard: selectedChallengeCard,
       challengeCardPlayer: challengeCardPlayer,
