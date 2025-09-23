@@ -847,7 +847,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   function getAdvantageCardId(message: string): number {
-    if (message.includes("Golden Bone")) {
+    if (message.includes("Infinite Time")) {
       return 27;
     } else if (message.includes("Rain Coat")) {
       return 28;
