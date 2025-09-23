@@ -189,4 +189,4 @@
       2. Set Up: Each player positions the canine player in the "Down" position on a soft surface like grass or carpet.
       3. How to Play: Each player guides the canine player to "Roll Over." Count consecutive successful rolls until the canine player stops.
     `
-  }
+  };
