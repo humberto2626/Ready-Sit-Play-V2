@@ -440,13 +440,6 @@
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
   }
 
-  .countdown-display {
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-shadow: 0 0 5px rgba(0,0,0,0.5);
-  }
-
   .record-btn {
     position: fixed;
     top: 80px;
