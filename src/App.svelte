@@ -782,29 +782,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   function handleRecordedVideo(event) {
     console.log('Video action received:', event.detail);
     
-    // Execute the same game logic as the card action buttons
     if (event.detail.status === 'completed') {
-      console.log('Video completed successfully - executing success logic');
-      // Execute the same logic as the checkmark button next to active card
-      handleCardSuccess();
+      actionCompleted();
     } else if (event.detail.status === 'failed') {
-      console.log('Video failed or was rejected - executing failure logic');
-      // Execute the same logic as the X button next to active card
-      handleCardFailure();
+      actionCardFailed();
     }
     
-    // Hide the video recorder after handling the action
     showVideoRecorder = false;
-  }
-
-  function handleCardSuccess() {
-    // TODO: Add your success logic here
-    console.log('Card action: Success');
-  }
-
-  function handleCardFailure() {
-    // TODO: Add your failure logic here
-    console.log('Card action: Failed');
   }
 
   function startGame() {
