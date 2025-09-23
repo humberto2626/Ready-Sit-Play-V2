@@ -2012,7 +2012,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           onclick={() => playerWins(1)}
           title="{player1Name || 'Player 1'} Wins This Round"
         >
-          P1
+         {player1Name || 'Player 1'} Wins
         </div>
       {/if}
 
