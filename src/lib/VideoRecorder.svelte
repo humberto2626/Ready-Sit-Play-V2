@@ -353,14 +353,14 @@
         class="recorded-video"
       ></video>
       <div class="recorded-controls">
-        <button class="download-btn" on:click={downloadVideo}>
-          Download Video
+        <button class="action-completed-btn" on:click={handleVideoCompleted}>
+          ✓
         </button>
-        <button class="share-btn" on:click={shareVideo}>
-          Share Video
+        <button class="action-failed-btn" on:click={handleVideoFailed}>
+          ✗
         </button>
-        <button class="reset-btn" on:click={resetRecording}>
-          Record Again
+        <button class="record-again-btn" on:click={resetRecording}>
+          🔄
         </button>
       </div>
     </div>
