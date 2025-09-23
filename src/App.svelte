@@ -1555,6 +1555,59 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     transform: none;
   }
 
+  .mini-game-win-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+    border: none;
+  }
+
+  .mini-game-win-btn-p1 {
+    background-color: #ff6b35;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  }
+
+  .mini-game-win-btn-p1:hover:not(.disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+  }
+
+  .mini-game-win-btn-p2 {
+    background-color: #4ecdc4;
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+  }
+
+  .mini-game-win-btn-p2:hover:not(.disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(78, 205, 196, 0.4);
+  }
+
+  .mini-game-win-btn-p3 {
+    background-color: #45b7d1;
+    box-shadow: 0 4px 12px rgba(69, 183, 209, 0.3);
+  }
+
+  .mini-game-win-btn-p3:hover:not(.disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(69, 183, 209, 0.4);
+  }
+
+  .mini-game-win-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    pointer-events: none;
+  }
+
   @media (max-width: 800px) {
     .card { width: 120px; height: 150px; font-size: 1rem; }
     .small-card { width: 75px; height: 100px; }
@@ -1891,7 +1944,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
               title="Show instructions for this challenge card"
             >
               <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
               </svg>
             </button>
             <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
@@ -2072,9 +2125,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     {#if player3Name}
       <div>
         {#if activeCard && activeCard.category === 'Mini Game'}
-          <button onclick={() => playerWins(3)} disabled={flying || gameOver} style="margin-bottom: 0.5rem;">
-            {player3Name} Wins This Round
-          </button>
+          <div 
+            class="mini-game-win-btn mini-game-win-btn-p3" 
+            class:disabled={flying || gameOver}
+            onclick={() => playerWins(3)}
+            title="{player3Name} Wins This Round"
+          >
+            P3
+          </div>
         {/if}
 
         <h3>{player3Name}'s Cards ({player3Cards.filter(c => c.category === 'Action').length})</h3>
@@ -2118,13 +2176,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           {#each player3Cards.filter(c => c.category === 'Action') as card (card.id)}
             <div class="card small-card edge-action">
               <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-        <div 
-          class="mini-game-win-btn mini-game-win-btn-p3" 
-          class:disabled={flying || gameOver}
-          onclick={() => playerWins(3)}
-          title="{player3Name} Wins This Round"
-        >
-          P3
+            </div>
+          {/each}
         </div>
       </div>
     {/if}
