@@ -461,7 +461,26 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           }
           
           // Clear the active card and switch turn
-          showChallengeInstruction(activeCard);
+          // Store the card before clearing activeCard
+          const processedCard = activeCard;
+          
+          // Perform all game state updates immediately
+          if (currentTurn === 1) {
+            player1Hand = [...player1Hand, processedCard];
+          } else if (currentTurn === 2) {
+            player2Hand = [...player2Hand, processedCard];
+          } else if (currentTurn === 3) {
+            player3Hand = [...player3Hand, processedCard];
+          }
+          
+          // Clear the active card
+          activeCard = null;
+          
+          // Advance to next player
+          currentTurn = currentTurn === 3 ? 1 : currentTurn + 1;
+          
+          // Then show the instruction tooltip (without affecting game state)
+          showChallengeInstruction(processedCard, false);
         }
       }, 3000);
     }
