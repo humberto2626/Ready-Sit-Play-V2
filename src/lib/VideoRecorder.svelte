@@ -375,9 +375,6 @@
         <div class="countdown-display">
           {countdown}s
         </div>
-        <div class="countdown-display">
-          {countdown}s
-        </div>
         <button class="stop-btn-container" on:click={stopRecording}>
           <div class="stop-btn-circle">
             <div class="stop-btn-square"></div>
