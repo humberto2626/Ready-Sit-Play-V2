@@ -173,6 +173,32 @@ button:focus-visible {
   transform: none;
 }
 
+.video-recorder-btn {
+  position: fixed;
+  top: 20px;
+  right: 100px;
+  z-index: 1000;
+  background-color: #ff6b35;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.video-recorder-btn:hover:not(:disabled) {
+  background-color: #ff5722;
+  transform: translateY(-2px);
+}
+
+.video-recorder-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
