@@ -1953,9 +1953,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <!-- Player 1 Cards -->
     <div>
       {#if activeCard && activeCard.category === 'Mini Game'}
-        <button onclick={() => playerWins(1)} disabled={flying || gameOver} style="margin-bottom: 0.5rem;">
-          {player1Name || 'Player 1'} Wins This Round
-        </button>
+        <div 
+          class="mini-game-win-btn mini-game-win-btn-p1" 
+          class:disabled={flying || gameOver}
+          onclick={() => playerWins(1)}
+          title="{player1Name || 'Player 1'} Wins This Round"
+        >
+          P1
+        </div>
       {/if}
 
       <h3>{player1Name || 'Player 1'}'s Cards ({player1Cards.filter(c => c.category === 'Action').length})</h3>
@@ -2007,9 +2012,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <!-- Player 2 Cards -->
     <div>
       {#if activeCard && activeCard.category === 'Mini Game'}
-        <button onclick={() => playerWins(2)} disabled={flying || gameOver} style="margin-bottom: 0.5rem;">
-          {player2Name || 'Player 2'} Wins This Round
-        </button>
+        <div 
+          class="mini-game-win-btn mini-game-win-btn-p2" 
+          class:disabled={flying || gameOver}
+          onclick={() => playerWins(2)}
+          title="{player2Name || 'Player 2'} Wins This Round"
+        >
+          P2
+        </div>
       {/if}
 
       <h3>{player2Name || 'Player 2'}'s Cards ({player2Cards.filter(c => c.category === 'Action').length})</h3>
@@ -2108,8 +2118,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           {#each player3Cards.filter(c => c.category === 'Action') as card (card.id)}
             <div class="card small-card edge-action">
               <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-            </div>
-          {/each}
+        <div 
+          class="mini-game-win-btn mini-game-win-btn-p3" 
+          class:disabled={flying || gameOver}
+          onclick={() => playerWins(3)}
+          title="{player3Name} Wins This Round"
+        >
+          P3
         </div>
       </div>
     {/if}
