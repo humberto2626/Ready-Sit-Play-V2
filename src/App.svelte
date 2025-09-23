@@ -2111,7 +2111,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           onclick={() => playerWins(2)}
           title="{player2Name || 'Player 2'} Wins This Round"
         >
-          P2
+          {player1Name || 'Player 2'} Wins
         </div>
       {/if}
 
@@ -2171,7 +2171,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             onclick={() => playerWins(3)}
             title="{player3Name} Wins This Round"
           >
-            P3
+           {player1Name || 'Player 3'} Wins
           </div>
         {/if}
 
