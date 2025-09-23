@@ -1560,14 +1560,17 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     border-radius: 12px;
     padding: 1.5rem;
     background-color: rgba(100, 108, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
   }
 
-  .player-header-row {
+  .player-content {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 2rem;
     width: 100%;
-    margin-bottom: 1rem;
     justify-content: center;
   }
 
@@ -1601,7 +1604,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     font-family: inherit;
     cursor: pointer;
     transition: all 0.25s ease;
-    display: block;
+    display: flex;
     align-items: center;
     justify-content: center;
     color: white;
@@ -1750,6 +1753,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             <label for="player3Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 3 (Optional):</label>
             <input type="text" id="player3Name" bind:value={player3Name} placeholder="Enter Player 3's name (optional)" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
 
+            <label for="dogName" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Canine Player:</label>
+            <input type="text" id="dogName" bind:value={dogName} placeholder="Enter your dog's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+
+            <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email (Optional):</label>
+            <input type="email" id="email" bind:value={email} placeholder="Enter your email" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
           </div>
         </div>
       {/if}
@@ -1926,56 +1934,51 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   >
     {#if !activeCard}
       {#if shuffledDeck.length > 0}
-        <div class="player-header-row">
-          <h2>{player1Name || 'Player 1'}'s cards ({player1Cards.length})</h2>
+        <div class="card card-back back-{getCardBackType()}">
+          <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
+        </div>
+      {:else}
+        <div class="card card-back back-action">
+          <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
+        </div>
+      {/if}
+    {/if}
+  </div>
+
+  {#if activeCard}
+    <div class="active-card-container">
+      <!-- Show the active card -->
+      <div class="cards-row">
+        <div class="card open edge-{activeCard.category.toLowerCase().replace(' ', '-')}" 
+             class:flying-left={flying && flyingDirection === 'left'}
+             class:flying-right={flying && flyingDirection === 'right'}>
+          <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
           <button 
-            class="mini-game-win-btn mini-game-win-btn-p1" 
-            on:click={() => handleMiniGameWin(1)}
+            class="card-info-icon"
+            onclick={() => {
+              isReviewingInstructions = true;
+              isReviewingInstructions = true;
+              if (activeCard.category === 'Action') {
+                showActionInstruction(activeCard);
+              } else if (activeCard.category === 'Challenge') {
+                showChallengeInstruction(activeCard);
+              } else if (activeCard.category === 'Mini Game') {
+                showMiniGameInstruction(activeCard);
+              }
+            }}
+            title="Show instructions for this card"
           >
-            {player1Name || 'Player 1'} Wins This Round
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+            </svg>
           </button>
         </div>
-                <button class="remove-card-btn" on:click={() => removeCard(1, index)">×</button>
-              </div>
-            {/each}
-          </div>
-        <div class="player-header-row">
-          <h2>{player2Name || 'Player 2'}'s cards ({player2Cards.length})</h2>
-          <button 
-            class="mini-game-win-btn mini-game-win-btn-p2" 
-            on:click={() => handleMiniGameWin(2)}
-          >
-            {player2Name || 'Player 2'} Wins This Round
-          </button>
-        </div>
-        <div class="player-cards-section">
-          <div class="cards-container">
-            {#each player2Cards as card, index}
-          <div class="player-header-row">
-            <h2>{player3Name}'s cards ({player3Cards.length})</h2>
-            <button 
-              class="mini-game-win-btn mini-game-win-btn-p3" 
-              on:click={() => handleMiniGameWin(3)}
-            >
-              {player3Name} Wins This Round
-            </button>
-          </div>
-          <div class="player-cards-section">
-            <div class="cards-container">
-              {#each player3Cards as card, index}
-                <div class="card" style="position: relative;">
-                  <img src={card.image} alt={card.name} class="card-image" />
-                  <button class="remove-card-btn" on:click={() => removeCard(3, index)">×</button>
-                </div>
-              {/each}
-            </div>
-            <div class="advantage-cards">
-              {#each player3AdvantageCards as card, index}
-                <div class="advantage-card" on:click={() => removeAdvantageCard(3, index)">
-                  {card}
-                </div>
-              {/each}
+
+        <!-- If challenge card active, show it side by side -->
+        {#if selectedChallengeCard}
+          <div class="card open edge-challenge">
           <img src="/card-images/{selectedChallengeCard.id}.png" alt="Card {selectedChallengeCard.id}" class="card-image" />
+            <button 
               class="card-info-icon"
               onclick={() => showChallengeInstruction(selectedChallengeCard)}
               title="Show instructions for this challenge card"
