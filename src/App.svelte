@@ -1892,11 +1892,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           <div
             class="card tiny-card edge-{card.category.toLowerCase()}"
             onclick={() => {
-              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver) {
+              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1) {
                 activateChallengeCard(card, 1);
               }
             }}
-            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver ? 'pointer' : 'default'}"
+            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1 ? 'pointer' : 'default'}"
             title={card.label}
           >
             <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
@@ -1946,11 +1946,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           <div
             class="card tiny-card edge-{card.category.toLowerCase()}"
             onclick={() => {
-              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver) {
+              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2) {
                 activateChallengeCard(card, 2);
               }
             }}
-            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver ? 'pointer' : 'default'}"
+            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2 ? 'pointer' : 'default'}"
             title={card.label}
           >
             <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
@@ -2001,11 +2001,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             <div
               class="card tiny-card edge-{card.category.toLowerCase()}"
               onclick={() => {
-                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver) {
+                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3) {
                   activateChallengeCard(card, 3);
                 }
               }}
-              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver ? 'pointer' : 'default'}"
+              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3 ? 'pointer' : 'default'}"
               title={card.label}
             >
               <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
