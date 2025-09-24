@@ -2046,16 +2046,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       {/if}
 
       <!-- Timer Button positioned below the recording button -->
-      {#if canStartTimer()}
-        <button class="timer-button" onclick={startTimer} disabled={!canStartTimer()}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 2V4H16V2H8Z" fill="currentColor"/>
-            <path d="M7 6C7 5.44772 7.44772 5 8 5H16C16.5523 5 17 5.44772 17 6V7C17 7.55228 16.5523 8 16 8H15V9C15 10.1046 14.1046 11 13 11H12.5L16 14.5V16C16 17.1046 15.1046 18 14 18H10C8.89543 18 8 17.1046 8 16V14.5L11.5 11H11C9.89543 11 9 10.1046 9 9V8H8C7.44772 8 7 7.55228 7 7V6Z" fill="currentColor"/>
-            <path d="M8 19V20H16V19H8Z" fill="currentColor"/>
-            <circle cx="12" cy="14" r="1" fill="currentColor"/>
-          </svg>
-        </button>
-      {/if}
+     
     </div>
   {/if}
   {/if}
