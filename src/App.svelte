@@ -1984,7 +1984,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             }}
             title="Show instructions for this card"
           >
-            <img src="/public/info.svg" alt="info" />
+            <img src="/public/Info.svg" alt="Info" />
           </button>
         </div>
 
@@ -1997,7 +1997,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
               onclick={() => showChallengeInstruction(selectedChallengeCard)}
               title="Show instructions for this challenge card"
             >
-                <img src="/public/info.svg" alt="info" />
+                <img src="/public/Info.svg" alt="Info" />
             </button>
             <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
               (Challenge Card Active)
