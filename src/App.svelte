@@ -125,7 +125,8 @@
     'Heel': `With a treat in your hand, guide the canine player to walk right next to you for at least five steps.`,
     'Focus': `Holding a treat between your index finger and thumb, grace just above the canine player nose and then place it between your eyebrows, count out loud for at least three seconds.`,
     'Paw': `With a treat in your hand, grace and hold just below the ear of the canine player, wait for them to use their paw to push off your hand.`,
-    'Down': `With a treat in your hand, grace the canine player chin and chest as you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
+    'Down': `With a treat in your hand, grace the canine player chin and chest as
+  } you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
     'Back': `With the canine player sitting, hold a treat in your hand just above the top of the canine player head, putting your foot in between their front paws, move your hand towards their tail, waiting for them to move back.`,
     'Stay': `With the canine player sitting or laying down, show the palm of your hand and slowly take at least three steps backwards, return and reward the canine player self-control.`,
     'Place': `With a towel on the floor, guide the canine player near it and drop a treat in the towel, the moment they step on it, praise and reward them again.`
@@ -1190,11 +1191,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     position: absolute;
     bottom: 8px;
     right: 8px;
-    width: 28px;
-    height: 28px;
-    background: rgba(0, 0, 0, 0.7);
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
     color: white;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -1208,13 +1209,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .card-info-icon:hover {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
     transform: scale(1.1);
   }
 
   .card-info-icon svg {
-    width: 12px;
-    height: 12px;
+    width: 20px;
+    height: 20px;
   }
 
   .instruction-icon {
@@ -1310,6 +1312,15 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     background: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.5);
     transform: scale(1.05);
+  }
+
+  .golden-bone-active-illustration {
+    display: block;
+    margin: -1rem;
+    width: 80px;
+    height: 80px;
+    object-fit: contain ;
+    filter: drop-shadow(0 0 6px #ffd700);
   }
 
   @keyframes instructions-fade-in {
@@ -1442,6 +1453,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     top: .25rem;
     right: .25rem;
     padding: 0.13rem 0.25rem;
+    font-size: 0.6rem;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -1909,7 +1921,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     onclick={undoLastStep}
     disabled={stateHistory.length === 0 || isShuffling || gameOver}
   >
-    <img src="/public/Undo.svg" alt="Undo" />
+    Back
   </button>
 
   <!-- Turn indicator above the deck -->
@@ -1974,7 +1986,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             }}
             title="Show instructions for this card"
           >
-            <img src="/public/Info.svg" alt="Info" />
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
           </button>
         </div>
 
@@ -1987,7 +2001,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
               onclick={() => showChallengeInstruction(selectedChallengeCard)}
               title="Show instructions for this challenge card"
             >
-                <img src="/public/Info.svg" alt="Info" />
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+              </svg>
             </button>
             <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
               (Challenge Card Active)
@@ -2032,7 +2048,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       <!-- Timer Button positioned below the recording button -->
       {#if canStartTimer()}
         <button class="timer-button" onclick={startTimer} disabled={!canStartTimer()}>
-          <img src="/public/Timer.svg" alt="timer" />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 2V4H16V2H8Z" fill="currentColor"/>
+            <path d="M7 6C7 5.44772 7.44772 5 8 5H16C16.5523 5 17 5.44772 17 6V7C17 7.55228 16.5523 8 16 8H15V9C15 10.1046 14.1046 11 13 11H12.5L16 14.5V16C16 17.1046 15.1046 18 14 18H10C8.89543 18 8 17.1046 8 16V14.5L11.5 11H11C9.89543 11 9 10.1046 9 9V8H8C7.44772 8 7 7.55228 7 7V6Z" fill="currentColor"/>
+            <path d="M8 19V20H16V19H8Z" fill="currentColor"/>
+            <circle cx="12" cy="14" r="1" fill="currentColor"/>
+          </svg>
         </button>
       {/if}
     </div>
