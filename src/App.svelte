@@ -1466,10 +1466,29 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     background: rgba(255, 255, 255, 1);
   }
 
+  .game-interaction-area {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 3rem;
+    padding: 3rem;
+    width: 100%;
+  }
+
+  .active-card-and-controls {
+    display: flex;
+    align-items: flex-start;
+    gap: 3rem;
+  }
+
+  .action-buttons-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
   .timer-button {
-    position: fixed;
-    top: 160px;
-    right: 20px;
     width: 60px;
     height: 60px;
     background: linear-gradient(45deg, #333, #000);
@@ -1482,7 +1501,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 999;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1508,11 +1526,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .action-completed-btn {
-    position: fixed;
-    top: 240px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     background: linear-gradient(45deg, #22c55e, #16a34a);
     color: #ffffff;
     border: none;
@@ -1523,7 +1538,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-    z-index: 999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1541,11 +1555,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .action-failed-btn {
-    position: fixed;
-    top: 300px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     background: linear-gradient(45deg, #ef4444, #dc2626);
     color: #ffffff;
     border: none;
@@ -1556,7 +1567,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    z-index: 999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1944,120 +1954,120 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     </div>
   {/if}
 
-  <div
-    class="deck-container"
-    onclick={revealNextCard}
-    title="Click to draw the next card"
-    style="pointer-events: {isShuffling || activeCard !== null || gameOver ? 'none' : 'auto'}"
-  >
-    {#if !activeCard}
-      {#if shuffledDeck.length > 0}
-        <div class="card card-back back-{getCardBackType()}">
-          <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
-        </div>
-      {:else}
-        <div class="card card-back back-action">
-          <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
-        </div>
+  <div class="game-interaction-area">
+    <div
+      class="deck-container"
+      onclick={revealNextCard}
+      title="Click to draw the next card"
+      style="pointer-events: {isShuffling || activeCard !== null || gameOver ? 'none' : 'auto'}"
+    >
+      {#if !activeCard}
+        {#if shuffledDeck.length > 0}
+          <div class="card card-back back-{getCardBackType()}">
+            <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
+          </div>
+        {:else}
+          <div class="card card-back back-action">
+            <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
+          </div>
+        {/if}
       {/if}
+    </div>
+
+    {#if activeCard}
+      <div class="active-card-and-controls">
+        <div class="active-card-container">
+          <!-- Show the active card -->
+          <div class="cards-row">
+            <div class="card open edge-{activeCard.category.toLowerCase().replace(' ', '-')}" 
+                 class:flying-left={flying && flyingDirection === 'left'}
+                 class:flying-right={flying && flyingDirection === 'right'}>
+              <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
+              <button 
+                class="card-info-icon"
+                onclick={() => {
+                  isReviewingInstructions = true;
+                  isReviewingInstructions = true;
+                  if (activeCard.category === 'Action') {
+                    showActionInstruction(activeCard);
+                  } else if (activeCard.category === 'Challenge') {
+                    showChallengeInstruction(activeCard);
+                  } else if (activeCard.category === 'Mini Game') {
+                    showMiniGameInstruction(activeCard);
+                  }
+                }}
+                title="Show instructions for this card"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- If challenge card active, show it side by side -->
+            {#if selectedChallengeCard}
+              <div class="card open edge-challenge">
+              <img src="/card-images/{selectedChallengeCard.id}.png" alt="Card {selectedChallengeCard.id}" class="card-image" />
+                <button 
+                  class="card-info-icon"
+                  onclick={() => showChallengeInstruction(selectedChallengeCard)}
+                  title="Show instructions for this challenge card"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                  </svg>
+                </button>
+                <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
+                  (Challenge Card Active)
+                </div>
+              </div>
+            {/if}
+          </div>
+        </div>
+
+        <div class="action-buttons-group">
+          <!-- Video Recording for Action and Mini Game cards -->
+          {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
+            <VideoRecorder on:videoAction={handleRecordedVideo} />
+          {/if}
+
+          <!-- Timer Button -->
+          {#if canStartTimer()}
+            <button class="timer-button" onclick={startTimer} disabled={!canStartTimer()}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 2V4H16V2H8Z" fill="currentColor"/>
+                <path d="M7 6C7 5.44772 7.44772 5 8 5H16C16.5523 5 17 5.44772 17 6V7C17 7.55228 16.5523 8 16 8H15V9C15 10.1046 14.1046 11 13 11H12.5L16 14.5V16C16 17.1046 15.1046 18 14 18H10C8.89543 18 8 17.1046 8 16V14.5L11.5 11H11C9.89543 11 9 10.1046 9 9V8H8C7.44772 8 7 7.55228 7 7V6Z" fill="currentColor"/>
+                <path d="M8 19V20H16V19H8Z" fill="currentColor"/>
+                <circle cx="12" cy="14" r="1" fill="currentColor"/>
+              </svg>
+            </button>
+          {/if}
+
+          {#if activeCard.category === 'Action'}
+            <button 
+              class="action-completed-btn" 
+              onclick={actionCompleted} 
+              disabled={flying || gameOver}
+            >
+              ✓
+            </button>
+            <button 
+              class="action-failed-btn" 
+              onclick={actionCardFailed} 
+              disabled={flying || gameOver}
+            >
+              ✗
+            </button>
+          {/if}
+        </div>
+      </div>
     {/if}
   </div>
 
-  {#if activeCard}
-    <div class="active-card-container">
-      <!-- Show the active card -->
-      <div class="cards-row">
-        <div class="card open edge-{activeCard.category.toLowerCase().replace(' ', '-')}" 
-             class:flying-left={flying && flyingDirection === 'left'}
-             class:flying-right={flying && flyingDirection === 'right'}>
-          <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
-          <button 
-            class="card-info-icon"
-            onclick={() => {
-              isReviewingInstructions = true;
-              isReviewingInstructions = true;
-              if (activeCard.category === 'Action') {
-                showActionInstruction(activeCard);
-              } else if (activeCard.category === 'Challenge') {
-                showChallengeInstruction(activeCard);
-              } else if (activeCard.category === 'Mini Game') {
-                showMiniGameInstruction(activeCard);
-              }
-            }}
-            title="Show instructions for this card"
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" stroke="currentColor" stroke-width="1.5"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- If challenge card active, show it side by side -->
-        {#if selectedChallengeCard}
-          <div class="card open edge-challenge">
-          <img src="/card-images/{selectedChallengeCard.id}.png" alt="Card {selectedChallengeCard.id}" class="card-image" />
-            <button 
-              class="card-info-icon"
-              onclick={() => showChallengeInstruction(selectedChallengeCard)}
-              title="Show instructions for this challenge card"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-              </svg>
-            </button>
-            <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
-              (Challenge Card Active)
-            </div>
-          </div>
-        {/if}
-      </div>
+  {#if timerRunning}
+    <div style="font-weight: bold; font-size: 1.2rem; color: #ff6b35; text-align: center; margin-top: 1rem;">
+      Timer: {timer}s
     </div>
-
-    <!-- Timer controls below the cards -->
-  {#if activeCard}
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.1rem;">
-      
-      {#if activeCard.category === 'Action'}
-        <button 
-          class="action-completed-btn" 
-          onclick={actionCompleted} 
-          disabled={flying || gameOver}
-        >
-          ✓
-        </button>
-        <button 
-          class="action-failed-btn" 
-          onclick={actionCardFailed} 
-          disabled={flying || gameOver}
-        >
-          ✗
-        </button>
-      {/if}
-      
-      {#if timerRunning}
-        <div style="font-weight: bold; font-size: 1.2rem; color: #ff6b35;">
-          Timer: {timer}s
-        </div>
-      {/if}
-
-      <!-- Video Recording for Action and Mini Game cards -->
-      {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
-        <VideoRecorder on:videoAction={handleRecordedVideo} />
-      {/if}
-
-      <!-- Timer Button positioned below the recording button -->
-      {#if canStartTimer()}
-        <button class="timer-button" onclick={startTimer} disabled={!canStartTimer()}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 2V4H16V2H8Z" fill="currentColor"/>
-            <path d="M7 6C7 5.44772 7.44772 5 8 5H16C16.5523 5 17 5.44772 17 6V7C17 7.55228 16.5523 8 16 8H15V9C15 10.1046 14.1046 11 13 11H12.5L16 14.5V16C16 17.1046 15.1046 18 14 18H10C8.89543 18 8 17.1046 8 16V14.5L11.5 11H11C9.89543 11 9 10.1046 9 9V8H8C7.44772 8 7 7.55228 7 7V6Z" fill="currentColor"/>
-            <path d="M8 19V20H16V19H8Z" fill="currentColor"/>
-            <circle cx="12" cy="14" r="1" fill="currentColor"/>
-          </svg>
-        </button>
-      {/if}
-    </div>
-  {/if}
   {/if}
 
   <div style="display:flex; justify-content: space-around; width: 100%; margin-top: 1rem;">

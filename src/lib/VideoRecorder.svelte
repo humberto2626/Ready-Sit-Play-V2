@@ -396,9 +396,6 @@
   }
 
   .record-btn {
-    position: fixed;
-    top: 80px;
-    right: 20px;
     width: 60px;
     height: 60px;
     background: linear-gradient(45deg, #ff6b35, #ff3535);
@@ -411,7 +408,6 @@
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
-    z-index: 999;
     display: flex;
     align-items: center;
     justify-content: center;
