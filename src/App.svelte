@@ -2042,7 +2042,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       <!-- Timer Button positioned below the recording button -->
       {#if canStartTimer()}
         <button class="timer-button" onclick={startTimer} disabled={!canStartTimer()}>
-          <img src="/public/timer.svg" alt="info" />
+          <img src="/public/Timer.svg" alt="timer" />
         </button>
       {/if}
     </div>
