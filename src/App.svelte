@@ -407,6 +407,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     
     // Force a re-render to update the card back
     await tick();
+  }
 
   function revealNextCard() {
     if (isShuffling || activeCard !== null || shuffledDeck.length === 0 || gameOver) return;
