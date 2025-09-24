@@ -150,8 +150,8 @@ button:focus-visible {
 .undo-btn {
   position: fixed;
   top: .1rem;
-  Left: .1rem;
-  padding: 1rem 1rem;
+  left: .1rem;
+  padding: 0.25rem 0.75rem;;
   z-index: 100;
   background-color: #ff6b6b;
   color: white;
