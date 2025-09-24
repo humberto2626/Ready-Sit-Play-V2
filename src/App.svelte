@@ -1312,15 +1312,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     transform: scale(1.05);
   }
 
-  .golden-bone-active-illustration {
-    display: block;
-    margin: -1rem;
-    width: 80px;
-    height: 80px;
-    object-fit: contain ;
-    filter: drop-shadow(0 0 6px #ffd700);
-  }
-
   @keyframes instructions-fade-in {
     0% { opacity: 0; }
     100% { opacity: 1; }
