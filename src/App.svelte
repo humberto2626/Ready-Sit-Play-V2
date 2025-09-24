@@ -395,7 +395,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   
   }  stateHistory = [];
 
-    shuffleDeck(); {
+    shuffleDeck();
 
     await tick();
     await new Promise((r) => setTimeout(r, 100));
