@@ -125,7 +125,8 @@
     'Heel': `With a treat in your hand, guide the canine player to walk right next to you for at least five steps.`,
     'Focus': `Holding a treat between your index finger and thumb, grace just above the canine player nose and then place it between your eyebrows, count out loud for at least three seconds.`,
     'Paw': `With a treat in your hand, grace and hold just below the ear of the canine player, wait for them to use their paw to push off your hand.`,
-    'Down': `With a treat in your hand, grace the canine player chin and chest as you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
+    'Down': `With a treat in your hand, grace the canine player chin and chest as
+  } you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
     'Back': `With the canine player sitting, hold a treat in your hand just above the top of the canine player head, putting your foot in between their front paws, move your hand towards their tail, waiting for them to move back.`,
     'Stay': `With the canine player sitting or laying down, show the palm of your hand and slowly take at least three steps backwards, return and reward the canine player self-control.`,
     'Place': `With a towel on the floor, guide the canine player near it and drop a treat in the towel, the moment they step on it, praise and reward them again.`
@@ -392,8 +393,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     currentTurn = 1;
 
     // Clear state history when resetting game
-  
-  }  stateHistory = [];
+    stateHistory = [];
 
     shuffleDeck();
 
@@ -407,7 +407,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     
     // Force a re-render to update the card back
     await tick();
-  
+  }
+
   function revealNextCard() {
     if (isShuffling || activeCard !== null || shuffledDeck.length === 0 || gameOver) return;
 
@@ -2001,7 +2002,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
               title="Show instructions for this challenge card"
             >
               <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
               </svg>
             </button>
             <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
