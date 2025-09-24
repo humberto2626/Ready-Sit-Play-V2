@@ -1919,7 +1919,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     onclick={undoLastStep}
     disabled={stateHistory.length === 0 || isShuffling || gameOver}
   >
-    Back
+    <img src="/public/Undo.svg" alt="Undo" />
   </button>
 
   <!-- Turn indicator above the deck -->
