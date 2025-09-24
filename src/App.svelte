@@ -1746,7 +1746,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <div class="instructions-content">
       <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
       <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-        Balancedogi
+        Balancedog
       </div>
       
       {#if currentStep === 1}
