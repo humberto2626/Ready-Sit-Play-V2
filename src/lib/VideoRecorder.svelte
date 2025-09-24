@@ -311,7 +311,7 @@
 <div class="video-recorder">
   {#if recordingStatus === 'idle'}
     <button class="record-btn" on:click={startRecording}>
-    <svg width="15px" height="15px" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--twemoji" preserveAspectRatio="xMidYMid meet" fill="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><circle fill="#ffffff" cx="18" cy="18" r="18"></circle></g></svg>
+      Rec.
     </button>
   {:else if recordingStatus === 'recording'}
     <div class="recording-container" class:fullscreen-recording={recordingStatus === 'recording'}>
