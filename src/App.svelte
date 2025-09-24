@@ -1,2292 +1,754 @@
-<script lang="ts">
-  import { tick } from 'svelte';
+<script>
+  import { onMount } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
 
+  // Game state
+  let gameStarted = false;
+  let gameOver = false;
+  let currentPlayer = 1;
+  let players = [
+    { id: 1, name: 'Player 1', position: 0, advantages: [] },
+    { id: 2, name: 'Player 2', position: 0, advantages: [] }
+  ];
+  let activeCard = null;
+  let usedCards = [];
+  let flying = false;
+  let showInstructions = false;
   let showVideoRecorder = false;
+  let gameHistory = [];
 
-  type Card = {
-    id: number;
-    category: 'Action' | 'Challenge' | 'Mini Game';
-    label: string;
-  };
-
-  const rawDeck: Card[] = [
-    { id: 1, category: 'Action', label: 'Recall' },
-    { id: 2, category: 'Action', label: 'Sit' },
-    { id: 3, category: 'Action', label: 'Greet' },
-    { id: 4, category: 'Action', label: 'Heel' },
-    { id: 5, category: 'Action', label: 'Focus' },
-    { id: 6, category: 'Action', label: 'Paw' },
-    { id: 7, category: 'Action', label: 'Down' },
-    { id: 8, category: 'Action', label: 'Back' },
-    { id: 9, category: 'Action', label: 'Stay' },
-    { id: 10, category: 'Action', label: 'Place' },
-
-    { id: 11, category: 'Challenge', label: 'Squirrel' },
-    { id: 12, category: 'Challenge', label: 'Do it Twice' },
-    { id: 13, category: 'Challenge', label: 'Cat Ate Your Tongue' },
-    { id: 14, category: 'Challenge', label: 'Pirate Leg' },
-    { id: 15, category: 'Challenge', label: 'Hands Behind Your Back' },
-    { id: 16, category: 'Challenge', label: 'Long Distance Call' },
-
-    { id: 17, category: 'Mini Game', label: 'Two Ball Fetch' },
-    { id: 18, category: 'Mini Game', label: 'Sniff and Choose' },
-    { id: 19, category: 'Mini Game', label: 'Hot Potato' },
-    { id: 20, category: 'Mini Game', label: 'Hide and Seek' },
-    { id: 21, category: 'Mini Game', label: 'The Statue' },
-    { id: 22, category: 'Mini Game', label: 'Pawathon' },
-    { id: 23, category: 'Mini Game', label: 'Treasure Hunt' },
-    { id: 24, category: 'Mini Game', label: 'Dog Roll' },
-    { id: 25, category: 'Mini Game', label: 'The Catcher' },
-    { id: 26, category: 'Mini Game', label: 'Give Me, Drop it, Leave it!' }
+  // Card data
+  const cards = [
+    // Trick cards (1-15)
+    { id: 1, type: 'trick', name: 'Sit', description: 'Dog sits on command', category: 'Basic', image: '/card-images/1.png' },
+    { id: 2, type: 'trick', name: 'Stay', description: 'Dog stays in position', category: 'Basic', image: '/card-images/2.png' },
+    { id: 3, type: 'trick', name: 'Come', description: 'Dog comes when called', category: 'Basic', image: '/card-images/3.png' },
+    { id: 4, type: 'trick', name: 'Down', description: 'Dog lies down', category: 'Basic', image: '/card-images/4.png' },
+    { id: 5, type: 'trick', name: 'Shake', description: 'Dog shakes hands/paws', category: 'Intermediate', image: '/card-images/5.png' },
+    { id: 6, type: 'trick', name: 'Roll Over', description: 'Dog rolls over completely', category: 'Intermediate', image: '/card-images/6.png' },
+    { id: 7, type: 'trick', name: 'Play Dead', description: 'Dog plays dead on command', category: 'Intermediate', image: '/card-images/7.png' },
+    { id: 8, type: 'trick', name: 'Spin', description: 'Dog spins in a circle', category: 'Intermediate', image: '/card-images/8.png' },
+    { id: 9, type: 'trick', name: 'High Five', description: 'Dog gives a high five', category: 'Intermediate', image: '/card-images/9.png' },
+    { id: 10, type: 'trick', name: 'Bow', description: 'Dog takes a bow', category: 'Advanced', image: '/card-images/10.png' },
+    { id: 11, type: 'trick', name: 'Crawl', description: 'Dog crawls forward', category: 'Advanced', image: '/card-images/11.png' },
+    { id: 12, type: 'trick', name: 'Back Up', description: 'Dog walks backwards', category: 'Advanced', image: '/card-images/12.png' },
+    { id: 13, type: 'trick', name: 'Weave', description: 'Dog weaves through legs', category: 'Advanced', image: '/card-images/13.png' },
+    { id: 14, type: 'trick', name: 'Balance', description: 'Dog balances treat on nose', category: 'Expert', image: '/card-images/14.png' },
+    { id: 15, type: 'trick', name: 'Fetch Specific', description: 'Dog fetches named object', category: 'Expert', image: '/card-images/15.png' },
+    
+    // Action cards (16-29)
+    { id: 16, type: 'action', name: 'Advantage', description: 'Draw an advantage card', category: 'Action', image: '/card-images/16.png' },
+    { id: 17, type: 'action', name: 'Challenge', description: 'Challenge another player', category: 'Action', image: '/card-images/17.png' },
+    { id: 18, type: 'action', name: 'Skip Turn', description: 'Skip your next turn', category: 'Action', image: '/card-images/18.png' },
+    { id: 19, type: 'action', name: 'Double Points', description: 'Next trick is worth double', category: 'Action', image: '/card-images/19.png' },
+    { id: 20, type: 'action', name: 'Steal Advantage', description: 'Steal an advantage from opponent', category: 'Action', image: '/card-images/20.png' },
+    { id: 21, type: 'action', name: 'Extra Turn', description: 'Take an extra turn', category: 'Action', image: '/card-images/21.png' },
+    { id: 22, type: 'action', name: 'Reset Position', description: 'Move back to start', category: 'Action', image: '/card-images/22.png' },
+    { id: 23, type: 'action', name: 'Swap Positions', description: 'Swap positions with opponent', category: 'Action', image: '/card-images/23.png' },
+    { id: 24, type: 'action', name: 'Block', description: 'Block opponent\'s next action', category: 'Action', image: '/card-images/24.png' },
+    { id: 25, type: 'action', name: 'Wild Card', description: 'Choose any trick to perform', category: 'Action', image: '/card-images/25.png' },
+    { id: 26, type: 'action', name: 'Bonus Move', description: 'Move forward 2 extra spaces', category: 'Action', image: '/card-images/26.png' },
+    { id: 27, type: 'action', name: 'Reverse', description: 'Reverse turn order', category: 'Action', image: '/card-images/27.png' },
+    { id: 28, type: 'action', name: 'Freeze', description: 'Freeze opponent for one turn', category: 'Action', image: '/card-images/28.png' },
+    { id: 29, type: 'action', name: 'Lucky Draw', description: 'Draw 2 cards, keep 1', category: 'Action', image: '/card-images/29.png' }
   ];
 
-  let shuffledDeck: Card[] = [];
-  let isShuffling = false;
-  let activeCard: Card | null = null;
-  let timer = 0;
-  let timerRunning = false;
-  let timerInterval: any = null;
-  let player1Cards: Card[] = [];
-  let player2Cards: Card[] = [];
-  let player3Cards: Card[] = [];
-  let flying = false;
-  let flyingDirection: 'left' | 'right' | null = null;
+  const advantages = [
+    'Treat Motivation', 'Toy Reward', 'Extra Time', 'Second Chance', 
+    'Easier Variation', 'Verbal Encouragement', 'Physical Guidance', 'Practice Round'
+  ];
 
-  let miniGameReserve: Card[] = [];
-  let selectedMiniGames: Card[] = [];
-
-  let miniGameTurn: 1 | 2 | null = null;
-  let actionTimerUsed = false;
-
-  let gameOver = false;
-  let winner: 1 | 2 | null = null;
-  let showTieOverlay = false;
-
-  // Turn tracking
-  let currentTurn: 1 | 2 | 3 = 1;
-
-  // Player and dog names
-  let player1Name = '';
-  let player2Name = '';
-  let player3Name = '';
-  let dogName = '';
-  let email = '';
-
-  // Helper function to get number of players
-  function getNumPlayers() {
-    return player3Name.trim() ? 3 : 2;
+  function saveGameState() {
+    gameHistory.push({
+      gameStarted,
+      gameOver,
+      currentPlayer,
+      players: JSON.parse(JSON.stringify(players)),
+      activeCard: activeCard ? { ...activeCard } : null,
+      usedCards: [...usedCards],
+      flying
+    });
   }
 
-  // Helper function to get next turn
-  function getNextTurn(current) {
-    const numPlayers = getNumPlayers();
-    if (current >= numPlayers) {
-      return 1;
-    } else {
-      return current + 1;
+  function undoLastAction() {
+    if (gameHistory.length > 0) {
+      const lastState = gameHistory.pop();
+      gameStarted = lastState.gameStarted;
+      gameOver = lastState.gameOver;
+      currentPlayer = lastState.currentPlayer;
+      players = lastState.players;
+      activeCard = lastState.activeCard;
+      usedCards = lastState.usedCards;
+      flying = lastState.flying;
     }
-  }
-
-  // --- Global mini-game advantage counter ---
-  let globalMiniGameCount = 0;
-
-  // Track advantage cards for each player
-  let player1AdvantageCards: { id: string, message: string }[] = [];
-  let player2AdvantageCards: { id: string, message: string }[] = [];
-  let player3AdvantageCards: { id: string, message: string }[] = [];
-
-  // Mini-game advantage overlay state
-  let showAdvantageOverlay = false;
-  let currentAdvantageMessage = '';
-
-  // Golden Bone advantage state
-  let goldenBoneActive = false;
-  let kitchenThiefActive = false;
-
-  // State history for undo functionality (limited to last 3 steps)
-  let stateHistory: any[] = [];
-
-  // Mini-game explanation overlay state
-  let showMiniGameExplanation = false;
-  let currentMiniGameExplanation = '';
-
-  // Action card instructions tooltip
-  let showActionTooltip = false;
-  let actionTooltipContent = '';
-  let actionTooltipCard: Card | null = null;
-  let isReviewingInstructions = false;
-
-  // Track if instructions are being reviewed (vs automatic game flow)
-  const actionInstructions: Record<string, string> = {
-   'Recall': `Call the canine player from as far as possible into a treat in your extended hand.`,
-    'Sit': `With a treat in your hand, grace just above the canine player nose until they sit.`,
-    'Greet': `Present your fist with a treat inside, if the canine player sniffs, licks or nudges your hand, reward their good manners.`,
-    'Heel': `With a treat in your hand, guide the canine player to walk right next to you for at least five steps.`,
-    'Focus': `Holding a treat between your index finger and thumb, grace just above the canine player nose and then place it between your eyebrows, count out loud for at least three seconds.`,
-    'Paw': `With a treat in your hand, grace and hold just below the ear of the canine player, wait for them to use their paw to push off your hand.`,
-    'Down': `With a treat in your hand, grace the canine player chin and chest as you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
-    'Back': `With the canine player sitting, hold a treat in your hand just above the top of the canine player head, putting your foot in between their front paws, move your hand towards their tail, waiting for them to move back.`,
-    'Stay': `With the canine player sitting or laying down, show the palm of your hand and slowly take at least three steps backwards, return and reward the canine player self-control.`,
-    'Place': `With a towel on the floor, guide the canine player near it and drop a treat in the towel, the moment they step on it, praise and reward them again.`
-
-  };
-
-  const challengeInstructions: Record<string, string> = {
-    'Squirrel': 'Toss a ball to create a distraction',
-    'Do it Twice': 'Self explanatory',
-    'Cat Ate Your Tongue': 'Guide the canine player to perform the Action Card without saying a word',
-    'Pirate Leg': 'Guide the canine player to perform the Action Card while standing only on one leg',
-    'Hands Behind Your Back': 'Guide the canine player to perform the Action Card without any hand gestures',
-    'Long Distance Call': `Guide the canine player to perform the Action Card standing at least five steps away from them`
-  };
-  // Instructions walkthrough state
-  const miniGameExplanations: Record<string, string> = {
-    'Two Ball Fetch': `
-      1. Win by: Getting more balls fetched under 30 seconds.
-      2. Set Up: You get the two balls on your turn, the timer starts the moment you toss the first one.
-*The throw has to be at least three times the length of the canine player.
-*For the fetch to count the canine player has to come to where you can pick up the ball without moving one of your feet.
-      3. How to Play: While keeping one foot glued where you are standing, throw the first ball, once the canine player brings it back, show the second one, when the canine player drops the first ball, throw the second one.
-      4. Tie Breaker: Each player has a ball, standing next to each other, both throw it at the same time, the ball that gets fetched wins.
-    `,
-    'Sniff and Choose': `
-      1. Win by: Having the canine player choose your hand over your opponent's.
-      2. Set Up: Each player hides a treat in their closed fist. Both players kneel down facing each other about 3 feet apart.
-      3. How to Play: Present both closed fists to the canine player simultaneously. The canine player will sniff and choose one fist by pawing, licking, or nudging it.
-    `,
-    'Hot Potato': `
-      1. Win by: Not having the ball in your hands when the 30 second timer runs out.
-      2. Set Up: Players stand on opposite sides of the room, one of them holding a ball.
-      3. How to Play: The player that's empty handed calls the canine player's name, only then the player that has the ball passes it, the player receiving the ball lowers it in such a way that the canine player comes closer to take it, only then the player that is now empty handed calls the canine player's name to continue playing.
-      4. Tie Breaker: In the event of the ball being mid air when the timer goes off, the game is repeated.
-    `,
-    'Hide and Seek': `
-      1. Win by: If hiding, not being found, if seeking, having the canine player find the other player under 30 seconds.
-      2. Set Up: "The player that picked up the card hides, while the other player takes the canine player to a different room, asks them to "Sit" and counts out loud to 10.
-      3. How to Play: The timer begins when the player holding the canine player releases them and says "Find (Name of the hidden player)!" the canine player will search for the hidden player.
-    `,
-    'The Statue': `
-      1. Win by: Keeping the canine player sitting the longest time possible up to 30 seconds.
-      2. Set Up: Each player positions the canine player in a "Sit" about 3 feet away from them, the timer starts the moment the canine player's bottom touches the floor.
-      3. How to Play: Each player gets a 30 second turn, as the canine player sits the human players count out loud the seconds.
-      4. Tie Breaker: if both players reach the exact same count, repeat
-  } the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
-    `,
-    'Pawathon': `
-      1. Win by: Being the player to whom the canine player gives the most paws under 30 seconds.
-      2. Set Up: Players take turns standing in front of the canine player to offer their hand repeatedly without reward until the end of the 30 seconds. 
-*Both players reward at the end of their turn as to not discourage the canine player.
-      3. How to Play: the canine player sits and each player asks for paw repeatedly. 
-*only one paw at a time, double paws or high 10s don't count.
-      4. Tie Breaker: Both players stand in front of the seated canina player , they both ask for Paw at the same time. whoever gets the paw wins.
-    `,
-    'Treasure Hunt': `
-      1. Win by: If hiding the treat, not having it found, if hunting, having the canine player find the treat under 30 seconds.
-      2. Set Up: "The player that picked the card hides the treat while the other player takes the canine player to a different room, asks them to "Sit" and counts out loud to 10.
-
-      3. How to Play: The timer begins when the player holding the canine player releases them and says "find it" the canine player will search for the hidden treats.
-    `,
-    'Dog Roll': `
-      1. Win by: Getting the canine player to complete the most rolls in a row under 30 seconds.
-      2. Set Up: Each player positions the canine player in the "Down" position on a soft surface like grass or carpet.
-      3. How to Play: Each player guides the canine player to "Roll Over." Count consecutive successful rolls until the canine player stops or gets up.
-      4. Tie Breaker: If both dogs achieve the same number of rolls, go into a "Roll face off", where you take turns guiding the canine player to roll in sudden death format.
-    `,
-    'The Catcher': `
-      1. Win by: Having the canine player catch the most treats out of 5 tosses.
-      2. Set Up: Each player stands 2 long steps away from the canine player with 5 small treats. 
-      3. How to Play: Toss each treat gently toward the canine player's mouth. Count successful catches. After both players complete their 5 tosses, compare scores.
-      4. Tie Breaker: If tied, each player gets 3 additional tosses in sudden death format.
-    `,
-     'Give Me, Drop it, Leave it!': `
-      1. Win by: Collecting the most points from the canine player giving you, dropping or leaving a toy under 30 seconds.
-      2. Set Up: Each player starts by holding the toy in front of the canine player. 
-      3. How to Play: Toss the toy, after each time the canine player performs one of the behaviors, toss it again. 
-Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points and "Leave it" for 3 points.
-      4. Tie Breaker: If tied, each player gets 3 additional tosses in sudden death format.
-    `
-  };
-
-  let showInstructions = true;
-  let currentStep = 1;
-  const totalSteps = 8;
-
-  function reviewInstructions() {
-    showInstructions = true;
-    currentStep = 1;
-    // Don't call animateShuffle() - just show instructions without restarting
-  }
-
-  function showActionInstruction(card: Card) {
-    if (card.category === 'Action' && actionInstructions[card.label]) {
-      actionTooltipContent = actionInstructions[card.label];
-      actionTooltipCard = card;
-      showActionTooltip = true;
-    }
-  }
-
-  function showChallengeInstruction(card: Card) {
-    if (card.category === 'Challenge' && challengeInstructions[card.label]) {
-      actionTooltipContent = challengeInstructions[card.label];
-      actionTooltipCard = card;
-      showActionTooltip = true;
-    }
-  }
-  function hideActionInstruction() {
-    if (actionTooltipCard && actionTooltipCard.category === 'Challenge') {
-      if (currentTurn === 'player1') {
-        player1Cards = [actionTooltipCard, ...player1Cards];
-      } else if (currentTurn === 'player2') {
-        player2Cards = [actionTooltipCard, ...player2Cards];
-      }
-      activeCard = null;
-      currentTurn = getNextTurn(currentTurn);
-    }
-    
-    showActionTooltip = false;
-    actionTooltipContent = '';
-    actionTooltipCard = null;
-  }
-
-  function showMiniGameInstruction(card: Card) {
-    if (card.category === 'Mini Game' && miniGameExplanations[card.label]) {
-      currentMiniGameExplanation = miniGameExplanations[card.label];
-      showMiniGameExplanation = true;
-    }
-  }
-
-  function hideMiniGameInstruction() {
-    showMiniGameExplanation = false;
-    currentMiniGameExplanation = '';
-  }
-
-  // --- Challenge card play state ---
-  let selectedChallengeCard: Card | null = null;
-  let challengeCardPlayer: 1 | 2 | 3 | null = null;
-
-  // Save current state for undo functionality
-  function saveCurrentState() {
-    const currentState = {
-      player1Cards: structuredClone(player1Cards),
-      player2Cards: structuredClone(player2Cards),
-      player3Cards: structuredClone(player3Cards),
-      player1AdvantageCards: structuredClone(player1AdvantageCards),
-      player2AdvantageCards: structuredClone(player2AdvantageCards),
-      player3AdvantageCards: structuredClone(player3AdvantageCards),
-      goldenBoneActive: goldenBoneActive,
-      kitchenThiefActive: kitchenThiefActive,
-      selectedChallengeCard: selectedChallengeCard,
-      challengeCardPlayer: challengeCardPlayer,
-      currentTurn: currentTurn,
-      globalMiniGameCount: globalMiniGameCount,
-      shuffledDeck: structuredClone(shuffledDeck),
-      activeCard: activeCard,
-      gameOver: gameOver,
-      winner: winner
-    };
-    
-    stateHistory.push(currentState);
-    
-    // Limit history to last 3 steps
-    if (stateHistory.length > 3) {
-      stateHistory.shift();
-    }
-  }
-
-  // Undo last step
-  function undoLastStep() {
-    if (stateHistory.length === 0) return;
-    
-    const previousState = stateHistory.pop();
-    
-    // Restore all state variables
-    player1Cards = previousState.player1Cards;
-    player2Cards = previousState.player2Cards;
-    player3Cards = previousState.player3Cards;
-    player1AdvantageCards = previousState.player1AdvantageCards;
-    player2AdvantageCards = previousState.player2AdvantageCards;
-    player3AdvantageCards = previousState.player3AdvantageCards;
-    goldenBoneActive = previousState.goldenBoneActive;
-    kitchenThiefActive = previousState.kitchenThiefActive;
-    selectedChallengeCard = previousState.selectedChallengeCard;
-    challengeCardPlayer = previousState.challengeCardPlayer;
-    currentTurn = previousState.currentTurn;
-    globalMiniGameCount = previousState.globalMiniGameCount;
-    shuffledDeck = previousState.shuffledDeck;
-    activeCard = previousState.activeCard;
-    gameOver = previousState.gameOver;
-    winner = previousState.winner;
-  }
-
-  function activateChallengeCard(card: Card, player: 1 | 2 | 3) {
-    if (selectedChallengeCard) return; // Only one active challenge card allowed
-    
-    saveCurrentState();
-    
-    selectedChallengeCard = card;
-    challengeCardPlayer = player;
-
-    // Remove challenge card from player's cards immediately
-    if (player === 1) {
-      player1Cards = player1Cards.filter(c => c.id !== card.id);
-    } else if (player === 2) {
-      player2Cards = player2Cards.filter(c => c.id !== card.id);
-    } else if (player === 3) {
-      player3Cards = player3Cards.filter(c => c.id !== card.id);
-    }
-  }
-
-  function shuffleDeck() {
-    const actionAndChallenge = rawDeck.filter(card => card.category !== 'Mini Game');
-    const miniGames = rawDeck.filter(card => card.category === 'Mini Game');
-
-    selectedMiniGames = [...miniGames].sort(() => Math.random() - 0.5).slice(0, 3);
-    miniGameReserve = miniGames.filter(card => !selectedMiniGames.includes(card));
-
-    shuffledDeck = [...actionAndChallenge, ...selectedMiniGames];
-
-    for (let i = shuffledDeck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledDeck[i], shuffledDeck[j]] = [shuffledDeck[j], shuffledDeck[i]];
-    }
-  }
-
-  async function animateShuffle() {
-    isShuffling = true;
-    activeCard = null;
-    player1Cards = [];
-    player2Cards = [];
-    player3Cards = [];
-    flying = false;
-    flyingDirection = null;
-    miniGameTurn = null;
-    actionTimerUsed = false;
-    timerRunning = false;
-    clearInterval(timerInterval);
-    timer = 0;
-    gameOver = false;
-    winner = null;
-    showTieOverlay = false;
-
-    currentTurn = 1;
-
-    globalMiniGameCount = 0;
-    player1AdvantageCards = [];
-    player2AdvantageCards = [];
-    player3AdvantageCards = [];
-
-    showAdvantageOverlay = false;
-    currentAdvantageMessage = '';
-    showInstructions = false;
-
-    showActionTooltip = false;
-    actionTooltipContent = '';
-    actionTooltipCard = null;
-    showMiniGameExplanation = false;
-    currentMiniGameExplanation = '';
-
-    selectedChallengeCard = null;
-    challengeCardPlayer = null;
-
-    currentTurn = 1;
-
-    // Clear state history when resetting game
-    stateHistory = [];
-
-    shuffleDeck();
-
-    await tick();
-    await new Promise((r) => setTimeout(r, 100));
-
-    isShuffling = false;
-    
-    // Ensure we start with Player 1's turn
-    currentTurn = 1;
-    
-    // Force a re-render to update the card back
-    await tick();
-  }
-
-  function revealNextCard() {
-    if (isShuffling || activeCard !== null || shuffledDeck.length === 0 || gameOver) return;
-
-    saveCurrentState();
-
-    console.log('Drawing card. Deck before draw:', shuffledDeck.map(c => c.category));
-    console.log('Selected challenge card:', selectedChallengeCard);
-    
-    if (selectedChallengeCard) {
-      // Find next Action card in deck
-      const actionIndex = shuffledDeck.findIndex(c => c.category === 'Action');
-      console.log('Action index found:', actionIndex);
-      if (actionIndex === -1) {
-        // No action card left: put back challenge card to player's pile and draw next normally
-        if (challengeCardPlayer === 1) {
-          player1Cards = [selectedChallengeCard, ...player1Cards];
-        } else if (challengeCardPlayer === 2) {
-          player2Cards = [selectedChallengeCard, ...player2Cards];
-        }
-        selectedChallengeCard = null;
-        challengeCardPlayer = null;
-
-        activeCard = shuffledDeck.pop()!;
-        console.log('No action found, drew:', activeCard);
-      } else {
-        activeCard = shuffledDeck.splice(actionIndex, 1)[0];
-        console.log('Drew action card:', activeCard);
-      }
-    } else {
-      activeCard = shuffledDeck.pop()!;
-      console.log('Normal draw:', activeCard);
-    }
-
-    timerRunning = false;
-    clearInterval(timerInterval);
-    timer = 0;
-    flying = false;
-    flyingDirection = null;
-    miniGameTurn = null;
-    actionTimerUsed = false;
-    goldenBoneActive = false;
-
-    // Handle Challenge cards - show them for 3 seconds then move to reserve
-    if (activeCard.category === 'Challenge') {
-      setTimeout(async () => {
-        if (activeCard && activeCard.category === 'Challenge') {
-          // Add challenge card to current player's reserve
-          if (currentTurn === 1) {
-            player1Cards = [activeCard, ...player1Cards];
-          } else if (currentTurn === 2) {
-            player2Cards = [activeCard, ...player2Cards];
-          } else if (currentTurn === 3) {
-            player3Cards = [activeCard, ...player3Cards];
-          }
-          
-          // Clear the active card and switch turn
-          showChallengeInstruction(activeCard);
-        }
-      }, 3000);
-    }
-  }
-
-  function getTimerDuration() {
-    if (!activeCard) return 0;
-    if (activeCard.category === 'Action') return 30;
-    if (activeCard.category === 'Mini Game') return 30;
-    return 0;
-  }
-
-  function getMiniGameAdvantageMessage(count: number): string {
-    switch (count) {
-      case 1:
-        return "You have won the Infinite Time Advantage, with which your turn has no time limit.";
-      case 2:
-        return "You have won the Rain Coat Advantage, with which you can block and eliminate a Challenge Card used against you.";
-      case 3:
-        return "You have won the Kitchen Thieve Advantage, which allows you to steal an Action Card from an opponent.";
-      default:
-        return "";
-    }
-  }
-
-  function addMiniGameAdvantage(player: 1 | 2 | 3, count: number) {
-    const message = getMiniGameAdvantageMessage(count);
-    if (message) {
-      const advantageCard = {
-        id: `advantage-${player}-${count}-${Date.now()}`,
-        message: message
-      };
-      
-      if (player === 1) {
-        player1AdvantageCards = [...player1AdvantageCards, advantageCard];
-      } else if (player === 2) {
-        player2AdvantageCards = [...player2AdvantageCards, advantageCard];
-      } else if (player === 3) {
-        player3AdvantageCards = [...player3AdvantageCards, advantageCard];
-      }
-    }
-  }
-
-  function useAdvantageCard(cardId: string, player: 1 | 2 | 3) {
-    saveCurrentState();
-    
-    // Find the advantage card to determine its type
-    const playerAdvantageCards = player === 1 ? player1AdvantageCards : 
-                                 player === 2 ? player2AdvantageCards : 
-                                 player3AdvantageCards;
-    const advantageCard = playerAdvantageCards.find(card => card.id === cardId);
-    
-    if (advantageCard && advantageCard.message.includes("Golden Bone")) {
-      goldenBoneActive = true;
-    }
-    
-    if (advantageCard && advantageCard.message.includes("Rain Coat")) {
-      // Remove the active challenge card if there is one
-      if (selectedChallengeCard) {
-        selectedChallengeCard = null;
-        challengeCardPlayer = null;
-      }
-    }
-    
-    if (advantageCard && advantageCard.message.includes("Kitchen Thieve")) {
-      kitchenThiefActive = true;
-      // Steal the last action card from opponent
-      // For 3-player game, steal from the next player in turn order
-      const numPlayers = getNumPlayers();
-      const opponent = numPlayers === 3 ? getNextTurn(player) : (player === 1 ? 2 : 1);
-      
-      let opponentCards, currentPlayerCards;
-      
-      if (opponent === 1) {
-        opponentCards = player1Cards;
-      } else if (opponent === 2) {
-        opponentCards = player2Cards;
-      } else {
-        opponentCards = player3Cards;
-      }
-      
-      if (player === 1) {
-        currentPlayerCards = player1Cards;
-      } else if (player === 2) {
-        currentPlayerCards = player2Cards;
-      } else {
-        currentPlayerCards = player3Cards;
-      }
-      
-      // Find the last action card in opponent's collection
-      const lastActionIndex = opponentCards.findLastIndex(c => c.category === 'Action');
-      if (lastActionIndex !== -1) {
-        const stolenCard = opponentCards[lastActionIndex];
-        // Remove from opponent
-        opponentCards.splice(lastActionIndex, 1);
-        // Add to current player
-        currentPlayerCards.push(stolenCard);
-        
-        // Update the reactive variables
-        if (opponent === 1 && player === 2) {
-          player1Cards = [...opponentCards];
-          player2Cards = [...currentPlayerCards];
-        } else if (opponent === 2 && player === 1) {
-          player1Cards = [...currentPlayerCards];
-          player2Cards = [...opponentCards];
-        } else if (opponent === 1 && player === 3) {
-          player1Cards = [...opponentCards];
-          player3Cards = [...currentPlayerCards];
-        } else if (opponent === 3 && player === 1) {
-          player1Cards = [...currentPlayerCards];
-          player3Cards = [...opponentCards];
-        } else if (opponent === 2 && player === 3) {
-          player2Cards = [...opponentCards];
-          player3Cards = [...currentPlayerCards];
-        } else if (opponent === 3 && player === 2) {
-          player2Cards = [...currentPlayerCards];
-          player3Cards = [...opponentCards];
-        }
-      }
-    }
-    
-    if (player === 1) {
-      player1AdvantageCards = player1AdvantageCards.filter(card => card.id !== cardId);
-    } else if (player === 2) {
-      player2AdvantageCards = player2AdvantageCards.filter(card => card.id !== cardId);
-    } else if (player === 3) {
-      player3AdvantageCards = player3AdvantageCards.filter(card => card.id !== cardId);
-    }
-  }
-
-  function dismissAdvantageOverlay() {
-    showAdvantageOverlay = false;
-    currentAdvantageMessage = '';
-  }
-
-  function canStartTimer() {
-    if (!activeCard) return false;
-    if (activeCard.category === 'Challenge') return false;
-    if (activeCard.category === 'Action') return !actionTimerUsed && !timerRunning && !flying;
-    if (activeCard.category === 'Mini Game') return !timerRunning && !flying;
-    return false;
-  }
-
-  function startTimer() {
-    if (!activeCard || timerRunning) return;
-
-    timer = getTimerDuration();
-    timerRunning = true;
-
-    if (activeCard.category === 'Action') {
-      actionTimerUsed = true;
-    }
-
-    if (activeCard.category === 'Mini Game' && miniGameTurn === null) {
-      miniGameTurn = 1;
-    }
-
-    timerInterval = setInterval(() => {
-      timer--;
-      if (timer <= 0) {
-        clearInterval(timerInterval);
-        timerRunning = false;
-
-        if (activeCard?.category === 'Mini Game' && miniGameTurn === 1) {
-          miniGameTurn = 2;
-        } else {
-          miniGameTurn = null;
-        }
-      }
-    }, 1000);
-  }
-
-  async function checkForWinner() {
-    const numPlayers = getNumPlayers();
-    const winThreshold = numPlayers === 3 ? 4 : 6;
-    
-    const player1ActionCount = player1Cards.filter(c => c.category === 'Action').length;
-    const player2ActionCount = player2Cards.filter(c => c.category === 'Action').length;
-    
-    if (player1ActionCount >= winThreshold) {
-      winner = 1;
-      gameOver = true;
-    } else if (player2ActionCount >= winThreshold) {
-      winner = 2;
-      gameOver = true;
-    } else if (numPlayers === 3 && player3Cards.filter(c => c.category === 'Action').length >= winThreshold) {
-      winner = 3;
-      gameOver = true;
-    } else {
-      // Check for tie
-      const tieThreshold = winThreshold - 1;
-      if (numPlayers === 2 && player1ActionCount === tieThreshold && player2ActionCount === tieThreshold) {
-        showTieOverlay = true;
-        return;
-      }
-    }
-  }
-
-  async function playerWins(player: 1 | 2 | 3) {
-    if (!activeCard || gameOver) return;
-
-    saveCurrentState();
-
-    // Only mini-games use the playerWins function now
-    if (activeCard.category === 'Mini Game') {
-      globalMiniGameCount++;
-      const advantageMessage = getMiniGameAdvantageMessage(globalMiniGameCount);
-      showAdvantageOverlay = true;
-      currentAdvantageMessage = advantageMessage;
-      
-      const advantageCard = {
-        id: `advantage-${player}-${globalMiniGameCount}-${Date.now()}`,
-        message: advantageMessage
-      };
-      
-      if (player === 1) {
-        player1AdvantageCards = [...player1AdvantageCards, advantageCard];
-      } else if (player === 2) {
-        player2AdvantageCards = [...player2AdvantageCards, advantageCard];
-      } else if (player === 3) {
-        player3AdvantageCards = [...player3AdvantageCards, advantageCard];
-      }
-    }
-
-    flyingDirection = player === 1 ? 'left' : player === 2 ? 'right' : 'right';
-    flying = true;
-
-    await tick();
-
-    setTimeout(async () => {
-      flying = false;
-      activeCard = null;
-      timer = 0;
-      timerRunning = false;
-      flyingDirection = null;
-      miniGameTurn = null;
-      actionTimerUsed = false;
-      
-      // Switch turn after card is resolved
-      currentTurn = getNextTurn(currentTurn);
-
-      await checkForWinner();
-    }, 800);
-  }
-
-  async function actionCompleted() {
-    if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
-
-    saveCurrentState();
-
-    // Action card goes to current player
-    if (currentTurn === 1) {
-      player1Cards = [activeCard, ...player1Cards];
-    } else if (currentTurn === 2) {
-      player2Cards = [activeCard, ...player2Cards];
-    } else if (currentTurn === 3) {
-      player3Cards = [activeCard, ...player3Cards];
-    }
-
-    // If there was a challenge card active, it disappears
-    selectedChallengeCard = null;
-    challengeCardPlayer = null;
-
-    flyingDirection = currentTurn === 1 ? 'left' : currentTurn === 2 ? 'right' : 'right';
-    flying = true;
-
-    await tick();
-
-    setTimeout(async () => {
-      flying = false;
-      activeCard = null;
-      goldenBoneActive = false; // Reset after action is completed
-      kitchenThiefActive = false;
-      timer = 0;
-      timerRunning = false;
-      flyingDirection = null;
-      miniGameTurn = null;
-      actionTimerUsed = false;
-      
-      // Switch turn after card is resolved
-      currentTurn = getNextTurn(currentTurn);
-
-      await checkForWinner();
-    }, 800);
-  }
-
-  async function actionCardFailed() {
-    if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
-
-    saveCurrentState();
-
-    // Put the action card at the bottom of the deck
-    shuffledDeck = [activeCard, ...shuffledDeck];
-
-    // If there was a challenge card active, put it back in the player's hand
-    if (selectedChallengeCard) {
-      // Challenge card should be discarded regardless of action outcome
-      selectedChallengeCard = null;
-      challengeCardPlayer = null;
-    }
-
-    // Clear the active card and reset state
-    activeCard = null;
-    timer = 0;
-    timerRunning = false;
-    clearInterval(timerInterval);
-    flyingDirection = null;
-    miniGameTurn = null;
-    actionTimerUsed = false;
-    
-    // Switch turn after failed action
-    currentTurn = getNextTurn(currentTurn);
-
-    await tick();
-  }
-
-  function handleRecordedVideo(event) {
-    console.log('Video action received:', event.detail);
-    
-    if (event.detail.status === 'completed') {
-      actionCompleted();
-    } else if (event.detail.status === 'failed') {
-      actionCardFailed();
-    }
-    
-    showVideoRecorder = false;
   }
 
   function startGame() {
-    if (currentStep === 2) {
-      if (!player1Name.trim() || !player2Name.trim() || !dogName.trim()) {
-        alert('Please enter names for Player 1, Player 2, and your dog to continue.');
+    saveGameState();
+    gameStarted = true;
+    drawCard();
+  }
+
+  function drawCard() {
+    if (usedCards.length >= cards.length) {
+      gameOver = true;
+      return;
+    }
+
+    let availableCards = cards.filter(card => !usedCards.includes(card.id));
+    let randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+    
+    activeCard = randomCard;
+    usedCards.push(randomCard.id);
+  }
+
+  function trickCompleted() {
+    if (!activeCard || flying || gameOver) return;
+    
+    saveGameState();
+    
+    let currentPlayerObj = players.find(p => p.id === currentPlayer);
+    let points = getPointsForCategory(activeCard.category);
+    currentPlayerObj.position += points;
+    
+    flying = true;
+    
+    setTimeout(() => {
+      flying = false;
+      
+      if (currentPlayerObj.position >= 20) {
+        gameOver = true;
         return;
       }
-    }
+      
+      nextTurn();
+    }, 1500);
+  }
 
-    if (currentStep < totalSteps) {
-      currentStep++;
-    } else {
-      showInstructions = false;
-      currentStep = 1; // Reset for next time
-      // Only auto-start the game if it hasn't been started yet
-      if (shuffledDeck.length === 0 && player1Cards.length === 0 && player2Cards.length === 0) {
-        animateShuffle();
+  function trickFailed() {
+    if (!activeCard || flying || gameOver) return;
+    
+    saveGameState();
+    nextTurn();
+  }
+
+  function actionCompleted() {
+    if (!activeCard || flying || gameOver) return;
+    
+    saveGameState();
+    executeActionCard();
+  }
+
+  function actionCardFailed() {
+    if (!activeCard || flying || gameOver) return;
+    
+    saveGameState();
+    nextTurn();
+  }
+
+  function executeActionCard() {
+    let currentPlayerObj = players.find(p => p.id === currentPlayer);
+    
+    switch(activeCard.name) {
+      case 'Advantage':
+        let randomAdvantage = advantages[Math.floor(Math.random() * advantages.length)];
+        currentPlayerObj.advantages.push(randomAdvantage);
+        break;
+      case 'Extra Turn':
+        // Don't change currentPlayer, effectively giving an extra turn
+        break;
+      case 'Bonus Move':
+        currentPlayerObj.position += 2;
+        break;
+      default:
+        // For other action cards, just proceed to next turn
+        break;
+    }
+    
+    flying = true;
+    
+    setTimeout(() => {
+      flying = false;
+      
+      if (currentPlayerObj.position >= 20) {
+        gameOver = true;
+        return;
       }
-    }
-  }
-
-  function skipInstructions() {
-    showInstructions = false;
-    currentStep = 1; // Reset for next time
-    showTieOverlay = false;
-    // Only auto-start the game if it hasn't been started yet
-    if (shuffledDeck.length === 0 && player1Cards.length === 0 && player2Cards.length === 0) {
-      animateShuffle();
-    }
-  }
-
-  function getCardBackType() {
-    console.log('Getting card back type...');
-    console.log('Deck length:', shuffledDeck.length);
-    console.log('Selected challenge card:', selectedChallengeCard);
-    
-    if (shuffledDeck.length === 0) {
-      console.log('Deck empty, returning action');
-      return null; // Don't show card back if deck is empty
-    }
-    
-    let nextCard;
-    
-    if (selectedChallengeCard) {
-      // Find next Action card in deck
-      const actionIndex = shuffledDeck.findIndex(c => c.category === 'Action');
-      if (actionIndex === -1) {
-        // No action card left, show the last card in deck
-        nextCard = shuffledDeck[shuffledDeck.length - 1];
-        console.log('No action card found, next card:', nextCard);
+      
+      if (activeCard.name !== 'Extra Turn') {
+        nextTurn();
       } else {
-        console.log('Challenge active, forcing action card');
-        return 'action';
+        drawCard();
       }
-    } else {
-      nextCard = shuffledDeck[shuffledDeck.length - 1];
-      console.log('Normal draw, next card:', nextCard);
-    }
-    
-    const cardType = nextCard?.category?.toLowerCase().replace(' ', '-') || 'action';
-    console.log('Returning card type:', cardType);
-    return cardType;
+    }, 1500);
   }
 
-  function goBack() {
-    if (currentStep > 1) {
-      currentStep--;
+  function nextTurn() {
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    drawCard();
+  }
+
+  function getPointsForCategory(category) {
+    switch(category) {
+      case 'Basic': return 1;
+      case 'Intermediate': return 2;
+      case 'Advanced': return 3;
+      case 'Expert': return 4;
+      default: return 1;
     }
   }
 
-  function getAdvantageCardId(message: string): number {
-    if (message.includes("Infinite Time")) {
-      return 27;
-    } else if (message.includes("Rain Coat")) {
-      return 28;
-    } else if (message.includes("Kitchen Thieve")) {
-      return 29;
+  function removeAdvantage(playerId, advantage) {
+    saveGameState();
+    let player = players.find(p => p.id === playerId);
+    player.advantages = player.advantages.filter(a => a !== advantage);
+  }
+
+  function toggleInstructions() {
+    showInstructions = !showInstructions;
+  }
+
+  function toggleVideoRecorder() {
+    showVideoRecorder = !showVideoRecorder;
+  }
+
+  function handleRecordedVideo(event) {
+    if (event.detail.status === 'completed') {
+      if (activeCard.category === 'Action') {
+        actionCompleted();
+      } else {
+        trickCompleted();
+      }
+    } else if (event.detail.status === 'failed') {
+      if (activeCard.category === 'Action') {
+        actionCardFailed();
+      } else {
+        trickFailed();
+      }
     }
-    return 27; // Default fallback
+    showVideoRecorder = false;
+  }
+
+  function resetGame() {
+    gameStarted = false;
+    gameOver = false;
+    currentPlayer = 1;
+    players = [
+      { id: 1, name: 'Player 1', position: 0, advantages: [] },
+      { id: 2, name: 'Player 2', position: 0, advantages: [] }
+    ];
+    activeCard = null;
+    usedCards = [];
+    flying = false;
+    gameHistory = [];
   }
 </script>
 
-<style>
-  /* Same styles as before, plus container for active cards side-by-side */
-  .deck-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    min-height: 480px;
-  }
+<button class="undo-btn" onclick={undoLastAction} disabled={gameHistory.length === 0}>
+  ↶
+</button>
 
-  button {
-    cursor: pointer;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 2px solid #333;
-    background: #fafafa;
-    transition: background 0.2s ease;
-    color: black;
-  }
-  button:hover:not(:disabled) {
-    background: #eee;
-  }
-  button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
+<button class="instructions-btn" onclick={toggleInstructions} disabled={flying}>
+  {showInstructions ? 'Hide' : 'Show'} Instructions
+</button>
 
-  .deck-container {
-    cursor: pointer;
-    user-select: none;
-  }
+<button class="video-recorder-btn" onclick={toggleVideoRecorder} disabled={flying || !gameStarted}>
+  📹 Record
+</button>
 
-  .card {
-    width: 140px;
-    height: 195px;
-    border: 2px solid #333;
-    border-radius: 12px;
-    background-color: transparent;
-    overflow: hidden;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
-    position: relative;
-    user-select: none;
-    transition: transform 0.3s ease-in-out;
-  }
+{#if showInstructions}
+  <div class="instructions-overlay" onclick={toggleInstructions}>
+    <div class="instructions-content" onclick={(e) => e.stopPropagation()}>
+      <h2>Ready, Sit, Play! - Game Instructions</h2>
+      
+      <div class="instructions-section">
+        <h3>🎯 Objective</h3>
+        <p>Be the first player to reach 20 points by successfully completing dog tricks and using action cards strategically!</p>
+      </div>
 
-  .card.open {
-    box-shadow: 0 0 15px rgba(0,0,0,0.4);
-  }
+      <div class="instructions-section">
+        <h3>🃏 Card Types</h3>
+        <div class="card-types">
+          <div class="card-type">
+            <h4>Trick Cards</h4>
+            <ul>
+              <li><strong>Basic (1 point):</strong> Sit, Stay, Come, Down</li>
+              <li><strong>Intermediate (2 points):</strong> Shake, Roll Over, Play Dead, Spin, High Five</li>
+              <li><strong>Advanced (3 points):</strong> Bow, Crawl, Back Up, Weave</li>
+              <li><strong>Expert (4 points):</strong> Balance, Fetch Specific</li>
+            </ul>
+          </div>
+          <div class="card-type">
+            <h4>Action Cards</h4>
+            <p>Special cards that provide advantages, challenges, or game-changing effects like extra turns, position swaps, and advantage stealing.</p>
+          </div>
+        </div>
+      </div>
 
-  .card-back {
-    width: 70px;
-    height: 90px;
-    border-radius: 12px;
-    border: 2px solid #000;
-    box-shadow: 0 0 8px rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
+      <div class="instructions-section">
+        <h3>🎮 How to Play</h3>
+        <ol>
+          <li><strong>Start:</strong> Click "Start Game" to begin</li>
+          <li><strong>Draw Card:</strong> A random card is drawn for the current player</li>
+          <li><strong>Perform Action:</strong>
+            <ul>
+              <li>For <strong>Trick Cards:</strong> Teach/perform the trick with your dog</li>
+              <li>For <strong>Action Cards:</strong> Follow the card's instructions</li>
+            </ul>
+          </li>
+          <li><strong>Mark Success/Failure:</strong> Click ✓ for success or ✗ for failure</li>
+          <li><strong>Scoring:</strong> Successful tricks award points based on difficulty</li>
+          <li><strong>Win Condition:</strong> First player to reach 20 points wins!</li>
+        </ol>
+      </div>
 
-  .card-back-logo {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    z-index: 2;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-  }
+      <div class="instructions-section">
+        <h3>🏆 Advantage Cards</h3>
+        <p>Some action cards give you advantage cards that can help with difficult tricks:</p>
+        <ul>
+          <li>Treat Motivation, Toy Reward, Extra Time</li>
+          <li>Second Chance, Easier Variation</li>
+          <li>Verbal Encouragement, Physical Guidance, Practice Round</li>
+        </ul>
+        <p><em>Click on advantage cards to use them (removes them from your collection)</em></p>
+      </div>
 
-  .back-action {
-    background-color: #fff;
-    background-image: repeating-linear-gradient(45deg, #ddd 0 10px, #eee 10px 20px);
-    border-color: #bbb;
-  }
+      <div class="instructions-section">
+        <h3>📱 Video Recording</h3>
+        <p>Use the "📹 Record" button to record yourself performing tricks! The video recorder helps you:</p>
+        <ul>
+          <li>Document successful trick performances</li>
+          <li>Review and improve your training technique</li>
+          <li>Share your dog's progress with others</li>
+        </ul>
+      </div>
 
-  .back-challenge {
-    background-color: #111;
-    background-image: repeating-linear-gradient(45deg, #333 0 10px, #222 10px 20px);
-    border-color: #000;
-  }
+      <button class="close-instructions" onclick={toggleInstructions}>Close Instructions</button>
+    </div>
+  </div>
+{/if}
 
-  .back-mini-game {
-    background-color: #444; background-image: repeating-linear-gradient(
-      45deg,
-      red 0 10px,
-      green 10px 20px,
-      yellow 20px 30px,
-      blue 30px 40px
-    );
-    border-color: #000;
-  }
+{#if showVideoRecorder}
+  <div class="video-overlay">
+    <div class="video-content">
+      <VideoRecorder on:videoAction={handleRecordedVideo} />
+      <button class="close-video" onclick={() => showVideoRecorder = false}>Close</button>
+    </div>
+  </div>
+{/if}
+
+<main>
+  <h1>Ready, Sit, Play!</h1>
   
-  .back-mini-game {
-    background: linear-gradient(45deg, 
-      #ff6b6b 0%, #4ecdc4 25%, #45b7d1 50%, #96ceb4 75%, #ffeaa7 100%);
-    background-size: 400% 400%;
-    animation: gradient-shift 3s ease infinite;
-  }
+  {#if !gameStarted}
+    <button onclick={startGame}>Start Game</button>
+  {:else if gameOver}
+    <div class="game-over">
+      <h2>🎉 Game Over! 🎉</h2>
+      <p>
+        {players.find(p => p.position >= 20)?.name || 'Someone'} wins with {Math.max(...players.map(p => p.position))} points!
+      </p>
+      <button onclick={resetGame}>Play Again</button>
+    </div>
+  {:else}
+    <div class="game-board">
+      {#each players as player}
+        <div class="player-section" class:active={player.id === currentPlayer}>
+          <h3>{player.name} {player.id === currentPlayer ? '(Current Turn)' : ''}</h3>
+          <p>Position: {player.position}/20</p>
+          
+          {#if player.advantages.length > 0}
+            <div class="advantage-cards">
+              <strong>Advantages:</strong>
+              {#each player.advantages as advantage}
+                <span 
+                  class="advantage-card" 
+                  onclick={() => removeAdvantage(player.id, advantage)}
+                  title="Click to use this advantage"
+                >
+                  {advantage}
+                </span>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/each}
+    </div>
 
-  .drawn-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-  }
+    {#if activeCard}
+      <div class="active-card">
+        <div class="card-header">
+          <h3>{activeCard.name}</h3>
+          <button class="card-info-btn" title="Card Information">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4"/>
+              <path d="M12 8h.01"/>
+            </svg>
+          </button>
+        </div>
+        <div class="card-content">
+          <div class="card-image-container">
+            <img src={activeCard.image} alt={activeCard.name} class="card-image" />
+          </div>
+          <div class="card-details">
+            <p class="card-category">{activeCard.category}</p>
+            <p class="card-description">{activeCard.description}</p>
+            {#if activeCard.type === 'trick'}
+              <p class="card-points">Points: {getPointsForCategory(activeCard.category)}</p>
+            {/if}
+          </div>
+        </div>
+        
+        <div class="card-actions">
+          {#if activeCard.category === 'Action'}
+            <button 
+              class="action-completed-btn" 
+              onclick={actionCompleted} 
+              disabled={flying || gameOver}
+            >
+              ✓
+            </button>
+            <button 
+              class="action-failed-btn" 
+              onclick={actionCardFailed} 
+              disabled={flying || gameOver}
+            >
+              ✗
+            </button>
+          {:else}
+            <button 
+              class="trick-completed-btn" 
+              onclick={trickCompleted} 
+              disabled={flying || gameOver}
+            >
+              ✓ Completed
+            </button>
+            <button 
+              class="trick-failed-btn" 
+              onclick={trickFailed} 
+              disabled={flying || gameOver}
+            >
+              ✗ Failed
+            </button>
+          {/if}
+        </div>
+      </div>
+    {/if}
+  {/if}
+</main>
 
-  .small-card {
-    width: 90px;
-    height: 125px;
-    overflow: hidden;
-  }
-
-  .active-card-container {
-    position: relative;
-    min-height: 240px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .cards-row {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-  }
-  .flying-left {
-    animation: fly-left 0.8s forwards cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .flying-right {
-    animation: fly-right 0.8s forwards cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @keyframes fly-left {
-    0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateX(-300px) translateY(-100px) rotate(-30deg); opacity: 0; }
-  }
-  @keyframes fly-right {
-    0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateX(300px) translateY(-100px) rotate(30deg); opacity: 0; }
-  }
-
-  @keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  .advantage-message {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #ffd700, #ffed4e);
-    color: #333;
-    padding: 2rem;
-    border-radius: 15px;
-    border: 3px solid #ff6b35;
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-    z-index: 8888;
-    max-width: 1400px;
-  }
-
-  @keyframes advantage-glow {
-    0% {
-      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-      transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-      box-shadow: 0 0 50px rgba(255, 107, 53, 0.9);
-      transform: translate(-50%, -50%) scale(1.02);
-    }
-  }
-
-  .action-tooltip {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #4a90e2, #357abd);
-    color: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    border: 2px solid #2c5aa0;
-    box-shadow: 0 0 25px rgba(74, 144, 226, 0.6);
-    font-size: 1.1rem;
-    text-align: center;
-    z-index: 8000;
-    max-width: 400px;
-    line-height: 1.4;
-  }
-
-  .mini-game-explanation {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #96ceb4, #45b7d1);
-    color: white;
-    padding: 2rem;
-    border-radius: 15px;
-    border: 3px solid #4ecdc4;
-    box-shadow: 0 0 30px rgba(78, 205, 196, 0.6);
-    font-size: 1rem;
-    text-align: left;
-    z-index: 8000;
-    max-width: 800px;
-    max-height: 80vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    line-height: 1.5;
-    white-space: pre-line;
-  }
-
-  .mini-game-explanation h4 {
-    margin: 0 0 1rem 0;
-    font-size: 1.4rem;
-    color: #ffd700;
-    text-align: center;
-  }
-
-  .action-tooltip h4 {
-    margin: 0 0 1rem 0;
-    font-size: 1.3rem;
-    color: #ffd700;
-  }
-
+<style>
   .instructions-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    z-index: 10000;
-    padding: .5rem;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
     box-sizing: border-box;
-    animation: instructions-fade-in 1s ease-out;
-   overflow-y: auto;
   }
 
   .instructions-content {
-    max-width: 600px;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.1);
+    background-color: white;
+    color: #333;
     padding: 2rem;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    animation: instructions-slide-up 1.2s ease-out 0.3s both;
-   width: 80%;
-   max-height: calc(100vh - 4rem);
-   overflow-y: auto;
-   display: flex;
-   flex-direction: column;
+    border-radius: 12px;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
 
-  .overlay-logo {
-  padding: .3rem;
-    height: 80px;
-    object-fit: contain;
-    margin: 0 auto 1.5rem auto;
-    display: block;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-   flex-shrink: 0;
-  }
-
-  .instructions-title {
-    font-size: 2.5rem;
-    font-weight: bold;
+  .instructions-content h2 {
+    color: #646cff;
+    margin-bottom: 1.5rem;
     text-align: center;
-    margin-bottom: 2rem;
-    color: white;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-   flex-shrink: 0;
   }
 
   .instructions-section {
     margin-bottom: 1.5rem;
-    animation: section-fade-in 0.8s ease-out var(--delay) both;
-   flex-grow: 1;
   }
 
   .instructions-section h3 {
-    font-size: 1.4rem;
-    color: white;
+    color: #646cff;
     margin-bottom: 0.5rem;
-    font-weight: bold;
   }
 
-  .instructions-section p {
-    margin: 0.5rem 0;
-    line-height: 1.6;
-    font-size: 1.1rem;
-    color: white;
+  .card-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
   }
 
- .instructions-footer {
-   flex-shrink: 0;
- }
+  .card-type {
+    background-color: #f5f5f5;
+    padding: 1rem;
+    border-radius: 8px;
+  }
 
-  .card-info-icon {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
-    background: rgba(0, 0, 0, 0.7);
+  .card-type h4 {
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  .close-instructions {
+    background-color: #646cff;
     color: white;
     border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  .close-instructions:hover {
+    background-color: #535bf2;
+  }
+
+  .video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  .video-content {
+    background-color: #1a1a1a;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .close-video {
+    background-color: #ff6b35;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  .close-video:hover {
+    background-color: #ff5722;
+  }
+
+  .game-board {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .player-section.active {
+    border-color: #ffd700;
+    background-color: rgba(255, 215, 0, 0.1);
+  }
+
+  .active-card {
+    border: 3px solid #646cff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    background-color: rgba(100, 108, 255, 0.05);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .card-header h3 {
+    margin: 0;
+    color: #646cff;
+  }
+
+  .card-info-btn {
+    background: none;
+    border: 2px solid #646cff;
+    color: #646cff;
     border-radius: 50%;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
     transition: all 0.2s ease;
-    z-index: 10;
-    backdrop-filter: blur(5px);
+    padding: 0;
   }
 
-  .card-info-icon:hover {
-    background: rgba(0, 0, 0, 0.9);
+  .card-info-btn:hover {
+    background-color: #646cff;
+    color: white;
     transform: scale(1.1);
   }
 
-  .card-info-icon svg {
+  .card-info-btn svg {
     width: 16px;
     height: 16px;
   }
 
-  .instruction-icon {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(100, 108, 255, 0.9);
-    color: white;
-    border: none;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
+  .card-content {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    z-index: 10;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
   }
 
-  .instruction-icon:hover {
-    background: rgba(100, 108, 255, 1);
-    transform: scale(1.1);
+  .card-image-container {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #ddd;
   }
 
-  @media (max-width: 800px) {
-    .mini-game-content {
-      width: 95%;
-      max-width: 95vw;
-      padding: 15px;
-    }
+  .card-details {
+    flex: 1;
   }
-  .start-button {
-    background: linear-gradient(45deg, #ff6b35, #ffd700);
-    color: #333;
-    border: none;
-    padding: 1rem 2rem;
-    font-size: 1.3rem;
+
+  .card-category {
     font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    animation: button-bounce 2s ease-in-out infinite;
-  }
-
-  .step-indicator {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: white;
-    font-size: 1.1rem;
-  }
-
-  .step-dots {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-   margin-bottom: 1rem;
-  }
-
-  .step-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transition: background 0.3s ease;
-  }
-
-  .step-dot.active {
-    background: white;
-  }
-
-  .start-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-  }
-
-  .skip-button {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    border-radius: 25px;
-    cursor: pointer;
-    margin-left: 1rem;
-    transition: all 0.3s ease;
-  }
-
-  .skip-button:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: scale(1.05);
-  }
-
-  .golden-bone-active-illustration {
-    display: block;
-    margin: -1rem;
-    width: 80px;
-    height: 80px;
-    object-fit: contain ;
-    filter: drop-shadow(0 0 6px #ffd700);
-  }
-
-  @keyframes instructions-fade-in {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-
-  @keyframes instructions-slide-up {
-    0% { 
-      opacity: 0;
-      transform: translateY(50px);
-    }
-    100% { 
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes section-fade-in {
-    0% { 
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    100% { 
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes button-bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-  }
-
-  .edge-action {
-    border-color: #000 !important;
-    border-width: 5px !important;
-  }
-
-  .edge-challenge {
-    border-color: #fff !important;
-    border-width: 5px !important;
-  }
-
-  .edge-mini-game {
-    border: 5px solid transparent !important;
-    background: linear-gradient(white, white) padding-box, 
-                linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7) border-box !important;
-  }
-
-  .edge-advantage {
-    border: 2.5px solid transparent !important;
-    background: linear-gradient(135deg, #ffd700, #ffed4e) padding-box, 
-                linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7) border-box !important;
-  }
-
-
-  .winner-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(135deg, #ff6b35 0%, #ff4757 100%);
-    color: white;
-    font-size: 3rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-  }
-
-  .turn-indicator {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    text-align: center;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    color: white;
-  }
-
-   .turn-indicator.player1 {
-    text-shadow: 
-      0 -1px 2px #22c55e,
-      0 1px 2px #22c55e,
-      0 2px 4px rgba(0,0,0,0.3);
-  }
-
-  .turn-indicator.player2 {
-    text-shadow: 
-     0 -1px 2px #1d4ed8,
-     0 1px 2px #1d4ed8,
-      0 2px 4px rgba(0,0,0,0.3);
-  }
-
-  .turn-indicator.player3 {
-    text-shadow: 
-      0 -1px 2px #dc2626,
-      0 1px 2px #dc2626,
-      0 2px 4px rgba(0,0,0,0.3);
-  }
-
-  .top-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.25rem;
+    color: #646cff;
     margin-bottom: 0.5rem;
   }
 
-  .tiny-card {
-    width: 70px;
-    height: 95px;
-    border: 2px solid #333;
-    border-radius: 12px;
-    background: #fefefe;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: black;
-    font-size: 0.7rem;
-    padding: 0.25rem;
-    overflow: hidden;
+  .card-description {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
   }
 
-  .review-button {
-    position: fixed;
-    top: .25rem;
-    right: .25rem;
-    padding: 0.13rem 0.25rem;
-    font-size: 0.6rem;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    z-index: 100;
-    transition: background 0.2s ease;
-  }
-
-  .review-button:hover {
-    background: rgba(255, 255, 255, 1);
-  }
-
-  .timer-button {
-    position: fixed;
-    top: 160px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(45deg, #333, #000);
-    color: #ffffff;
-    border: none;
-    padding: 0;
-    font-size: 0.8rem;
+  .card-points {
     font-weight: bold;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 999;
+    color: #22c55e;
+  }
+
+  .card-actions {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-  }
-
-  .timer-button:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-  }
-
-  .timer-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .timer-button svg {
-    width: 24px;
-    height: 24px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-  }
-
-  .action-completed-btn {
-    position: fixed;
-    top: 240px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(45deg, #22c55e, #16a34a);
-    color: #ffffff;
-    border: none;
-    padding: 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-    z-index: 999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .action-completed-btn:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
-  }
-
-  .action-completed-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .action-failed-btn {
-    position: fixed;
-    top: 300px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(45deg, #ef4444, #dc2626);
-    color: #ffffff;
-    border: none;
-    padding: 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    z-index: 999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .action-failed-btn:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-  }
-
-  .action-failed-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .player-section {
-    border: 2px solid #646cff;
-    border-radius: 12px;
-    padding: 1.5rem;
-    background-color: rgba(100, 108, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .player-content {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .player-cards-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .cards-container {
-    display: flex;
-    flex-wrap: wrap;
     gap: 1rem;
     justify-content: center;
   }
 
-  .advantage-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-  }
-
-  .mini-game-win-btn {
-    border-radius: 8px;
-    border: none;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .trick-completed-btn, .action-completed-btn {
+    background-color: #22c55e;
     color: white;
-    white-space: nowrap;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.25s;
   }
 
-  .mini-game-win-btn-p1 {
-    background-color: #ff6b35;
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  .trick-completed-btn:hover:not(:disabled), .action-completed-btn:hover:not(:disabled) {
+    background-color: #16a34a;
+    transform: translateY(-2px);
   }
 
-  .mini-game-win-btn-p1:hover:not(.disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+  .trick-failed-btn, .action-failed-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.25s;
   }
 
-  .mini-game-win-btn-p2 {
-    background-color: #4ecdc4;
-    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+  .trick-failed-btn:hover:not(:disabled), .action-failed-btn:hover:not(:disabled) {
+    background-color: #dc2626;
+    transform: translateY(-2px);
   }
 
-  .mini-game-win-btn-p2:hover:not(.disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(78, 205, 196, 0.4);
-  }
-
-  .mini-game-win-btn-p3 {
-    background-color: #45b7d1;
-    box-shadow: 0 4px 12px rgba(69, 183, 209, 0.3);
-  }
-
-  .mini-game-win-btn-p3:hover:not(.disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(69, 183, 209, 0.4);
-  }
-
-  .mini-game-win-btn.disabled {
+  .trick-completed-btn:disabled, .trick-failed-btn:disabled,
+  .action-completed-btn:disabled, .action-failed-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
-    pointer-events: none;
   }
 
-  @media (max-width: 800px) {
-    .card { width: 120px; height: 150px; font-size: 1rem; }
-    .small-card { width: 75px; height: 100px; }
-    .tiny-card { width: 55px; height: 70px; font-size: 0.6rem; }
-    .deck-area { min-height: 380px; }
-    
-    .advantage-message {
-      max-width: 90vw;
-      padding: 1.5rem;
-      font-size: 1rem;
-    }
-    
-    .mini-game-explanation {
-      max-width: 90vw;
-      padding: 1.5rem;
-      font-size: 0.9rem;
-    }
-    
-    .active-card-container {
-      min-height: 200px;
-    }
-    
-    .active-card-container + div {
-      margin-top: 0.05rem;
+  .game-over {
+    text-align: center;
+    padding: 2rem;
+    border: 3px solid #ffd700;
+    border-radius: 12px;
+    background-color: rgba(255, 215, 0, 0.1);
+  }
+
+  .game-over h2 {
+    color: #ffd700;
+    margin-bottom: 1rem;
+  }
+
+  .game-over button {
+    background-color: #646cff;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+  }
+
+  .game-over button:hover {
+    background-color: #535bf2;
+  }
+
+  @media (max-width: 600px) {
+    .card-content {
+      flex-direction: column;
     }
 
-    .instructions-overlay {
-      padding: 1rem;
+    .card-image-container {
+      width: 100%;
+      height: 200px;
+    }
+
+    .card-actions {
+      flex-direction: column;
+    }
+
+    .game-board {
+      flex-direction: column;
+      gap: 1rem;
     }
 
     .instructions-content {
-      max-width: 95vw;
-      padding: 1.5rem;
-      margin: 0;
+      padding: 1rem;
+      margin: 0.5rem;
     }
 
-    .overlay-logo {
-      width: 60px;
-      height: 60px;
-      margin-bottom: 1rem;
-    }
-
-    .instructions-title {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .instructions-section {
-      margin-bottom: 1rem;
-    }
-
-    .instructions-section h3 {
-      font-size: 1.2rem;
-    }
-
-    .instructions-section p {
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-
-    .start-button {
-      padding: 0.75rem 1.5rem;
-      font-size: 1.1rem;
-    }
-
-    .skip-button {
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      margin-left: 0.5rem;
-      margin-top: 0.5rem;
+    .card-types {
+      grid-template-columns: 1fr;
     }
   }
-
 </style>
-
-{#if showInstructions}
-  <div class="instructions-overlay">
-    <div class="instructions-content">
-      <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
-      <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-        Balancedog
-      </div>
-      
-      {#if currentStep === 1}
-        <h1 class="instructions-title">Ready, Sit, Play!</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-          <p>Welcome to Ready, Sit, Play!</p>
-          <p>The tail-wagging card game where you and your dog team up for treats, challenges, and non-stop fun!</p>
-        </div>
-      {/if}
-
-      {#if currentStep === 2}
-        <h1 class="instructions-title">Player Setup</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-          <p>Let's get you and your furry friend ready to play!</p>
-          <div style="margin-top: 1rem;">
-            <label for="player1Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 1:</label>
-            <input type="text" id="player1Name" bind:value={player1Name} placeholder="Enter Player 1's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-
-            <label for="player2Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 2:</label>
-            <input type="text" id="player2Name" bind:value={player2Name} placeholder="Enter Player 2's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-
-            <label for="player3Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 3 (Optional):</label>
-            <input type="text" id="player3Name" bind:value={player3Name} placeholder="Enter Player 3's name (optional)" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-
-            <label for="dogName" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Canine Player:</label>
-            <input type="text" id="dogName" bind:value={dogName} placeholder="Enter your dog's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-
-            <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email (Optional):</label>
-            <input type="email" id="email" bind:value={email} placeholder="Enter your email" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-          </div>
-        </div>
-      {/if}
-
-      {#if currentStep === 3}
-        <h1 class="instructions-title">How to Play</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>In order to win, be the first player to collect {player3Name.trim() ? 'four' : 'six'} Action Cards by successfully completing dog training tasks.</strong></p>
-          <p>Your turn begins by picking up the card facing down at the top of the deck.</p>
-        </div>
-      {/if}
-
-      {#if currentStep === 4}
-        <h1 class="instructions-title">Action Cards</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>Training commands to perform with your dog</strong></p>
-          <div class="card small-card edge-action" style="margin: 1rem auto;">
-            <img src="/card-images/6.png" class="card-image" />
-          </div>
-          <p>Guide {dogName || 'your dog'} to complete the action shown.</p>
-          <p><strong>Success:</strong> Reward {dogName || 'your dog'} with a treat and keep the card.</p>
-          <p><strong>Fail:</strong> The card is placed at the bottom of the deck.</p>
-        </div>
-      {/if}
-
-      {#if currentStep === 5}
-        <h1 class="instructions-title">Challenge Cards</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-           <p><strong>Make Action Cards harder for opponents</strong></p>
-          <div class="card small-card edge-challenge" style="margin: 1rem auto;">
-            <img src="/card-images/11.png" class="card-image" />
-          </div>
-         <p>As an opponent reveals an Action Card, you can play your Challenge Card to make their turn more difficult.</p>
-           <p>From your reserve, tap on it to trigger its effect.</p>
-        </div>
-      {/if}
-
-      {#if currentStep === 6}
-        <h1 class="instructions-title">Mini-Game Cards</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>Competitive challenges that give you special advantages</strong></p>
-           <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
-            <img src="/card-images/19.png" class="card-image" />
-          </div>
-          <p>Once a Mini-Game card is revealed, all players compete following the unique rules of that card. The winner earns a special advantage.</p>
-          <p>From your reserve, tap on it to trigger its effect.</p>
-        </div>
-      {/if}
-
-         {#if currentStep === 7}
-        <h1 class="instructions-title">Mini-Game Advantages</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-           <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
-            <img src="/card-images/27.png" class="card-image" />
-          </div>
-          <p><strong>Awarded to the first Mini-Game winner</strong></p>
-          <p>With which your turn has no time limit.</p>
-          <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
-            <img src="/card-images/28.png" class="card-image" />
-          </div>
-          <p><strong>Awarded to the second Mini-Game winner</strong></p>
-          <p>With which you can block and eliminate a Challenge Card used against you.</p>
-          <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
-            <img src="/card-images/29.png" class="card-image" />
-          </div>
-          <p><strong>Awarded to the third Mini-Game winner</strong></p>
-          <p>Which allows you to steal an Action Card from an opponent.</p>
-        </div>
-      {/if}
-      
-      {#if currentStep === 8}
-        <h1 class="instructions-title">You're All Set!</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-          <p>Remember: The goal is to have fun training with your dog while playing a competitive game.</p>
-          <p>Good luck, and may the best trainer win!</p>
-          </div>
-          <div style="text-align: center; font-size: 3rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-        Ready, Sit, Play!
-      </div>
-         <div style="text-align: center; font-size: 0.7rem; color: white; margin-bottom: 1rem; margin-top: -1rem;">
-        Need Help? Use the "Review Instructions" button anytime during the game.
-      </div> 
-        {/if}
-        
-      <div class="step-dots">
-        {#each Array(totalSteps) as _, i}
-          <div class="step-dot {currentStep === i + 1 ? 'active' : ''}"></div>
-        {/each}
-      </div>
-
-     <div class="instructions-footer" style="text-align: center;">
-        {#if currentStep > 1}
-          <button class="skip-button" onclick={goBack} style="margin-right: 1rem;">
-            Back
-          </button>
-        {/if}
-        {#if currentStep === 2}
-          <button class="start-button" onclick={startGame}>
-            Next
-          </button>
-        {:else}
-          <button class="start-button" onclick={startGame}>
-            {currentStep < totalSteps ? 'Next' : 'Start Playing!'}
-          </button>
-        {/if}
-        <button class="skip-button" onclick={skipInstructions}>
-          Skip Instructions
-        </button>
-      </div>
-    </div>
-  </div>
-{/if}
-
-{#if showTieOverlay}
-  <div class="instructions-overlay">
-    <div class="instructions-content">
-      <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
-      Balancedog
-      <div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);">
-        Ready, Sit, Play!
-      </div> <h1 class="instructions-title">It's a Tie!</h1>
-      <div class="instructions-section" style="--delay: 0.5s">
-        <p>Congratulations! You both are amazing at communicating with your dog!</p>
-        <p>To settle this game and declare a winner, make sure to be standing at the opposite sides of the room with {dogName || 'your dog'} in the middle, call their name at the same time.</p>
-      </div>
-      
-      <div style="text-align: center;">
-        <button class="start-button" onclick={animateShuffle}>
-          Restart Game
-        </button>
-      </div>
-    </div>
-  </div>
-{/if}
-
-<div class="deck-area">
-  <button class="review-button" onclick={reviewInstructions} disabled={isShuffling || gameOver}>
-    Review Instructions
-  </button>
-  
-  <button 
-    class="undo-btn" 
-    onclick={undoLastStep}
-    disabled={stateHistory.length === 0 || isShuffling || gameOver}
-  >
-    Back
-  </button>
-
-  <!-- Turn indicator above the deck -->
-  {#if !gameOver && !isShuffling}
-    <div class="turn-indicator player{currentTurn}">
-      {#if currentTurn === 1}
-        {player1Name || 'Player 1'}'s turn
-      {:else if currentTurn === 2}
-        {player2Name || 'Player 2'}'s turn
-      {:else}
-        {player3Name || 'Player 3'}'s turn
-      {/if}
-    </div>
-  {/if}
-
-  <!-- Golden Bone Illustration -->
-  {#if goldenBoneActive}
-    <div style="text-align: center; margin-bottom: 1rem;">
-      <img src="/golden-bone-illustration.png" class="golden-bone-active-illustration" />
-    </div>
-  {/if}
-
-  <div
-    class="deck-container"
-    onclick={revealNextCard}
-    title="Click to draw the next card"
-    style="pointer-events: {isShuffling || activeCard !== null || gameOver ? 'none' : 'auto'}"
-  >
-    {#if !activeCard}
-      {#if shuffledDeck.length > 0}
-        <div class="card card-back back-{getCardBackType()}">
-          <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
-        </div>
-      {:else}
-        <div class="card card-back back-action">
-          <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
-        </div>
-      {/if}
-    {/if}
-  </div>
-
-  {#if activeCard}
-    <div class="active-card-container">
-      <!-- Show the active card -->
-      <div class="cards-row">
-        <div class="card open edge-{activeCard.category.toLowerCase().replace(' ', '-')}" 
-             class:flying-left={flying && flyingDirection === 'left'}
-             class:flying-right={flying && flyingDirection === 'right'}>
-          <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
-          <button 
-            class="card-info-icon"
-            onclick={() => {
-              isReviewingInstructions = true;
-              isReviewingInstructions = true;
-              if (activeCard.category === 'Action') {
-                showActionInstruction(activeCard);
-              } else if (activeCard.category === 'Challenge') {
-                showChallengeInstruction(activeCard);
-              } else if (activeCard.category === 'Mini Game') {
-                showMiniGameInstruction(activeCard);
-              }
-            }}
-            title="Show instructions for this card"
-          >
-            <svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 32 32" xml:space="preserve" stroke="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path d="M17.962,24.725l1.806,0.096v2.531h-7.534v-2.406l1.045-0.094c0.568-0.063,0.916-0.254,0.916-1.014v-8.801 c0-0.699-0.188-0.92-0.791-0.92l-1.106-0.062v-2.626h5.666L17.962,24.725L17.962,24.725z M15.747,4.648 c1.394,0,2.405,1.047,2.405,2.374c0,1.331-1.014,2.313-2.438,2.313c-1.454,0-2.404-0.982-2.404-2.313 C13.31,5.695,14.26,4.648,15.747,4.648z M16,32C7.178,32,0,24.822,0,16S7.178,0,16,0c8.82,0,16,7.178,16,16S24.82,32,16,32z M16,3 C8.832,3,3,8.832,3,16s5.832,13,13,13s13-5.832,13-13S23.168,3,16,3z"></path> </g> </g></svg>
-          </button>
-        </div>
-
-        <!-- If challenge card active, show it side by side -->
-        {#if selectedChallengeCard}
-          <div class="card open edge-challenge">
-          <img src="/card-images/{selectedChallengeCard.id}.png" alt="Card {selectedChallengeCard.id}" class="card-image" />
-            <button 
-              class="card-info-icon"
-              onclick={() => showChallengeInstruction(selectedChallengeCard)}
-              title="Show instructions for this challenge card"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-              </svg>
-            </button>
-            <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
-              (Challenge Card Active)
-            </div>
-          </div>
-        {/if}
-      </div>
-    </div>
-
-    <!-- Timer controls below the cards -->
-  {#if activeCard}
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.1rem;">
-      
-      {#if activeCard.category === 'Action'}
-        <button 
-          class="action-completed-btn" 
-          onclick={actionCompleted} 
-          disabled={flying || gameOver}
-        >
-          ✓
-        </button>
-        <button 
-          class="action-failed-btn" 
-          onclick={actionCardFailed} 
-          disabled={flying || gameOver}
-        >
-          ✗
-        </button>
-      {/if}
-      
-      {#if timerRunning}
-        <div style="font-weight: bold; font-size: 1.2rem; color: #ff6b35;">
-          Timer: {timer}s
-        </div>
-      {/if}
-
-      <!-- Video Recording for Action and Mini Game cards -->
-      {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
-        <VideoRecorder on:videoAction={handleRecordedVideo} />
-      {/if}
-
-      <!-- Timer Button positioned below the recording button -->
-      {#if canStartTimer()}
-        <button class="timer-button" onclick={startTimer} disabled={!canStartTimer()}>
-          <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 28 32" enable-background="new 0 0 28 32" xml:space="preserve" fill="#ffffff" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path fill="#808184" d="M12.926,32c6.675,0,12.334-5.194,12.883-11.825c0.023-0.275-0.182-0.517-0.457-0.54 c-0.254-0.019-0.516,0.182-0.539,0.457C24.306,26.208,19.084,31,12.926,31C6.35,31,1,25.662,1,19.1 c0-4.816,2.879-9.129,7.334-10.988c0.255-0.106,0.375-0.399,0.27-0.654C8.496,7.203,8.201,7.083,7.949,7.189 C3.12,9.204,0,13.879,0,19.1C0,26.213,5.799,32,12.926,32z"></path> <path fill="#808184" d="M24.803,18.107c0.021,0.262,0.24,0.459,0.497,0.459c0.014,0,0.027,0,0.042-0.001 c0.274-0.022,0.479-0.264,0.457-0.539c-0.393-4.815-3.419-8.967-7.896-10.837c-0.252-0.107-0.547,0.014-0.653,0.269 s0.014,0.548,0.269,0.654C21.648,9.837,24.44,13.667,24.803,18.107z"></path> <path fill="#808184" d="M8.938,1h8c0.275,0,0.5,0.224,0.5,0.5v2c0,0.276-0.225,0.5-0.5,0.5h-1c-0.827,0-1.5,0.673-1.5,1.5V9 c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5V5.5c0-0.276,0.225-0.5,0.5-0.5h1c0.827,0,1.5-0.673,1.5-1.5v-2 c0-0.827-0.673-1.5-1.5-1.5h-8c-0.827,0-1.5,0.673-1.5,1.5v2c0,0.827,0.673,1.5,1.5,1.5h1c0.275,0,0.5,0.224,0.5,0.5V9 c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5V5.5c0-0.827-0.673-1.5-1.5-1.5h-1c-0.275,0-0.5-0.224-0.5-0.5v-2 C8.438,1.224,8.662,1,8.938,1z"></path> <path fill="#808184" d="M24.218,2.819c-0.195,0.195-0.195,0.512,0,0.707l1.11,1.108l-2.751,2.746c-0.195,0.195-0.195,0.512,0,0.707 c0.098,0.098,0.226,0.147,0.354,0.147s0.256-0.049,0.354-0.146l2.753-2.747l1.111,1.108c0.098,0.097,0.226,0.146,0.354,0.146 c0.128,0,0.256-0.049,0.354-0.147c0.195-0.195,0.195-0.512,0-0.707l-2.929-2.923C24.73,2.624,24.413,2.623,24.218,2.819z"></path> <path fill="#808184" d="M13.938,20h6.5c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-6.5c-0.275,0-0.5-0.224-0.5-0.5V11 c0-0.276-0.224-0.5-0.5-0.5s-0.5,0.224-0.5,0.5v7.5C12.438,19.327,13.11,20,13.938,20z"></path> </g> </g></svg>
-        </button>
-      {/if}
-    </div>
-  {/if}
-  {/if}
-
-  <div style="display:flex; justify-content: space-around; width: 100%; margin-top: 1rem;">
-    <!-- Player 1 Cards -->
-    <div>
-      {#if activeCard && activeCard.category === 'Mini Game'}
-        <div 
-          class="mini-game-win-btn mini-game-win-btn-p1" 
-          class:disabled={flying || gameOver}
-          onclick={() => playerWins(1)}
-          title="{player1Name || 'Player 1'} Wins This Round"
-        >
-         {player1Name || 'Player 1'} Wins
-        </div>
-      {/if}
-
-      <h3>{player1Name || 'Player 1'}'s Cards ({player1Cards.filter(c => c.category === 'Action').length})</h3>
-
-      <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
-      <div class="top-row">
-        {#each player1Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
-          <div
-            class="card tiny-card edge-{card.category.toLowerCase()}"
-            onclick={() => {
-              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1) {
-                activateChallengeCard(card, 1);
-              }
-            }}
-            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1 ? 'pointer' : 'default'}"
-            title={card.label}
-          >
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
-        
-        <!-- Advantage cards -->
-        {#each player1AdvantageCards as advantageCard (advantageCard.id)}
-          <div
-            class="card tiny-card edge-advantage"
-            onclick={() => {
-              if (currentTurn === 1) {
-                useAdvantageCard(advantageCard.id, 1);
-              }
-            }}
-            style="cursor: {currentTurn === 1 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 1 ? 1 : 0.4};"
-            title={advantageCard.message}
-          >
-            <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
-          </div>
-        {/each}
-      </div>
-
-      <!-- Bottom row: Action cards -->
-      <div class="drawn-cards" style="margin-top: 0.25rem;">
-        {#each player1Cards.filter(c => c.category === 'Action') as card (card.id)}
-          <div class="card small-card edge-action">
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    <!-- Player 2 Cards -->
-    <div>
-      {#if activeCard && activeCard.category === 'Mini Game'}
-        <div 
-          class="mini-game-win-btn mini-game-win-btn-p2" 
-          class:disabled={flying || gameOver}
-          onclick={() => playerWins(2)}
-          title="{player2Name || 'Player 2'} Wins This Round"
-        >
-          {player2Name || 'Player 2'} Wins
-        </div>
-      {/if}
-
-      <h3>{player2Name || 'Player 2'}'s Cards ({player2Cards.filter(c => c.category === 'Action').length})</h3>
-
-      <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
-      <div class="top-row">
-        {#each player2Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
-          <div
-            class="card tiny-card edge-{card.category.toLowerCase()}"
-            onclick={() => {
-              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2) {
-                activateChallengeCard(card, 2);
-              }
-            }}
-            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2 ? 'pointer' : 'default'}"
-            title={card.label}
-          >
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
-        
-        <!-- Advantage cards -->
-        {#each player2AdvantageCards as advantageCard (advantageCard.id)}
-          <div
-            class="card tiny-card edge-advantage"
-            onclick={() => {
-              if (currentTurn === 2) {
-                useAdvantageCard(advantageCard.id, 2);
-              }
-            }}
-            style="cursor: {currentTurn === 2 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 2 ? 1 : 0.4};"
-            title={advantageCard.message}
-          >
-            <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
-          </div>
-        {/each}
-      </div>
-
-      <!-- Bottom row: Action cards -->
-      <div class="drawn-cards" style="margin-top: 0.25rem;">
-        {#each player2Cards.filter(c => c.category === 'Action') as card (card.id)}
-          <div class="card small-card edge-action">
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    <!-- Player 3 Cards (only show if player3Name exists) -->
-    {#if player3Name}
-      <div>
-        {#if activeCard && activeCard.category === 'Mini Game'}
-          <div 
-            class="mini-game-win-btn mini-game-win-btn-p3" 
-            class:disabled={flying || gameOver}
-            onclick={() => playerWins(3)}
-            title="{player3Name} Wins This Round"
-          >
-            {player3Name || 'Player 3'} Wins
-          </div>
-        {/if}
-
-        <h3>{player3Name}'s Cards ({player3Cards.filter(c => c.category === 'Action').length})</h3>
-
-        <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
-        <div class="top-row">
-          {#each player3Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
-            <div
-              class="card tiny-card edge-{card.category.toLowerCase()}"
-              onclick={() => {
-                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3) {
-                  activateChallengeCard(card, 3);
-                }
-              }}
-              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3 ? 'pointer' : 'default'}"
-              title={card.label}
-            >
-              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-            </div>
-          {/each}
-          
-          <!-- Advantage cards -->
-          {#each player3AdvantageCards as advantageCard (advantageCard.id)}
-            <div
-              class="card tiny-card edge-advantage"
-              onclick={() => {
-                if (currentTurn === 3) {
-                  useAdvantageCard(advantageCard.id, 3);
-                }
-              }}
-              style="cursor: {currentTurn === 3 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 3 ? 1 : 0.4};"
-              title={advantageCard.message}
-            >
-              <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
-            </div>
-          {/each}
-        </div>
-
-        <!-- Bottom row: Action cards -->
-        <div class="drawn-cards" style="margin-top: 0.25rem;">
-          {#each player3Cards.filter(c => c.category === 'Action') as card (card.id)}
-            <div class="card small-card edge-action">
-              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/if}
-  </div>
-
-   {#if gameOver && winner !== null}
-    <div
-      class="winner-overlay"
-      onclick={animateShuffle}
-      title="Tap to restart"
-    >
-      <div class="instructions-content">
-        <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
-        <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-          Balancedog
-        </div>
-         <div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);">
-        Ready, Sit, Play!
-      </div>
-        <h1 class="instructions-title">🎉 {#if winner === 1}{player1Name || 'Player 1'}{:else if winner === 2}{player2Name || 'Player 2'}{:else}{player3Name || 'Player 3'}{/if} Wins 🎉</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-          <p>Congratulations on the amazing teamwork with {dogName || 'your dog'}!</p>
-          <p>Tap anywhere to play again.</p>
-        </div>
-      </div>
-    </div>
-  {/if}
-</div>
-
-{#if showMiniGameExplanation}
-<div class="mini-game-explanation" onclick={hideMiniGameInstruction}>
-  <h4>{activeCard?.label} Rules</h4>
-  <div>{currentMiniGameExplanation}</div>
-  <button 
-    onclick={hideMiniGameInstruction} 
-    style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ffd700; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: block; margin-left: auto; margin-right: auto;"
-  >
-    Got it!
-  </button>
-</div>
-{/if}
-
-{#if showAdvantageOverlay}
-  <div class="advantage-message">
-    <div>{currentAdvantageMessage}</div>
-    <button onclick={dismissAdvantageOverlay} style="margin-top: 1rem; padding: 0.75rem 1.5rem; font-size: 1rem; background: #ff6b35; color: white; border: none; border-radius: 8px; cursor: pointer;">
-      Tap to Continue
-    </button>
-  </div>
-{/if}
-
-{#if showActionTooltip && actionTooltipCard}
-  <div class="action-tooltip" onclick={hideActionInstruction}>
-    <h4>{actionTooltipCard.label}</h4>
-    <p>{actionTooltipContent}</p>
-    <button 
-      onclick={hideActionInstruction} 
-      style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ffd700; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;"
-    >
-      Got it!
-    </button>
-  </div>
-{/if}
