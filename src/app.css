@@ -66,56 +66,6 @@ main {
   gap: 2rem;
 }
 
-.game-layout-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-  width: 100%;
-}
-
-.game-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  flex: 1;
-}
-
-.video-area {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  max-width: 400px;
-}
-
-.control-area {
-  display: flex;
-  justify-content: center;
-}
-
-@media (min-width: 768px) {
-  .game-layout-container {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 3rem;
-  }
-  
-  .game-area {
-    flex: 1;
-    max-width: 600px;
-  }
-  
-  .video-area {
-    max-width: 400px;
-  }
-  
-  .control-area {
-    flex-shrink: 0;
-  }
-}
-
 .player-section {
   border: 2px solid #646cff;
   border-radius: 12px;
@@ -169,6 +119,88 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+.instructions-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.instructions-btn:hover:not(:disabled) {
+  background-color: #535bf2;
+  transform: translateY(-2px);
+}
+
+.instructions-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.undo-btn {
+  position: fixed;
+  top: .1rem;
+  left: .1rem;
+  width: 60px;
+  height: 35px;
+  padding: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.undo-btn:hover:not(:disabled) {
+  background-color: #ff5252;
+  transform: translateY(-2px);
+}
+
+.undo-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.video-recorder-btn {
+  position: fixed;
+  top: 20px;
+  right: 100px;
+  z-index: 1000;
+  background-color: #ff6b35;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.video-recorder-btn:hover:not(:disabled) {
+  background-color: #ff5722;
+  transform: translateY(-2px);
+}
+
+.video-recorder-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 @media (prefers-color-scheme: light) {
