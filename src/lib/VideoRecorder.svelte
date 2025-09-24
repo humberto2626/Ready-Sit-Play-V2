@@ -378,8 +378,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
   }
 
   .camera-switch-btn:hover {
@@ -443,8 +443,9 @@
 
   .recording-controls, .recorded-controls {
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
     align-items: center;
+    gap: 1rem;
   }
 
   .recording-container, .recorded-container {
@@ -489,9 +490,8 @@
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
     align-items: center;
-    justify-content: space-around; /* Adjust for spacing */
     background-color: rgba(0, 0, 0, 0.7);
     padding: 1rem 0.5rem;
     border-radius: 15px;
@@ -499,35 +499,16 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
+  .countdown-display {
+    min-width: 60px;
+    text-align: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
   .fullscreen-recording .camera-selection {
     margin: 0;
-  }
-
-  .fullscreen-recording .camera-switch-btn {
-    width: 40px;
-    height: 40px;
-    padding: 0.5rem;
-  }
-
-  .fullscreen-recording .camera-switch-btn svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .fullscreen-recording .countdown-display {
-    font-size: 2rem; /* Make it larger in fullscreen */
-    min-width: 60px; /* Ensure consistent width */
-  }
-
-  .fullscreen-recording .stop-btn-circle {
-    width: 40px;
-    height: 40px;
-    box-shadow: 0 3px 12px rgba(255, 68, 68, 0.5);
-  }
-
-  .fullscreen-recording .stop-btn-square {
-    width: 14px;
-    height: 14px;
   }
 
   .fullscreen-recording .recorded-video {
@@ -544,7 +525,7 @@
   .fullscreen-recording .recorded-controls {
     position: absolute;
     top: 75%;
-   display: flex;
+    display: flex;
     flex-direction: row;
     gap: 1rem;
     align-items: center;
@@ -555,30 +536,17 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
-  .fullscreen-recording .action-completed-btn,
-  .fullscreen-recording .action-failed-btn {
-    width: 60px;
-    height: 60px;
-    font-size: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
-
-  .fullscreen-recording .action-completed-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
-  }
-
-  .fullscreen-recording .action-failed-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-  }
-
   .stop-btn-container {
     background: transparent;
     border: none;
     cursor: pointer;
     padding: 0;
     transition: transform 0.2s ease;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .stop-btn-container:hover {
@@ -586,8 +554,8 @@
   }
 
   .stop-btn-circle {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     background: #ff4444;
     border-radius: 50%;
     display: flex;
@@ -607,13 +575,13 @@
     background: #22c55e;
     color: white;
     border: none;
-    padding: 0.75rem;
+    padding: 0;
     border-radius: 50%;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.2s ease;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -629,13 +597,13 @@
     background: #ef4444;
     color: white;
     border: none;
-    padding: 0.75rem;
+    padding: 0;
     border-radius: 50%;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.2s ease;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
