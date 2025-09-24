@@ -872,6 +872,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       return 29;
     }
     return 27; // Default fallback
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+    // Clean up video URL if it exists
+    if (currentRecordedVideoUrl) {
+      URL.revokeObjectURL(currentRecordedVideoUrl);
+    }
   }
 </script>
 
@@ -967,6 +975,88 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       blue 30px 40px
     );
     border-color: #000;
+  }
+  
+  // Video recording functions
+  function handleStartRecording() {
+    recordingStatus = 'recording';
+    countdown = 30;
+    
+    // Start countdown
+    countdownInterval = setInterval(() => {
+      countdown--;
+      if (countdown <= 0) {
+        handleStopRecording();
+      }
+    }, 1000);
+  }
+  
+  function handleStopRecording() {
+    recordingStatus = 'idle';
+    
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+  }
+  
+  function handleVideoRecorded(event) {
+    currentRecordedVideoUrl = event.detail.url;
+    recordingStatus = 'recorded';
+    
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+  }
+  
+  function handleVideoAction(event) {
+    const { status } = event.detail;
+    
+    if (status === 'completed') {
+      // Handle successful video completion
+      console.log('Video action completed successfully');
+    } else if (status === 'failed') {
+      // Handle failed video action
+      console.log('Video action failed');
+    }
+    
+    // Reset video recording state
+    if (currentRecordedVideoUrl) {
+      URL.revokeObjectURL(currentRecordedVideoUrl);
+      currentRecordedVideoUrl = '';
+    }
+    recordingStatus = 'idle';
+    countdown = 30;
+  }
+  
+  function handleSelectCamera() {
+    // Toggle between front and back camera
+    cameraFacingMode = cameraFacingMode === 'user' ? 'environment' : 'user';
+    console.log('Camera switched to:', cameraFacingMode === 'user' ? 'Front' : 'Back');
+  }
+  
+  function handleVideoError(event) {
+    console.error('Video error:', event.detail.error);
+    alert('Unable to access camera. Please make sure you have granted camera permissions.');
+    recordingStatus = 'idle';
+    
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+  }
+  
+  function handleShowInstructions() {
+    showInstructions = !showInstructions;
+  }
+  
+  function handleUndo() {
+    if (gameHistory.length > 0) {
+      const previousState = gameHistory.pop();
+      restoreGameState(previousState);
+      gameHistory = [...gameHistory]; // Trigger reactivity
+    }
   }
   
   .back-mini-game {
@@ -2250,6 +2340,35 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         <div class="instructions-section" style="--delay: 0.5s">
           <p>Congratulations on the amazing teamwork with {dogName || 'your dog'}!</p>
           <p>Tap anywhere to play again.</p>
+        </div>
+      </div>
+        
+        <!-- Video Recorder (when active) -->
+        {#if recordingStatus === 'recording' || recordingStatus === 'recorded'}
+          <div class="video-area">
+            <VideoRecorder 
+              shouldRecord={recordingStatus === 'recording'}
+              facingMode={cameraFacingMode}
+              recordedVideoUrl={currentRecordedVideoUrl}
+              on:videoRecorded={handleVideoRecorded}
+              on:videoError={handleVideoError}
+            />
+          </div>
+        {/if}
+        
+        <!-- Control Panel -->
+        <div class="control-area">
+          <GameControlPanel 
+            recordingStatus={recordingStatus}
+            countdown={countdown}
+            facingMode={cameraFacingMode}
+            on:startRecording={handleStartRecording}
+            on:stopRecording={handleStopRecording}
+            on:selectCamera={handleSelectCamera}
+            on:videoAction={handleVideoAction}
+            on:showInstructions={handleShowInstructions}
+            on:undo={handleUndo}
+          />
         </div>
       </div>
     </div>
