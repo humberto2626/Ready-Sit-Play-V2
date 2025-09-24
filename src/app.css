@@ -151,7 +151,7 @@ button:focus-visible {
   position: fixed;
   top: .1rem;
   Left: .1rem;
-  padding: 4rem 4rem;
+  padding: .3rem .3rem;
   font-size: 0.6rem;
   z-index: 100;
   background-color: #ff6b6b;
