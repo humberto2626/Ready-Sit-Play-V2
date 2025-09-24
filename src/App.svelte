@@ -884,9 +884,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     justify-content: center;
     gap: 1rem;
     min-height: 480px;
-}
+  }
 
-button {
+  button {
     cursor: pointer;
     padding: 0.5rem 1rem;
     font-size: 1rem;
@@ -895,21 +895,21 @@ button {
     background: #fafafa;
     transition: background 0.2s ease;
     color: black;
-}
-button:hover:not(:disabled) {
+  }
+  button:hover:not(:disabled) {
     background: #eee;
-}
-button:disabled {
+  }
+  button:disabled {
     cursor: not-allowed;
     opacity: 0.5;
-}
+  }
 
-.deck-container {
+  .deck-container {
     cursor: pointer;
     user-select: none;
-}
+  }
 
-.card {
+  .card {
     width: 140px;
     height: 195px;
     border: 2px solid #333;
@@ -920,13 +920,13 @@ button:disabled {
     position: relative;
     user-select: none;
     transition: transform 0.3s ease-in-out;
-}
+  }
 
-.card.open {
+  .card.open {
     box-shadow: 0 0 15px rgba(0,0,0,0.4);
-}
+  }
 
-.card-back {
+  .card-back {
     width: 70px;
     height: 90px;
     border-radius: 12px;
@@ -936,31 +936,30 @@ button:disabled {
     align-items: center;
     justify-content: center;
     position: relative;
-}
+  }
 
-.card-back-logo {
+  .card-back-logo {
     width: 60px;
     height: 60px;
     object-fit: contain;
     z-index: 2;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-}
+  }
 
-.back-action {
+  .back-action {
     background-color: #fff;
     background-image: repeating-linear-gradient(45deg, #ddd 0 10px, #eee 10px 20px);
     border-color: #bbb;
-}
+  }
 
-.back-challenge {
+  .back-challenge {
     background-color: #111;
     background-image: repeating-linear-gradient(45deg, #333 0 10px, #222 10px 20px);
     border-color: #000;
-}
+  }
 
-.back-mini-game {
-    background-color: #444; 
-    background-image: repeating-linear-gradient(
+  .back-mini-game {
+    background-color: #444; background-image: repeating-linear-gradient(
       45deg,
       red 0 10px,
       green 10px 20px,
@@ -968,65 +967,65 @@ button:disabled {
       blue 30px 40px
     );
     border-color: #000;
-}
-
-.back-mini-game {
+  }
+  
+  .back-mini-game {
     background: linear-gradient(45deg, 
       #ff6b6b 0%, #4ecdc4 25%, #45b7d1 50%, #96ceb4 75%, #ffeaa7 100%);
     background-size: 400% 400%;
     animation: gradient-shift 3s ease infinite;
-}
+  }
 
-.drawn-cards {
+  .drawn-cards {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     justify-content: center;
-}
+  }
 
-.small-card {
+  .small-card {
     width: 90px;
     height: 125px;
     overflow: hidden;
-}
+  }
 
-.active-card-container {
+  .active-card-container {
     position: relative;
     min-height: 240px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
-}
+  }
 
-.cards-row {
+  .cards-row {
     display: flex;
     justify-content: center;
     gap: 1rem;
-}
-.flying-left {
+  }
+  .flying-left {
     animation: fly-left 0.8s forwards cubic-bezier(0.4, 0, 0.2, 1);
-}
-.flying-right {
+  }
+  .flying-right {
     animation: fly-right 0.8s forwards cubic-bezier(0.4, 0, 0.2, 1);
-}
+  }
 
-@keyframes fly-left {
+  @keyframes fly-left {
     0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
     100% { transform: translateX(-300px) translateY(-100px) rotate(-30deg); opacity: 0; }
-}
-@keyframes fly-right {
+  }
+  @keyframes fly-right {
     0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
     100% { transform: translateX(300px) translateY(-100px) rotate(30deg); opacity: 0; }
-}
+  }
 
-@keyframes gradient-shift {
+  @keyframes gradient-shift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
-}
+  }
 
-.advantage-message {
+  .advantage-message {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -1042,9 +1041,9 @@ button:disabled {
     text-align: center;
     z-index: 8888;
     max-width: 1400px;
-}
+  }
 
-@keyframes advantage-glow {
+  @keyframes advantage-glow {
     0% {
       box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
       transform: translate(-50%, -50%) scale(1);
@@ -1053,9 +1052,9 @@ button:disabled {
       box-shadow: 0 0 50px rgba(255, 107, 53, 0.9);
       transform: translate(-50%, -50%) scale(1.02);
     }
-}
+  }
 
-.action-tooltip {
+  .action-tooltip {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -1071,9 +1070,9 @@ button:disabled {
     z-index: 8000;
     max-width: 400px;
     line-height: 1.4;
-}
+  }
 
-.mini-game-explanation {
+  .mini-game-explanation {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -1094,66 +1093,419 @@ button:disabled {
     flex-direction: column;
     line-height: 1.5;
     white-space: pre-line;
-}
+  }
 
-.mini-game-explanation h4 {
+  .mini-game-explanation h4 {
     margin: 0 0 1rem 0;
     font-size: 1.4rem;
     color: #ffd700;
     text-align: center;
-}
+  }
 
-.action-tooltip h4 {
+  .action-tooltip h4 {
     margin: 0 0 1rem 0;
     font-size: 1.3rem;
     color: #ffd700;
-}
+  }
 
-/* --- New section for cards + vertical button column --- */
-.cards-and-controls {
-  display: flex;
-  align-items: flex-start; /* top-align buttons with cards */
-  gap: 2rem; /* space between cards and buttons */
-}
+  .instructions-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: .5rem;
+    box-sizing: border-box;
+    animation: instructions-fade-in 1s ease-out;
+   overflow-y: auto;
+  }
 
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem; /* spacing between buttons */
-  align-items: center; /* center buttons horizontally */
-}
+  .instructions-content {
+    max-width: 600px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: instructions-slide-up 1.2s ease-out 0.3s both;
+   width: 80%;
+   max-height: calc(100vh - 4rem);
+   overflow-y: auto;
+   display: flex;
+   flex-direction: column;
+  }
 
-.timer-button,
-.action-completed-btn,
-.action-failed-btn {
-  position: static;   /* overrides fixed */
-  top: auto;
-  right: auto;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .overlay-logo {
+  padding: .3rem;
+    height: 80px;
+    object-fit: contain;
+    margin: 0 auto 1.5rem auto;
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+   flex-shrink: 0;
+  }
 
-.timer-button:hover:not(:disabled),
-.action-completed-btn:hover:not(:disabled),
-.action-failed-btn:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
-}
+  .instructions-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+   flex-shrink: 0;
+  }
 
-.timer-button:disabled,
-.action-completed-btn:disabled,
-.action-failed-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
+  .instructions-section {
+    margin-bottom: 1.5rem;
+    animation: section-fade-in 0.8s ease-out var(--delay) both;
+   flex-grow: 1;
+  }
+
+  .instructions-section h3 {
+    font-size: 1.4rem;
+    color: white;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+
+  .instructions-section p {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+    font-size: 1.1rem;
+    color: white;
+  }
+
+ .instructions-footer {
+   flex-shrink: 0;
+ }
+
+  .card-info-icon {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+  }
+
+  .card-info-icon:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.1);
+  }
+
+  .card-info-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .instruction-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(100, 108, 255, 0.9);
+    color: white;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .instruction-icon:hover {
+    background: rgba(100, 108, 255, 1);
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 800px) {
+    .mini-game-content {
+      width: 95%;
+      max-width: 95vw;
+      padding: 15px;
+    }
+  }
+  .start-button {
+    background: linear-gradient(45deg, #ff6b35, #ffd700);
+    color: #333;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: button-bounce 2s ease-in-out infinite;
+  }
+
+  .step-indicator {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: white;
+    font-size: 1.1rem;
+  }
+
+  .step-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+   margin-bottom: 1rem;
+  }
+
+  .step-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: background 0.3s ease;
+  }
+
+  .step-dot.active {
+    background: white;
+  }
+
+  .start-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+  }
+
+  .skip-button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    margin-left: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .skip-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+  }
+
+  .golden-bone-active-illustration {
+    display: block;
+    margin: -1rem;
+    width: 80px;
+    height: 80px;
+    object-fit: contain ;
+    filter: drop-shadow(0 0 6px #ffd700);
+  }
+
+  @keyframes instructions-fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes instructions-slide-up {
+    0% { 
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    100% { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes section-fade-in {
+    0% { 
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    100% { 
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes button-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .edge-action {
+    border-color: #000 !important;
+    border-width: 5px !important;
+  }
+
+  .edge-challenge {
+    border-color: #fff !important;
+    border-width: 5px !important;
+  }
+
+  .edge-mini-game {
+    border: 5px solid transparent !important;
+    background: linear-gradient(white, white) padding-box, 
+                linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7) border-box !important;
+  }
+
+  .edge-advantage {
+    border: 2.5px solid transparent !important;
+    background: linear-gradient(135deg, #ffd700, #ffed4e) padding-box, 
+                linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7) border-box !important;
+  }
+
+
+  .winner-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #ff6b35 0%, #ff4757 100%);
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  .turn-indicator {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    color: white;
+  }
+
+   .turn-indicator.player1 {
+    text-shadow: 
+      0 -1px 2px #22c55e,
+      0 1px 2px #22c55e,
+      0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .turn-indicator.player2 {
+    text-shadow: 
+     0 -1px 2px #1d4ed8,
+     0 1px 2px #1d4ed8,
+      0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .turn-indicator.player3 {
+    text-shadow: 
+      0 -1px 2px #dc2626,
+      0 1px 2px #dc2626,
+      0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .top-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tiny-card {
+    width: 70px;
+    height: 95px;
+    border: 2px solid #333;
+    border-radius: 12px;
+    background: #fefefe;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    font-size: 0.7rem;
+    padding: 0.25rem;
+    overflow: hidden;
+  }
+
+  .review-button {
+    position: fixed;
+    top: .25rem;
+    right: .25rem;
+    padding: 0.13rem 0.25rem;
+    font-size: 0.6rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 100;
+    transition: background 0.2s ease;
+  }
+
+  .review-button:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  .timer-button {
+    position: fixed;
+    top: 160px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #333, #000);
+    color: #ffffff;
+    border: none;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .timer-button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  .timer-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .timer-button svg {
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
 
   .action-completed-btn {
     position: fixed;
@@ -1394,7 +1746,7 @@ button:disabled {
     <div class="instructions-content">
       <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
       <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-        Balancedog
+        Balancedogi
       </div>
       
       {#if currentStep === 1}
