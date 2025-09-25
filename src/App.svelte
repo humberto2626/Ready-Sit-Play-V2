@@ -451,9 +451,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     miniGameTurn = null;
     actionTimerUsed = false;
     goldenBoneActive = false;
-
-    /
-  }/ Handle Challenge cards - show them for 3 seconds then move to reserve
+    
+  // Handle Challenge cards - show them for 3 seconds then move to reserve
     if (activeCard.category === 'Challenge') {
       setTimeout(async () => {
         if (activeCard && activeCard.category === 'Challenge') {
