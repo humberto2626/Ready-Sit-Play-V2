@@ -1,7 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
-  import GameControlPanel from './lib/GameControlPanel.svelte';
 
   let showVideoRecorder = false;
 
