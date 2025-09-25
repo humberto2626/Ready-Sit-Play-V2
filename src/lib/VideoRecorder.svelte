@@ -396,11 +396,12 @@
   }
 
   .record-btn {
-    position: fixed;
-    top: 80px;
-    right: 20px;
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 150px);
     width: 60px;
     height: 60px;
+    transform: translateY(-50%);
     background: linear-gradient(45deg, #ff6b35, #ff3535);
     color: #ffffff;
     border: none;
