@@ -398,7 +398,7 @@
   .record-btn {
     position: absolute;
     top: 15%;
-    left: calc(50% + 110px);
+    left: calc(50% + 105px);
     width: 60px;
     height: 60px;
     background: linear-gradient(45deg, #ff6b35, #ff3535);
