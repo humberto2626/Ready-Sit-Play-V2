@@ -1,6 +1,5 @@
 <script>
-  let recordedActions = $props(); // Expects an array of { videoUrl, cardImage }
-  let onClose = $props(); // Function to call when the review is closed
+  let { recordedActions, onClose } = $props(); // recordedActions: array of { videoUrl, cardImage }, onClose: function to call when review is closed
 </script>
 
 <div class="game-review-overlay">
