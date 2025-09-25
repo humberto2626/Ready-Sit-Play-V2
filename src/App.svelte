@@ -108,11 +108,6 @@
   // State history for undo functionality (limited to last 3 steps)
   let stateHistory: any[] = [];
 
-  // Video review state
-  let completedVideoActions: { videoUrl: string, cardImage: string }[] = $state([]);
-  let currentActiveCardImage = $state('');
-  let showGameReview = $state(false);
-
   // Mini-game explanation overlay state
   let showMiniGameExplanation = false;
   let currentMiniGameExplanation = '';
@@ -184,7 +179,8 @@
       1. Win by: Being the player to whom the canine player gives the most paws under 30 seconds.
       2. Set Up: Players take turns standing in front of the canine player to offer their hand repeatedly without reward until the end of the 30 seconds. 
 *Both players reward at the end of their turn as to not discourage the canine player.
-      3. How to Play: the canine player sits and each player asks for paw repeatedly. 
+      3. How to Play: the canine player sits and each player 
+  }asks for paw repeatedly. 
 *only one paw at a time, double paws or high 10s don't count.
       4. Tie Breaker: Both players stand in front of the seated canina player , they both ask for Paw at the same time. whoever gets the paw wins.
     `,
@@ -400,8 +396,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     // Clear state history when resetting game
     stateHistory = [];
-    completedVideoActions = [];
-    showGameReview = false;
 
     shuffleDeck();
 
@@ -794,14 +788,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     console.log('Video action received:', event.detail);
     
     if (event.detail.status === 'completed') {
-      completedVideoActions = [...completedVideoActions, {
-        videoUrl: event.detail.url,
-        cardImage: event.detail.cardImage
-      }];
       actionCompleted();
     } else if (event.detail.status === 'failed') {
       actionCardFailed();
     }
+    
+    showVideoRecorder = false;
   }
 
   function startGame() {
@@ -883,15 +875,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
     return 27; // Default fallback
   }
-
-  // Update current active card image when activeCard changes
-  $effect(() => {
-    if (activeCard) {
-      currentActiveCardImage = `/card-images/${activeCard.id}.png`;
-    } else {
-      currentActiveCardImage = '';
-    }
-  });
 </script>
 
 <style>
@@ -2061,7 +2044,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
       <!-- Video Recording for Action and Mini Game cards -->
       {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
-        <VideoRecorder on:videoAction={handleRecordedVideo} activeCardImage={currentActiveCardImage} />
+        <VideoRecorder on:videoAction={handleRecordedVideo} />
       {/if}
 
       <!-- Timer Button positioned below the recording button -->
@@ -2260,9 +2243,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     {/if}
   </div>
 
-   {#if gameOver && winner !== null && !showGameReview}
+   {#if gameOver && winner !== null}
     <div
       class="winner-overlay"
+      onclick={animateShuffle}
+      title="Tap to restart"
     >
       <div class="instructions-content">
         <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
@@ -2275,16 +2260,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         <h1 class="instructions-title">🎉 {#if winner === 1}{player1Name || 'Player 1'}{:else if winner === 2}{player2Name || 'Player 2'}{:else}{player3Name || 'Player 3'}{/if} Wins 🎉</h1>
         <div class="instructions-section" style="--delay: 0.5s">
           <p>Congratulations on the amazing teamwork with {dogName || 'your dog'}!</p>
-        </div>
-        <div style="text-align: center; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
-          {#if completedVideoActions.length > 0}
-            <button class="start-button" onclick={() => showGameReview = true}>
-              Review Videos
-            </button>
-          {/if}
-          <button class="start-button" onclick={animateShuffle}>
-            Play Again
-          </button>
+          <p>Tap anywhere to play again.</p>
         </div>
       </div>
     </div>
@@ -2302,10 +2278,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     Got it!
   </button>
 </div>
-{/if}
-
-{#if showGameReview}
-  <GameReview recordedActions={completedVideoActions} onClose={() => showGameReview = false} />
 {/if}
 
 {#if showAdvantageOverlay}
