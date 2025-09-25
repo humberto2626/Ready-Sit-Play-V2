@@ -3,7 +3,7 @@
 
   const dispatch = createEventDispatcher();
   
-  let activeCardImage = $props();
+  let { activeCardImage } = $props();
 
   let videoStream = $state(null);
   let mediaRecorder = $state(null);
