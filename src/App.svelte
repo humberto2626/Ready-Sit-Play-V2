@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
+  import GameControlPanel from './lib/GameControlPanel.svelte';
 
   let showVideoRecorder = false;
 
@@ -971,6 +972,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   
   .back-mini-game {
     background: linear-gradient(45deg, 
+    )
+  }
       #ff6b6b 0%, #4ecdc4 25%, #45b7d1 50%, #96ceb4 75%, #ffeaa7 100%);
     background-size: 400% 400%;
     animation: gradient-shift 3s ease infinite;
