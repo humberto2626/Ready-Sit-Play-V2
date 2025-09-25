@@ -309,7 +309,7 @@
 <div class="video-recorder">
   {#if recordingStatus === 'idle'}
     <button class="record-btn" on:click={startRecording}>
-     <img src="/public/Rec Button.svg" alt="Rec" />
+     <img src="/public/Rec.svg" alt="Rec" />
     </button>
   {:else if recordingStatus === 'recording'}
     <div class="recording-container" class:fullscreen-recording={recordingStatus === 'recording'}>
