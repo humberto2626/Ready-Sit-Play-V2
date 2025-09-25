@@ -399,8 +399,8 @@
     position: absolute;
     top: 15%;
     left: calc(50% + 105px);
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     background: linear-gradient(45deg, #ff6b35, #ff3535);
     color: #ffffff;
     border: none;
