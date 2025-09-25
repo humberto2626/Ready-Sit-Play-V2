@@ -1468,7 +1468,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .timer-button {
     position: absolute;
-    top: 26%;
+    top: 30%;
     left: calc(50% + 110px);
     width: 40px;
     height: 40px;
@@ -1509,7 +1509,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .action-completed-btn {
     position: absolute;
-    top: 28%;
+    top: 36%;
     left: calc(50% + 110px);
     width: 40px;
     height: 40px;
@@ -1542,7 +1542,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .action-failed-btn {
     position: absolute;
-    top: 30%;
+    top: 42%;
     left: calc(50% + 110px);
     width: 40px;
     height: 40px;
