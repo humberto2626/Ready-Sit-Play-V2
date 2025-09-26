@@ -885,7 +885,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    position: relative;
     min-height: 480px;
   }
 
@@ -1001,6 +1000,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .cards-row {
+    position: relative;
     display: flex;
     justify-content: center;
     gap: 1rem;
