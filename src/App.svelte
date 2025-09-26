@@ -17,6 +17,18 @@
     }
   }
 
+  // Reactive statement to manage body scroll when overlays are active
+  $: {
+    const hasActiveOverlay = showGameReview || 
+      (videoRecorderComponent && (videoRecorderComponent.recordingStatus === 'recording' || videoRecorderComponent.recordingStatus === 'recorded'));
+    
+    if (hasActiveOverlay) {
+      document.body.classList.add('no-scroll');
+    } else {
+      document.body.classList.remove('no-scroll');
+    }
+  }
+
   type Card = {
     id: number;
     category: 'Action' | 'Challenge' | 'Mini Game';
