@@ -1193,10 +1193,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     position: absolute;
     bottom: 3px;
     right: 3px;
-    width: 32px;
-    height: 32px;
+    width: 16px;
+    height: 16px;
     border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
+    border-radius: 25%;
     cursor: pointer;
     display: flex;
     align-items: center;
