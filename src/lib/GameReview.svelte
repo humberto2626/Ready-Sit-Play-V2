@@ -54,6 +54,7 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     max-width: 900px;
     max-height: 90vh;
+    overflow-y: auto;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -65,7 +66,6 @@
     margin-bottom: 1rem;
     color: white;
     text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-    flex-shrink: 0;
   }
 
   .recorded-actions-grid {
@@ -73,10 +73,6 @@
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     justify-content: center;
-    flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 10px;
-    min-height: 0;
   }
 
   .recorded-action-item {
@@ -143,7 +139,6 @@
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     margin-top: 1.5rem;
-    flex-shrink: 0;
   }
 
   .close-review-btn:hover {
