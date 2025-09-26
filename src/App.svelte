@@ -1546,8 +1546,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .action-failed-btn {
     position: absolute;
-    top: 60%;
-    left: calc(50% + 200px);
+    top: 250px;
+    left: calc(50% + 130px);
     width: 40px;
     height: 40px;
     background: linear-gradient(45deg, #ef4444, #dc2626);
