@@ -885,6 +885,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    position: relative;
     min-height: 480px;
   }
 
@@ -992,6 +993,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .active-card-container {
+    position: relative;
     min-height: 240px;
     display: flex;
     flex-direction: column;
@@ -1000,7 +1002,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .cards-row {
-    position: relative;
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -1471,7 +1472,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   .timer-button {
     position: absolute;
     top: 40%;
-    left: calc(50% + 110px);
+    left: calc(50% + 200px);
     width: 40px;
     height: 40px;
     background: linear-gradient(45deg, #333, #000);
@@ -1512,7 +1513,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   .action-completed-btn {
     position: absolute;
     top: 50%;
-    left: calc(50% + 110px);
+    left: calc(50% + 200px);
     width: 40px;
     height: 40px;
     background: linear-gradient(45deg, #22c55e, #16a34a);
@@ -1545,7 +1546,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   .action-failed-btn {
     position: absolute;
     top: 60%;
-    left: calc(50% + 110px);
+    left: calc(50% + 200px);
     width: 40px;
     height: 40px;
     background: linear-gradient(45deg, #ef4444, #dc2626);
