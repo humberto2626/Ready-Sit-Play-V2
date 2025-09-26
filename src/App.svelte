@@ -1201,11 +1201,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
     transition: all 0.2s ease;
     z-index: 10;
-    backdrop-filter: blur(5px);
+    
   }
 
   .card-info-icon:hover {
@@ -1227,8 +1225,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     height: 24px;
     border-radius: 50%;
     border: none;
-    font-size: 0.8rem;
-    font-weight: bold;
     cursor: pointer;
     display: flex;
     align-items: center;
