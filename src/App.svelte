@@ -138,8 +138,7 @@
     'Heel': `With a treat in your hand, guide the canine player to walk right next to you for at least five steps.`,
     'Focus': `Holding a treat between your index finger and thumb, grace just above the canine player nose and then place it between your eyebrows, count out loud for at least three seconds.`,
     'Paw': `With a treat in your hand, grace and hold just below the ear of the canine player, wait for them to use their paw to push off your hand.`,
-    'Down': `With a treat in your hand, grace the canine player chin and chest as
-  } you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
+    'Down': `With a treat in your hand, grace the canine player chin and chest as you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
     'Back': `With the canine player sitting, hold a treat in your hand just above the top of the canine player head, putting your foot in between their front paws, move your hand towards their tail, waiting for them to move back.`,
     'Stay': `With the canine player sitting or laying down, show the palm of your hand and slowly take at least three steps backwards, return and reward the canine player self-control.`,
     'Place': `With a towel on the floor, guide the canine player near it and drop a treat in the towel, the moment they step on it, praise and reward them again.`
@@ -184,15 +183,13 @@
       1. Win by: Keeping the canine player sitting the longest time possible up to 30 seconds.
       2. Set Up: Each player positions the canine player in a "Sit" about 3 feet away from them, the timer starts the moment the canine player's bottom touches the floor.
       3. How to Play: Each player gets a 30 second turn, as the canine player sits the human players count out loud the seconds.
-      4. Tie Breaker: if both players reach the exact same count, repeat
-  } the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
+      4. Tie Breaker: if both players reach the exact same count, repeat the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
     `,
     'Pawathon': `
       1. Win by: Being the player to whom the canine player gives the most paws under 30 seconds.
       2. Set Up: Players take turns standing in front of the canine player to offer their hand repeatedly without reward until the end of the 30 seconds. 
 *Both players reward at the end of their turn as to not discourage the canine player.
-      3. How to Play: the canine player sits and each player 
-  }asks for paw repeatedly. 
+      3. How to Play: the canine player sits and each player asks for paw repeatedly. 
 *only one paw at a time, double paws or high 10s don't count.
       4. Tie Breaker: Both players stand in front of the seated canina player , they both ask for Paw at the same time. whoever gets the paw wins.
     `,
@@ -591,6 +588,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         } else if (opponent === 3 && player === 2) {
           player2Cards = [...currentPlayerCards];
           player3Cards = [...opponentCards];
+        } else if (opponent === 1 && player === 3) {
+          player1Cards = [...opponentCards];
+          player3Cards = [...currentPlayerCards];
+        } else if (opponent === 3 && player === 1) {
+          player1Cards = [...currentPlayerCards];
+          player3Cards = [...opponentCards];
         }
       }
     }
@@ -610,7 +613,3 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 </script>
 
 <!-- Your HTML content would go here -->
-        } else if (opponent === 1 && player === 3) {
-          player1Cards = [...opponentCards];
-          player3Cards = [...currentPlayerCards];
-        } else if (opponent === 3 && player === 1)
