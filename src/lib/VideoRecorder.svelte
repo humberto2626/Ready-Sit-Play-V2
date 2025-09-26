@@ -395,7 +395,7 @@
 
   .record-btn {
     position: absolute;
-    top: 30%;
+    top: 60%;
     left: calc(50% + 150px);
     width: 40px;
     height: 40px;
