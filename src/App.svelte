@@ -1213,8 +1213,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .card-info-icon svg {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
   
   }
 
