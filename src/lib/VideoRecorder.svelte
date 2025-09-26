@@ -2,6 +2,8 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
+  
+  let activeCardImage = $props();
 
   let videoStream = null;
   let mediaRecorder = null;
@@ -280,7 +282,8 @@
     console.log('Video completed, dispatching event...');
     dispatch('videoAction', {
       url: recordedVideoUrl,
-      status: 'completed'
+      status: 'completed',
+      cardImage: activeCardImage
     });
     resetRecording();
   }

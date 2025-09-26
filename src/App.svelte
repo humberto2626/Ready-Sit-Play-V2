@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
+  import GameReview from './lib/GameReview.svelte';
 
   let showVideoRecorder = false;
 
@@ -178,7 +179,8 @@
       1. Win by: Being the player to whom the canine player gives the most paws under 30 seconds.
       2. Set Up: Players take turns standing in front of the canine player to offer their hand repeatedly without reward until the end of the 30 seconds. 
 *Both players reward at the end of their turn as to not discourage the canine player.
-      3. How to Play: the canine player sits and each player asks for paw repeatedly. 
+      3. How to Play: the canine player sits and each player 
+  }asks for paw repeatedly. 
 *only one paw at a time, double paws or high 10s don't count.
       4. Tie Breaker: Both players stand in front of the seated canina player , they both ask for Paw at the same time. whoever gets the paw wins.
     `,
