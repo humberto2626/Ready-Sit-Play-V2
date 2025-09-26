@@ -1940,6 +1940,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         {player3Name || 'Player 3'}'s turn
       {/if}
     </div>
+    {#if timerRunning}
+      <div class="player-turn-countdown">
+        {timer}s
+      </div>
+    {/if}
   {/if}
 
   <!-- Golden Bone Illustration -->
@@ -2062,12 +2067,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         </button>
       {/if}
       
-      {#if timerRunning}
-        <div style="font-weight: bold; font-size: 1.2rem; color: #ff6b35;">
-          Timer: {timer}s
-        </div>
-      {/if}
-
       <!-- Video Recording for Action and Mini Game cards -->
       {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
         <VideoRecorder on:videoAction={handleRecordedVideo} />
