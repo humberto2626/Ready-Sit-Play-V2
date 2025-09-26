@@ -993,7 +993,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .active-card-container {
-    position: relative;
     min-height: 240px;
     display: flex;
     flex-direction: column;
