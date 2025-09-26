@@ -15,6 +15,7 @@
   let facingMode = $state('environment'); // Default to back camera
   let liveVideoElement = $state(null);
   let recordedVideoElement = $state(null);
+  let isSwitchingCamera = $state(false);
 
   // Effect to handle video element setup when it becomes available
   $effect(() => {
@@ -101,6 +102,10 @@
     
     // If currently recording, restart with new camera
     if (recordingStatus === 'recording') {
+      // Set flag and clear chunks before stopping
+      isSwitchingCamera = true;
+      recordedChunks = [];
+      
       // Stop current recording
       if (mediaRecorder && mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
@@ -203,6 +208,15 @@
       mediaRecorder.onstop = () => {
         console.log('Recording stopped, total chunks:', recordedChunks.length);
         console.log('Total data size:', recordedChunks.reduce((sum, chunk) => sum + chunk.size, 0));
+        
+        if (isSwitchingCamera) {
+          console.log('Recording stopped due to camera switch, discarding chunks.');
+          isSwitchingCamera = false; // Reset flag
+          // No blob creation or recordedVideoUrl assignment needed
+          // The recordedChunks are already cleared by selectCamera()
+          // The recordingStatus will be set to 'recording' again by startRecording()
+          return;
+        }
         
         const blobType = mimeType || 'video/webm';
         const blob = new Blob(recordedChunks, { type: blobType });
