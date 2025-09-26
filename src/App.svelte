@@ -1450,8 +1450,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     color: #ffffff;
     border: none;
     padding: 0;
-    font-size: 0.8rem;
-    font-weight: bold;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1476,8 +1474,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .timer-button svg {
-    width: 24px;
-    height: 24px;
+    width: 75px;
+    height: 75px;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
   }
 
