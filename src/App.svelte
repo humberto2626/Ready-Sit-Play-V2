@@ -5,30 +5,6 @@
 
   let showVideoRecorder = false;
 
-  // Reactive statement to manage body scroll when overlays are active
-  $: {
-    const hasActiveOverlay = showGameReview || 
-      (videoRecorderComponent && (videoRecorderComponent.recordingStatus === 'recording' || videoRecorderComponent.recordingStatus === 'recorded'));
-    
-    if (hasActiveOverlay) {
-      document.body.classList.add('no-scroll');
-    } else {
-      document.body.classList.remove('no-scroll');
-    }
-  }
-
-  // Reactive statement to manage body scroll when overlays are active
-  $: {
-    const hasActiveOverlay = showGameReview || 
-      (videoRecorderComponent && (videoRecorderComponent.recordingStatus === 'recording' || videoRecorderComponent.recordingStatus === 'recorded'));
-    
-    if (hasActiveOverlay) {
-      document.body.classList.add('no-scroll');
-    } else {
-      document.body.classList.remove('no-scroll');
-    }
-  }
-
   type Card = {
     id: number;
     category: 'Action' | 'Challenge' | 'Mini Game';
@@ -150,7 +126,8 @@
     'Heel': `With a treat in your hand, guide the canine player to walk right next to you for at least five steps.`,
     'Focus': `Holding a treat between your index finger and thumb, grace just above the canine player nose and then place it between your eyebrows, count out loud for at least three seconds.`,
     'Paw': `With a treat in your hand, grace and hold just below the ear of the canine player, wait for them to use their paw to push off your hand.`,
-    'Down': `With a treat in your hand, grace the canine player chin and chest as you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
+    'Down': `With a treat in your hand, grace the canine player chin and chest as
+  } you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
     'Back': `With the canine player sitting, hold a treat in your hand just above the top of the canine player head, putting your foot in between their front paws, move your hand towards their tail, waiting for them to move back.`,
     'Stay': `With the canine player sitting or laying down, show the palm of your hand and slowly take at least three steps backwards, return and reward the canine player self-control.`,
     'Place': `With a towel on the floor, guide the canine player near it and drop a treat in the towel, the moment they step on it, praise and reward them again.`
@@ -195,13 +172,15 @@
       1. Win by: Keeping the canine player sitting the longest time possible up to 30 seconds.
       2. Set Up: Each player positions the canine player in a "Sit" about 3 feet away from them, the timer starts the moment the canine player's bottom touches the floor.
       3. How to Play: Each player gets a 30 second turn, as the canine player sits the human players count out loud the seconds.
-      4. Tie Breaker: if both players reach the exact same count, repeat the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
+      4. Tie Breaker: if both players reach the exact same count, repeat
+  } the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
     `,
     'Pawathon': `
       1. Win by: Being the player to whom the canine player gives the most paws under 30 seconds.
       2. Set Up: Players take turns standing in front of the canine player to offer their hand repeatedly without reward until the end of the 30 seconds. 
 *Both players reward at the end of their turn as to not discourage the canine player.
-      3. How to Play: the canine player sits and each player asks for paw repeatedly. 
+      3. How to Play: the canine player sits and each player 
+  }asks for paw repeatedly. 
 *only one paw at a time, double paws or high 10s don't count.
       4. Tie Breaker: Both players stand in front of the seated canina player , they both ask for Paw at the same time. whoever gets the paw wins.
     `,
@@ -594,23 +573,22 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         } else if (opponent === 2 && player === 1) {
           player1Cards = [...currentPlayerCards];
           player2Cards = [...opponentCards];
-        } else if (opponent === 2 && player === 3) {
-          player2Cards = [...opponentCards];
-          player3Cards = [...currentPlayerCards];
-        } else if (opponent === 3 && player === 2) {
-          player2Cards = [...currentPlayerCards];
-          player3Cards = [...opponentCards];
         } else if (opponent === 1 && player === 3) {
           player1Cards = [...opponentCards];
           player3Cards = [...currentPlayerCards];
         } else if (opponent === 3 && player === 1) {
           player1Cards = [...currentPlayerCards];
           player3Cards = [...opponentCards];
+        } else if (opponent === 2 && player === 3) {
+          player2Cards = [...opponentCards];
+          player3Cards = [...currentPlayerCards];
+        } else if (opponent === 3 && player === 2) {
+          player2Cards = [...currentPlayerCards];
+          player3Cards = [...opponentCards];
         }
       }
     }
     
-    // Remove the used advantage card
     if (player === 1) {
       player1AdvantageCards = player1AdvantageCards.filter(card => card.id !== cardId);
     } else if (player === 2) {
@@ -620,8 +598,1758 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
   }
 
-  let videoRecorderComponent;
-  let showGameReview = false;
+  function dismissAdvantageOverlay() {
+    showAdvantageOverlay = false;
+    currentAdvantageMessage = '';
+  }
+
+  function canStartTimer() {
+    if (!activeCard) return false;
+    if (activeCard.category === 'Challenge') return false;
+    if (activeCard.category === 'Action') return !actionTimerUsed && !timerRunning && !flying;
+    if (activeCard.category === 'Mini Game') return !timerRunning && !flying;
+    return false;
+  }
+
+  function startTimer() {
+    if (!activeCard || timerRunning) return;
+
+    timer = getTimerDuration();
+    timerRunning = true;
+
+    if (activeCard.category === 'Action') {
+      actionTimerUsed = true;
+    }
+
+    if (activeCard.category === 'Mini Game' && miniGameTurn === null) {
+      miniGameTurn = 1;
+    }
+
+    timerInterval = setInterval(() => {
+      timer--;
+      if (timer <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+
+        if (activeCard?.category === 'Mini Game' && miniGameTurn === 1) {
+          miniGameTurn = 2;
+        } else {
+          miniGameTurn = null;
+        }
+      }
+    }, 1000);
+  }
+
+  async function checkForWinner() {
+    const numPlayers = getNumPlayers();
+    const winThreshold = numPlayers === 3 ? 4 : 6;
+    
+    const player1ActionCount = player1Cards.filter(c => c.category === 'Action').length;
+    const player2ActionCount = player2Cards.filter(c => c.category === 'Action').length;
+    
+    if (player1ActionCount >= winThreshold) {
+      winner = 1;
+      gameOver = true;
+    } else if (player2ActionCount >= winThreshold) {
+      winner = 2;
+      gameOver = true;
+    } else if (numPlayers === 3 && player3Cards.filter(c => c.category === 'Action').length >= winThreshold) {
+      winner = 3;
+      gameOver = true;
+    } else {
+      // Check for tie
+      const tieThreshold = winThreshold - 1;
+      if (numPlayers === 2 && player1ActionCount === tieThreshold && player2ActionCount === tieThreshold) {
+        showTieOverlay = true;
+        return;
+      }
+    }
+  }
+
+  async function playerWins(player: 1 | 2 | 3) {
+    if (!activeCard || gameOver) return;
+
+    saveCurrentState();
+
+    // Only mini-games use the playerWins function now
+    if (activeCard.category === 'Mini Game') {
+      globalMiniGameCount++;
+      const advantageMessage = getMiniGameAdvantageMessage(globalMiniGameCount);
+      showAdvantageOverlay = true;
+      currentAdvantageMessage = advantageMessage;
+      
+      const advantageCard = {
+        id: `advantage-${player}-${globalMiniGameCount}-${Date.now()}`,
+        message: advantageMessage
+      };
+      
+      if (player === 1) {
+        player1AdvantageCards = [...player1AdvantageCards, advantageCard];
+      } else if (player === 2) {
+        player2AdvantageCards = [...player2AdvantageCards, advantageCard];
+      } else if (player === 3) {
+        player3AdvantageCards = [...player3AdvantageCards, advantageCard];
+      }
+    }
+
+    flyingDirection = player === 1 ? 'left' : player === 2 ? 'right' : 'right';
+    flying = true;
+
+    await tick();
+
+    setTimeout(async () => {
+      flying = false;
+      activeCard = null;
+      timer = 0;
+      timerRunning = false;
+      flyingDirection = null;
+      miniGameTurn = null;
+      actionTimerUsed = false;
+      
+      // Switch turn after card is resolved
+      currentTurn = getNextTurn(currentTurn);
+
+      await checkForWinner();
+    }, 800);
+  }
+
+  async function actionCompleted() {
+    if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
+
+    saveCurrentState();
+
+    // Action card goes to current player
+    if (currentTurn === 1) {
+      player1Cards = [activeCard, ...player1Cards];
+    } else if (currentTurn === 2) {
+      player2Cards = [activeCard, ...player2Cards];
+    } else if (currentTurn === 3) {
+      player3Cards = [activeCard, ...player3Cards];
+    }
+
+    // If there was a challenge card active, it disappears
+    selectedChallengeCard = null;
+    challengeCardPlayer = null;
+
+    flyingDirection = currentTurn === 1 ? 'left' : currentTurn === 2 ? 'right' : 'right';
+    flying = true;
+
+    await tick();
+
+    setTimeout(async () => {
+      flying = false;
+      activeCard = null;
+      goldenBoneActive = false; // Reset after action is completed
+      kitchenThiefActive = false;
+      timer = 0;
+      timerRunning = false;
+      flyingDirection = null;
+      miniGameTurn = null;
+      actionTimerUsed = false;
+      
+      // Switch turn after card is resolved
+      currentTurn = getNextTurn(currentTurn);
+
+      await checkForWinner();
+    }, 800);
+  }
+
+  async function actionCardFailed() {
+    if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
+
+    saveCurrentState();
+
+    // Put the action card at the bottom of the deck
+    shuffledDeck = [activeCard, ...shuffledDeck];
+
+    // If there was a challenge card active, put it back in the player's hand
+    if (selectedChallengeCard) {
+      // Challenge card should be discarded regardless of action outcome
+      selectedChallengeCard = null;
+      challengeCardPlayer = null;
+    }
+
+    // Clear the active card and reset state
+    activeCard = null;
+    timer = 0;
+    timerRunning = false;
+    clearInterval(timerInterval);
+    flyingDirection = null;
+    miniGameTurn = null;
+    actionTimerUsed = false;
+    
+    // Switch turn after failed action
+    currentTurn = getNextTurn(currentTurn);
+
+    await tick();
+  }
+
+  function handleRecordedVideo(event) {
+    console.log('Video action received:', event.detail);
+    
+    if (event.detail.status === 'completed') {
+      actionCompleted();
+    } else if (event.detail.status === 'failed') {
+      actionCardFailed();
+    }
+    
+    showVideoRecorder = false;
+  }
+
+  function startGame() {
+    if (currentStep === 2) {
+      if (!player1Name.trim() || !player2Name.trim() || !dogName.trim()) {
+        alert('Please enter names for Player 1, Player 2, and your dog to continue.');
+        return;
+      }
+    }
+
+    if (currentStep < totalSteps) {
+      currentStep++;
+    } else {
+      showInstructions = false;
+      currentStep = 1; // Reset for next time
+      // Only auto-start the game if it hasn't been started yet
+      if (shuffledDeck.length === 0 && player1Cards.length === 0 && player2Cards.length === 0) {
+        animateShuffle();
+      }
+    }
+  }
+
+  function skipInstructions() {
+    showInstructions = false;
+    currentStep = 1; // Reset for next time
+    showTieOverlay = false;
+    // Only auto-start the game if it hasn't been started yet
+    if (shuffledDeck.length === 0 && player1Cards.length === 0 && player2Cards.length === 0) {
+      animateShuffle();
+    }
+  }
+
+  function getCardBackType() {
+    console.log('Getting card back type...');
+    console.log('Deck length:', shuffledDeck.length);
+    console.log('Selected challenge card:', selectedChallengeCard);
+    
+    if (shuffledDeck.length === 0) {
+      console.log('Deck empty, returning action');
+      return null; // Don't show card back if deck is empty
+    }
+    
+    let nextCard;
+    
+    if (selectedChallengeCard) {
+      // Find next Action card in deck
+      const actionIndex = shuffledDeck.findIndex(c => c.category === 'Action');
+      if (actionIndex === -1) {
+        // No action card left, show the last card in deck
+        nextCard = shuffledDeck[shuffledDeck.length - 1];
+        console.log('No action card found, next card:', nextCard);
+      } else {
+        console.log('Challenge active, forcing action card');
+        return 'action';
+      }
+    } else {
+      nextCard = shuffledDeck[shuffledDeck.length - 1];
+      console.log('Normal draw, next card:', nextCard);
+    }
+    
+    const cardType = nextCard?.category?.toLowerCase().replace(' ', '-') || 'action';
+    console.log('Returning card type:', cardType);
+    return cardType;
+  }
+
+  function goBack() {
+    if (currentStep > 1) {
+      currentStep--;
+    }
+  }
+
+  function getAdvantageCardId(message: string): number {
+    if (message.includes("Infinite Time")) {
+      return 27;
+    } else if (message.includes("Rain Coat")) {
+      return 28;
+    } else if (message.includes("Kitchen Thieve")) {
+      return 29;
+    }
+    return 27; // Default fallback
+  }
 </script>
 
-<!-- Your HTML content would go here -->
+<style>
+  /* Same styles as before, plus container for active cards side-by-side */
+  .deck-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    position: relative;
+    min-height: 480px;
+  }
+
+  button {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 2px solid #333;
+    background: #fafafa;
+    transition: background 0.2s ease;
+    color: black;
+  }
+  button:hover:not(:disabled) {
+    background: #eee;
+  }
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .deck-container {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .card {
+    width: 140px;
+    height: 195px;
+    border: 2px solid #333;
+    border-radius: 12px;
+    background-color: transparent;
+    overflow: hidden;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    user-select: none;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .card.open {
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  }
+
+  .card-back {
+    width: 70px;
+    height: 90px;
+    border-radius: 12px;
+    border: 2px solid #000;
+    box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .card-back-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    z-index: 2;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+  }
+
+  .back-action {
+    background-color: #fff;
+    background-image: repeating-linear-gradient(45deg, #ddd 0 10px, #eee 10px 20px);
+    border-color: #bbb;
+  }
+
+  .back-challenge {
+    background-color: #111;
+    background-image: repeating-linear-gradient(45deg, #333 0 10px, #222 10px 20px);
+    border-color: #000;
+  }
+
+  .back-mini-game {
+    background-color: #444; background-image: repeating-linear-gradient(
+      45deg,
+      red 0 10px,
+      green 10px 20px,
+      yellow 20px 30px,
+      blue 30px 40px
+    );
+    border-color: #000;
+  }
+  
+  .back-mini-game {
+    background: linear-gradient(45deg, 
+      #ff6b6b 0%, #4ecdc4 25%, #45b7d1 50%, #96ceb4 75%, #ffeaa7 100%);
+    background-size: 400% 400%;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  .drawn-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .small-card {
+    width: 90px;
+    height: 125px;
+    overflow: hidden;
+  }
+
+  .active-card-container {
+    position: relative;
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .cards-row {
+    display: fixed;
+     width: 185px;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .flying-left {
+    animation: fly-left 0.8s forwards cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .flying-right {
+    animation: fly-right 0.8s forwards cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes fly-left {
+    0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateX(-300px) translateY(-100px) rotate(-30deg); opacity: 0; }
+  }
+  @keyframes fly-right {
+    0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateX(300px) translateY(-100px) rotate(30deg); opacity: 0; }
+  }
+
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .advantage-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #333;
+    padding: 2rem;
+    border-radius: 15px;
+    border: 3px solid #ff6b35;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    z-index: 8888;
+    max-width: 1400px;
+  }
+
+  @keyframes advantage-glow {
+    0% {
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+      transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+      box-shadow: 0 0 50px rgba(255, 107, 53, 0.9);
+      transform: translate(-50%, -50%) scale(1.02);
+    }
+  }
+
+  .action-tooltip {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #4a90e2, #357abd);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #2c5aa0;
+    box-shadow: 0 0 25px rgba(74, 144, 226, 0.6);
+    font-size: 1.1rem;
+    text-align: center;
+    z-index: 8000;
+    max-width: 400px;
+    line-height: 1.4;
+  }
+
+  .mini-game-explanation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #96ceb4, #45b7d1);
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    border: 3px solid #4ecdc4;
+    box-shadow: 0 0 30px rgba(78, 205, 196, 0.6);
+    font-size: 1rem;
+    text-align: left;
+    z-index: 8000;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+
+  .mini-game-explanation h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1.4rem;
+    color: #ffd700;
+    text-align: center;
+  }
+
+  .action-tooltip h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+    color: #ffd700;
+  }
+
+  .instructions-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: .5rem;
+    box-sizing: border-box;
+    animation: instructions-fade-in 1s ease-out;
+   overflow-y: auto;
+  }
+
+  .instructions-content {
+    max-width: 600px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: instructions-slide-up 1.2s ease-out 0.3s both;
+   width: 80%;
+   max-height: calc(100vh - 4rem);
+   overflow-y: auto;
+   display: flex;
+   flex-direction: column;
+  }
+
+  .overlay-logo {
+  padding: .3rem;
+    height: 80px;
+    object-fit: contain;
+    margin: 0 auto 1.5rem auto;
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+   flex-shrink: 0;
+  }
+
+  .instructions-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+   flex-shrink: 0;
+  }
+
+  .instructions-section {
+    margin-bottom: 1.5rem;
+    animation: section-fade-in 0.8s ease-out var(--delay) both;
+   flex-grow: 1;
+  }
+
+  .instructions-section h3 {
+    font-size: 1.4rem;
+    color: white;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+
+  .instructions-section p {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+    font-size: 1.1rem;
+    color: white;
+  }
+
+ .instructions-footer {
+   flex-shrink: 0;
+ }
+
+  .card-info-icon {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+  }
+
+  .card-info-icon:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.1);
+  }
+
+  .card-info-icon svg {
+    width: 35px;
+    height: 40px;
+  }
+
+  .instruction-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(100, 108, 255, 0.9);
+    color: white;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .instruction-icon:hover {
+    background: rgba(100, 108, 255, 1);
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 800px) {
+    .mini-game-content {
+      width: 95%;
+      max-width: 95vw;
+      padding: 15px;
+    }
+  }
+  .start-button {
+    background: linear-gradient(45deg, #ff6b35, #ffd700);
+    color: #333;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: button-bounce 2s ease-in-out infinite;
+  }
+
+  .step-indicator {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: white;
+    font-size: 1.1rem;
+  }
+
+  .step-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+   margin-bottom: 1rem;
+  }
+
+  .step-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: background 0.3s ease;
+  }
+
+  .step-dot.active {
+    background: white;
+  }
+
+  .start-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+  }
+
+  .skip-button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    margin-left: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .skip-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+  }
+
+  .golden-bone-active-illustration {
+    display: block;
+    margin: -1rem;
+    width: 80px;
+    height: 80px;
+    object-fit: contain ;
+    filter: drop-shadow(0 0 6px #ffd700);
+  }
+
+  @keyframes instructions-fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes instructions-slide-up {
+    0% { 
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    100% { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes section-fade-in {
+    0% { 
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    100% { 
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes button-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .edge-action {
+    border-color: #000 !important;
+    border-width: 5px !important;
+  }
+
+  .edge-challenge {
+    border-color: #fff !important;
+    border-width: 5px !important;
+  }
+
+  .edge-mini-game {
+    border: 5px solid transparent !important;
+    background: linear-gradient(white, white) padding-box, 
+                linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7) border-box !important;
+  }
+
+  .edge-advantage {
+    border: 2.5px solid transparent !important;
+    background: linear-gradient(135deg, #ffd700, #ffed4e) padding-box, 
+                linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7) border-box !important;
+  }
+
+
+  .winner-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #ff6b35 0%, #ff4757 100%);
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  .turn-indicator {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    color: white;
+  }
+
+   .turn-indicator.player1 {
+    text-shadow: 
+      0 -1px 2px #22c55e,
+      0 1px 2px #22c55e,
+      0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .turn-indicator.player2 {
+    text-shadow: 
+     0 -1px 2px #1d4ed8,
+     0 1px 2px #1d4ed8,
+      0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .turn-indicator.player3 {
+    text-shadow: 
+      0 -1px 2px #dc2626,
+      0 1px 2px #dc2626,
+      0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .top-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tiny-card {
+    width: 70px;
+    height: 95px;
+    border: 2px solid #333;
+    border-radius: 12px;
+    background: #fefefe;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    font-size: 0.7rem;
+    padding: 0.25rem;
+    overflow: hidden;
+  }
+
+  .review-button {
+    position: fixed;
+    top: .25rem;
+    right: .25rem;
+    padding: 0.13rem 0.25rem;
+    font-size: 0.6rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: background 0.2s ease;
+  }
+
+  .review-button:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  .timer-button {
+    position: absolute;
+    top: 150px;
+    left: calc(50% + 130px);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, #333, #000);
+    color: #ffffff;
+    border: none;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .timer-button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  .timer-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .timer-button svg {
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
+
+  .action-completed-btn {
+    position: absolute;
+    top: 200px;
+    left: calc(50% + 130px);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, #22c55e, #16a34a);
+    color: #ffffff;
+    border: none;
+    padding: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-completed-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+  }
+
+  .action-completed-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .action-failed-btn {
+    position: absolute;
+    top: 250px;
+    left: calc(50% + 130px);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, #ef4444, #dc2626);
+    color: #ffffff;
+    border: none;
+    padding: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-failed-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  }
+
+  .action-failed-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .player-section {
+    border: 2px solid #646cff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    background-color: rgba(100, 108, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .player-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .player-cards-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .advantage-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .mini-game-win-btn {
+    border-radius: 8px;
+    border: none;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    white-space: nowrap;
+  }
+
+  .mini-game-win-btn-p1 {
+    background-color: #ff6b35;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  }
+
+  .mini-game-win-btn-p1:hover:not(.disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+  }
+
+  .mini-game-win-btn-p2 {
+    background-color: #4ecdc4;
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+  }
+
+  .mini-game-win-btn-p2:hover:not(.disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(78, 205, 196, 0.4);
+  }
+
+  .mini-game-win-btn-p3 {
+    background-color: #45b7d1;
+    box-shadow: 0 4px 12px rgba(69, 183, 209, 0.3);
+  }
+
+  .mini-game-win-btn-p3:hover:not(.disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(69, 183, 209, 0.4);
+  }
+
+  .mini-game-win-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    pointer-events: none;
+  }
+
+  @media (max-width: 800px) {
+    .card { width: 120px; height: 150px; font-size: 1rem; }
+    .small-card { width: 75px; height: 100px; }
+    .tiny-card { width: 55px; height: 70px; font-size: 0.6rem; }
+    .deck-area { min-height: 380px; }
+    
+    .advantage-message {
+      max-width: 90vw;
+      padding: 1.5rem;
+      font-size: 1rem;
+    }
+    
+    .mini-game-explanation {
+      max-width: 90vw;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .active-card-container {
+      min-height: 200px;
+    }
+    
+    .active-card-container + div {
+      margin-top: 0.05rem;
+    }
+
+    .instructions-overlay {
+      padding: 1rem;
+    }
+
+    .instructions-content {
+      max-width: 95vw;
+      padding: 1.5rem;
+      margin: 0;
+    }
+
+    .overlay-logo {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 1rem;
+    }
+
+    .instructions-title {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .instructions-section {
+      margin-bottom: 1rem;
+    }
+
+    .instructions-section h3 {
+      font-size: 1.2rem;
+    }
+
+    .instructions-section p {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .start-button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .skip-button {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      margin-left: 0.5rem;
+      margin-top: 0.5rem;
+    }
+  }
+
+</style>
+
+{#if showInstructions}
+  <div class="instructions-overlay">
+    <div class="instructions-content">
+      <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
+      <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+        Balancedog
+      </div>
+      
+      {#if currentStep === 1}
+        <h1 class="instructions-title">Ready, Sit, Play!</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+          <p>Welcome to Ready, Sit, Play!</p>
+          <p>The tail-wagging card game where you and your dog team up for treats, challenges, and non-stop fun!</p>
+        </div>
+      {/if}
+
+      {#if currentStep === 2}
+        <h1 class="instructions-title">Player Setup</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+          <p>Let's get you and your furry friend ready to play!</p>
+          <div style="margin-top: 1rem;">
+            <label for="player1Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 1:</label>
+            <input type="text" id="player1Name" bind:value={player1Name} placeholder="Enter Player 1's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+
+            <label for="player2Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 2:</label>
+            <input type="text" id="player2Name" bind:value={player2Name} placeholder="Enter Player 2's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+
+            <label for="player3Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 3 (Optional):</label>
+            <input type="text" id="player3Name" bind:value={player3Name} placeholder="Enter Player 3's name (optional)" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+
+            <label for="dogName" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Canine Player:</label>
+            <input type="text" id="dogName" bind:value={dogName} placeholder="Enter your dog's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+
+            <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email (Optional):</label>
+            <input type="email" id="email" bind:value={email} placeholder="Enter your email" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+          </div>
+        </div>
+      {/if}
+
+      {#if currentStep === 3}
+        <h1 class="instructions-title">How to Play</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+          <p><strong>In order to win, be the first player to collect {player3Name.trim() ? 'four' : 'six'} Action Cards by successfully completing dog training tasks.</strong></p>
+          <p>Your turn begins by picking up the card facing down at the top of the deck.</p>
+        </div>
+      {/if}
+
+      {#if currentStep === 4}
+        <h1 class="instructions-title">Action Cards</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+          <p><strong>Training commands to perform with your dog</strong></p>
+          <div class="card small-card edge-action" style="margin: 1rem auto;">
+            <img src="/card-images/6.png" class="card-image" />
+          </div>
+          <p>Guide {dogName || 'your dog'} to complete the action shown.</p>
+          <p><strong>Success:</strong> Reward {dogName || 'your dog'} with a treat and keep the card.</p>
+          <p><strong>Fail:</strong> The card is placed at the bottom of the deck.</p>
+        </div>
+      {/if}
+
+      {#if currentStep === 5}
+        <h1 class="instructions-title">Challenge Cards</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+           <p><strong>Make Action Cards harder for opponents</strong></p>
+          <div class="card small-card edge-challenge" style="margin: 1rem auto;">
+            <img src="/card-images/11.png" class="card-image" />
+          </div>
+         <p>As an opponent reveals an Action Card, you can play your Challenge Card to make their turn more difficult.</p>
+           <p>From your reserve, tap on it to trigger its effect.</p>
+        </div>
+      {/if}
+
+      {#if currentStep === 6}
+        <h1 class="instructions-title">Mini-Game Cards</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+          <p><strong>Competitive challenges that give you special advantages</strong></p>
+           <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
+            <img src="/card-images/19.png" class="card-image" />
+          </div>
+          <p>Once a Mini-Game card is revealed, all players compete following the unique rules of that card. The winner earns a special advantage.</p>
+          <p>From your reserve, tap on it to trigger its effect.</p>
+        </div>
+      {/if}
+
+         {#if currentStep === 7}
+        <h1 class="instructions-title">Mini-Game Advantages</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+           <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
+            <img src="/card-images/27.png" class="card-image" />
+          </div>
+          <p><strong>Awarded to the first Mini-Game winner</strong></p>
+          <p>With which your turn has no time limit.</p>
+          <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
+            <img src="/card-images/28.png" class="card-image" />
+          </div>
+          <p><strong>Awarded to the second Mini-Game winner</strong></p>
+          <p>With which you can block and eliminate a Challenge Card used against you.</p>
+          <div class="card tiny-card edge-mini-game" style="margin: 1rem auto;">
+            <img src="/card-images/29.png" class="card-image" />
+          </div>
+          <p><strong>Awarded to the third Mini-Game winner</strong></p>
+          <p>Which allows you to steal an Action Card from an opponent.</p>
+        </div>
+      {/if}
+      
+      {#if currentStep === 8}
+        <h1 class="instructions-title">You're All Set!</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+          <p>Remember: The goal is to have fun training with your dog while playing a competitive game.</p>
+          <p>Good luck, and may the best trainer win!</p>
+          </div>
+          <div style="text-align: center; font-size: 3rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+        Ready, Sit, Play!
+      </div>
+         <div style="text-align: center; font-size: 0.7rem; color: white; margin-bottom: 1rem; margin-top: -1rem;">
+        Need Help? Use the "Review Instructions" button anytime during the game.
+      </div> 
+        {/if}
+        
+      <div class="step-dots">
+        {#each Array(totalSteps) as _, i}
+          <div class="step-dot {currentStep === i + 1 ? 'active' : ''}"></div>
+        {/each}
+      </div>
+
+     <div class="instructions-footer" style="text-align: center;">
+        {#if currentStep > 1}
+          <button class="skip-button" onclick={goBack} style="margin-right: 1rem;">
+            Back
+          </button>
+        {/if}
+        {#if currentStep === 2}
+          <button class="start-button" onclick={startGame}>
+            Next
+          </button>
+        {:else}
+          <button class="start-button" onclick={startGame}>
+            {currentStep < totalSteps ? 'Next' : 'Start Playing!'}
+          </button>
+        {/if}
+        <button class="skip-button" onclick={skipInstructions}>
+          Skip Instructions
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+{#if showTieOverlay}
+  <div class="instructions-overlay">
+    <div class="instructions-content">
+      <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
+      Balancedog
+      <div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);">
+        Ready, Sit, Play!
+      </div> <h1 class="instructions-title">It's a Tie!</h1>
+      <div class="instructions-section" style="--delay: 0.5s">
+        <p>Congratulations! You both are amazing at communicating with your dog!</p>
+        <p>To settle this game and declare a winner, make sure to be standing at the opposite sides of the room with {dogName || 'your dog'} in the middle, call their name at the same time.</p>
+      </div>
+      
+      <div style="text-align: center;">
+        <button class="start-button" onclick={animateShuffle}>
+          Restart Game
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<div class="deck-area">
+  <button class="review-button" onclick={reviewInstructions} disabled={isShuffling || gameOver}>
+    Review Instructions
+  </button>
+  
+  <button 
+    class="undo-btn" 
+    onclick={undoLastStep}
+    disabled={stateHistory.length === 0 || isShuffling || gameOver}
+  >
+   <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30
+" zoomAndPan="magnify" viewBox="0 0 172.5 172.499994" height="30" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><clipPath id="7e6b23ce85"><path d="M 0 0 L 171.703125 0 L 171.703125 171.703125 L 0 171.703125 Z M 0 0 " clip-rule="nonzero"/></clipPath><clipPath id="3441266832"><path d="M 32.914062 32.914062 L 71 32.914062 L 71 86 L 32.914062 86 Z M 32.914062 32.914062 " clip-rule="nonzero"/></clipPath><clipPath id="c0eceb7a6b"><path d="M 32.914062 32.914062 L 138.921875 32.914062 L 138.921875 138.921875 L 32.914062 138.921875 Z M 32.914062 32.914062 " clip-rule="nonzero"/></clipPath><clipPath id="98c06b94d8"><rect x="0" width="172" y="0" height="172"/></clipPath></defs><path fill="#ffffff" d="M 0 0 L 172 0 L 172 172 L 0 172 Z M 0 0 " fill-opacity="1" fill-rule="nonzero"/><g transform="matrix(1, 0, 0, 1, 0, 0)"><g clip-path="url(#98c06b94d8)"><g clip-path="url(#7e6b23ce85)"><path fill="#ffffff" d="M 0 0 L 171.703125 0 L 171.703125 171.703125 L 0 171.703125 Z M 0 0 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#3441266832)"><path fill="#000000" d="M 70.019531 85.917969 L 32.914062 59.417969 L 70.019531 32.914062 Z M 70.019531 85.917969 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#c0eceb7a6b)"><path stroke-linecap="butt" transform="matrix(5.300392, 0, 0, 5.300392, 22.314432, 22.314429)" fill="none" stroke-linejoin="miter" d="M 1.999783 19.999632 L 13.50026 19.999632 C 17.09964 19.999632 19.999632 17.09964 19.999632 13.50026 C 19.999632 9.900143 17.09964 7.000151 13.50026 7.000151 L 6.000077 7.000151 " stroke="#000000" stroke-width="4" stroke-opacity="1" stroke-miterlimit="10"/></g></g></g></svg>
+  </button>
+
+  <!-- Turn indicator above the deck -->
+  {#if !gameOver && !isShuffling}
+    <div class="turn-indicator player{currentTurn}">
+      {#if currentTurn === 1}
+        {player1Name || 'Player 1'}'s turn
+      {:else if currentTurn === 2}
+        {player2Name || 'Player 2'}'s turn
+      {:else}
+        {player3Name || 'Player 3'}'s turn
+      {/if}
+    </div>
+    {#if timerRunning}
+      <div class="player-turn-countdown">
+        {timer}s
+      </div>
+    {/if}
+  {/if}
+
+  <!-- Golden Bone Illustration -->
+  {#if goldenBoneActive}
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <img src="/golden-bone-illustration.png" class="golden-bone-active-illustration" />
+    </div>
+  {/if}
+
+  <div
+    class="deck-container"
+    onclick={revealNextCard}
+    title="Click to draw the next card"
+    style="pointer-events: {isShuffling || activeCard !== null || gameOver ? 'none' : 'auto'}"
+  >
+    {#if !activeCard}
+      {#if shuffledDeck.length > 0}
+        <div class="card card-back back-{getCardBackType()}">
+          <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
+        </div>
+      {:else}
+        <div class="card card-back back-action">
+          <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="card-back-logo" />
+        </div>
+      {/if}
+    {/if}
+  </div>
+
+  {#if activeCard}
+    <div class="active-card-container">
+      <!-- Show the active card -->
+      <div class="cards-row">
+        <div class="card open edge-{activeCard.category.toLowerCase().replace(' ', '-')}" 
+             class:flying-left={flying && flyingDirection === 'left'}
+             class:flying-right={flying && flyingDirection === 'right'}>
+          <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
+          <button 
+            class="card-info-icon"
+            onclick={() => {
+              isReviewingInstructions = true;
+              isReviewingInstructions = true;
+              if (activeCard.category === 'Action') {
+                showActionInstruction(activeCard);
+              } else if (activeCard.category === 'Challenge') {
+                showChallengeInstruction(activeCard);
+              } else if (activeCard.category === 'Mini Game') {
+                showMiniGameInstruction(activeCard);
+              }
+            }}
+            title="Show instructions for this card"
+          >
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
+<defs>
+<mask id="mask" mask-type="alpha">
+<g>
+<path d="M34,34L139,34L139,139L34,139L34,34Z" fill="#000000"/>
+</g>
+</mask>
+</defs>
+<g id="layer0">
+<g mask="url(#mask)">
+<path d="M85.9102,34.3984C57.4609,34.3984 34.3984,57.4609 34.3984,85.9102C34.3984,114.359 57.4609,137.422 85.9102,137.422C114.359,137.422 137.422,114.359 137.422,85.9102C137.422,57.4609 114.359,34.3984 85.9102,34.3984L85.9102,34.3984ZM94.582,113.18C94.582,114.254 93.5625,114.871 91.5234,114.871L80.3008,114.871C78.3633,114.871 77.2422,114.25 77.2422,113.18L77.2422,77.1211C77.2422,75.9922 78.3633,75.4297 80.3008,75.4297L91.5234,75.4297C93.5625,75.4297 94.582,75.9961 94.582,77.1211L94.582,113.18ZM85.9102,71.5859C80.8477,71.5859 76.7383,67.4805 76.7383,62.4141C76.7383,57.3516 80.8438,53.2422 85.9102,53.2422C90.9766,53.2422 95.0859,57.3477 95.0859,62.4141C95.0859,67.4844 90.9766,71.5859 85.9102,71.5859L85.9102,71.5859Z" fill="#231F20"/>
+</g>
+</g>
+</svg>
+          </button>
+        </div>
+
+        <!-- If challenge card active, show it side by side -->
+        {#if selectedChallengeCard}
+          <div class="card open edge-challenge">
+          <img src="/card-images/{selectedChallengeCard.id}.png" alt="Card {selectedChallengeCard.id}" class="card-image" />
+            <button 
+              class="card-info-icon"
+              onclick={() => showChallengeInstruction(selectedChallengeCard)}
+              title="Show instructions for this challenge card"
+            >
+          
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
+<defs>
+<mask id="mask" mask-type="alpha">
+<g>
+<path d="M34,34L139,34L139,139L34,139L34,34Z" fill="#000000"/>
+</g>
+</mask>
+</defs>
+<g id="layer0">
+<g mask="url(#mask)">
+<path d="M85.9102,34.3984C57.4609,34.3984 34.3984,57.4609 34.3984,85.9102C34.3984,114.359 57.4609,137.422 85.9102,137.422C114.359,137.422 137.422,114.359 137.422,85.9102C137.422,57.4609 114.359,34.3984 85.9102,34.3984L85.9102,34.3984ZM94.582,113.18C94.582,114.254 93.5625,114.871 91.5234,114.871L80.3008,114.871C78.3633,114.871 77.2422,114.25 77.2422,113.18L77.2422,77.1211C77.2422,75.9922 78.3633,75.4297 80.3008,75.4297L91.5234,75.4297C93.5625,75.4297 94.582,75.9961 94.582,77.1211L94.582,113.18ZM85.9102,71.5859C80.8477,71.5859 76.7383,67.4805 76.7383,62.4141C76.7383,57.3516 80.8438,53.2422 85.9102,53.2422C90.9766,53.2422 95.0859,57.3477 95.0859,62.4141C95.0859,67.4844 90.9766,71.5859 85.9102,71.5859L85.9102,71.5859Z" fill="#231F20"/>
+</g>
+</g>
+</svg>
+            </button>
+            <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
+              (Challenge Card Active)
+            </div>
+          </div>
+        {/if}
+      </div>
+    </div>
+
+    <!-- Timer controls below the cards -->
+  {#if activeCard}
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.1rem;">
+      
+      {#if activeCard.category === 'Action'}
+        <button 
+          class="action-completed-btn" 
+          onclick={actionCompleted} 
+          disabled={flying || gameOver}
+        >
+          ✓
+        </button>
+        <button 
+          class="action-failed-btn" 
+          onclick={actionCardFailed} 
+          disabled={flying || gameOver}
+        >
+          ✗
+        </button>
+      {/if}
+      
+      <!-- Video Recording for Action and Mini Game cards -->
+      {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
+        <VideoRecorder on:videoAction={handleRecordedVideo} />
+      {/if}
+
+      <!-- Timer Button positioned below the recording button -->
+      {#if canStartTimer()}
+        <button class="timer-button" onclick={startTimer} disabled={!canStartTimer()}>
+          <svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
+<defs>
+<mask id="mask" mask-type="alpha">
+<g>
+<path d="M49,27L124,27L124,156L49,156L49,27Z" fill="#000000"/>
+</g>
+</mask>
+<mask id="mask_2" mask-type="alpha">
+<g>
+<path d="M49.4062,137L122.566,137L122.566,154.707L49.4062,154.707L49.4062,137Z" fill="#000000"/>
+</g>
+</mask>
+<mask id="mask_3" mask-type="alpha">
+<g>
+<path d="M49.4062,27.793L122.566,27.793L122.566,46L49.4062,46L49.4062,27.793Z" fill="#ffffff"/>
+</g>
+</mask>
+</defs>
+<g id="layer0">
+<g mask="url(#mask)">
+<g mask="url(#mask_2)">
+<path d="M53.7891,141.32C53.5,141.32 53.2617,141.555 53.2617,141.848L53.2617,150.332C53.2617,150.621 53.5,150.859 53.7891,150.859L118.195,150.859C118.484,150.859 118.723,150.621 118.723,150.332L118.723,141.848C118.723,141.555 118.484,141.32 118.195,141.32L53.7891,141.32ZM118.195,154.707L53.7891,154.707C51.3789,154.707 49.4141,152.742 49.4141,150.332L49.4141,141.848C49.4141,139.434 51.3789,137.473 53.7891,137.473L118.195,137.473C120.605,137.473 122.57,139.434 122.57,141.848L122.57,150.332C122.57,152.742 120.605,154.707 118.195,154.707L118.195,154.707Z" fill="#ffffff"/>
+</g>
+<path d="M111.641,141.32C110.578,141.32 109.719,140.461 109.719,139.398L109.719,137.312C109.719,119.094 100.469,102.488 84.9766,92.8867C68.3477,82.5781 58.418,64.7461 58.418,45.1875L58.418,43.1016C58.418,42.043 59.2812,41.1797 60.3438,41.1797C61.4062,41.1797 62.2656,42.043 62.2656,43.1016L62.2656,45.1875C62.2656,63.4062 71.5156,80.0117 87.0078,89.6133C103.637,99.9219 113.566,117.754 113.566,137.312L113.566,139.398C113.566,140.461 112.703,141.32 111.641,141.32L111.641,141.32Z" fill="#ffffff"/>
+<path d="M94.4062,86.7422C93.8945,86.7422 93.3789,86.5391 92.9961,86.1328C92.2734,85.3555 92.3164,84.1406 93.0938,83.4141C103.66,73.5625 109.719,59.6289 109.719,45.1875L109.719,43.1016C109.719,42.043 110.578,41.1797 111.641,41.1797C112.703,41.1797 113.566,42.043 113.566,43.1016L113.566,45.1875C113.566,60.6875 107.059,75.6484 95.7188,86.2266C95.3477,86.5742 94.875,86.7422 94.4062,86.7422L94.4062,86.7422Z" fill="#ffffff"/>
+<path d="M60.3438,141.32C59.2812,141.32 58.418,140.461 58.418,139.398L58.418,137.312C58.418,121.332 65.2617,106.066 77.1953,95.4297C77.9844,94.7188 79.2031,94.7891 79.9102,95.5859C80.6211,96.375 80.5508,97.5938 79.7539,98.2969C68.6406,108.207 62.2656,122.426 62.2656,137.312L62.2656,139.398C62.2656,140.461 61.4062,141.32 60.3438,141.32L60.3438,141.32Z" fill="#ffffff"/>
+<g mask="url(#mask_3)">
+<path d="M53.7891,31.6406C53.5,31.6406 53.2617,31.8789 53.2617,32.168L53.2617,40.6523C53.2617,40.9453 53.5,41.1797 53.7891,41.1797L118.195,41.1797C118.484,41.1797 118.723,40.9453 118.723,40.6523L118.723,32.168C118.723,31.8789 118.484,31.6406 118.195,31.6406L53.7891,31.6406ZM118.195,45.0273L53.7891,45.0273C51.3789,45.0273 49.4141,43.0664 49.4141,40.6523L49.4141,32.168C49.4141,29.7578 51.3789,27.793 53.7891,27.793L118.195,27.793C120.605,27.793 122.57,29.7578 122.57,32.168L122.57,40.6523C122.57,43.0664 120.605,45.0273 118.195,45.0273L118.195,45.0273Z" fill="#ffffff"/>
+</g>
+</g>
+</g>
+</svg>
+
+        </button>
+      {/if}
+    </div>
+  {/if}
+  {/if}
+
+  <div style="display:flex; justify-content: space-around; width: 100%; margin-top: 1rem;">
+    <!-- Player 1 Cards -->
+    <div>
+      {#if activeCard && activeCard.category === 'Mini Game'}
+        <div 
+          class="mini-game-win-btn mini-game-win-btn-p1" 
+          class:disabled={flying || gameOver}
+          onclick={() => playerWins(1)}
+          title="{player1Name || 'Player 1'} Wins This Round"
+        >
+         {player1Name || 'Player 1'} Wins
+        </div>
+      {/if}
+
+      <h3>{player1Name || 'Player 1'}'s Cards ({player1Cards.filter(c => c.category === 'Action').length})</h3>
+
+      <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
+      <div class="top-row">
+        {#each player1Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
+          <div
+            class="card tiny-card edge-{card.category.toLowerCase()}"
+            onclick={() => {
+              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1) {
+                activateChallengeCard(card, 1);
+              }
+            }}
+            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1 ? 'pointer' : 'default'}"
+            title={card.label}
+          >
+            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+          </div>
+        {/each}
+        
+        <!-- Advantage cards -->
+        {#each player1AdvantageCards as advantageCard (advantageCard.id)}
+          <div
+            class="card tiny-card edge-advantage"
+            onclick={() => {
+              if (currentTurn === 1) {
+                useAdvantageCard(advantageCard.id, 1);
+              }
+            }}
+            style="cursor: {currentTurn === 1 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 1 ? 1 : 0.4};"
+            title={advantageCard.message}
+          >
+            <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
+          </div>
+        {/each}
+      </div>
+
+      <!-- Bottom row: Action cards -->
+      <div class="drawn-cards" style="margin-top: 0.25rem;">
+        {#each player1Cards.filter(c => c.category === 'Action') as card (card.id)}
+          <div class="card small-card edge-action">
+            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+          </div>
+        {/each}
+      </div>
+    </div>
+
+    <!-- Player 2 Cards -->
+    <div>
+      {#if activeCard && activeCard.category === 'Mini Game'}
+        <div 
+          class="mini-game-win-btn mini-game-win-btn-p2" 
+          class:disabled={flying || gameOver}
+          onclick={() => playerWins(2)}
+          title="{player2Name || 'Player 2'} Wins This Round"
+        >
+          {player2Name || 'Player 2'} Wins
+        </div>
+      {/if}
+
+      <h3>{player2Name || 'Player 2'}'s Cards ({player2Cards.filter(c => c.category === 'Action').length})</h3>
+
+      <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
+      <div class="top-row">
+        {#each player2Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
+          <div
+            class="card tiny-card edge-{card.category.toLowerCase()}"
+            onclick={() => {
+              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2) {
+                activateChallengeCard(card, 2);
+              }
+            }}
+            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2 ? 'pointer' : 'default'}"
+            title={card.label}
+          >
+            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+          </div>
+        {/each}
+        
+        <!-- Advantage cards -->
+        {#each player2AdvantageCards as advantageCard (advantageCard.id)}
+          <div
+            class="card tiny-card edge-advantage"
+            onclick={() => {
+              if (currentTurn === 2) {
+                useAdvantageCard(advantageCard.id, 2);
+              }
+            }}
+            style="cursor: {currentTurn === 2 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 2 ? 1 : 0.4};"
+            title={advantageCard.message}
+          >
+            <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
+          </div>
+        {/each}
+      </div>
+
+      <!-- Bottom row: Action cards -->
+      <div class="drawn-cards" style="margin-top: 0.25rem;">
+        {#each player2Cards.filter(c => c.category === 'Action') as card (card.id)}
+          <div class="card small-card edge-action">
+            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+          </div>
+        {/each}
+      </div>
+    </div>
+
+    <!-- Player 3 Cards (only show if player3Name exists) -->
+    {#if player3Name}
+      <div>
+        {#if activeCard && activeCard.category === 'Mini Game'}
+          <div 
+            class="mini-game-win-btn mini-game-win-btn-p3" 
+            class:disabled={flying || gameOver}
+            onclick={() => playerWins(3)}
+            title="{player3Name} Wins This Round"
+          >
+            {player3Name || 'Player 3'} Wins
+          </div>
+        {/if}
+
+        <h3>{player3Name}'s Cards ({player3Cards.filter(c => c.category === 'Action').length})</h3>
+
+        <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
+        <div class="top-row">
+          {#each player3Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
+            <div
+              class="card tiny-card edge-{card.category.toLowerCase()}"
+              onclick={() => {
+                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3) {
+                  activateChallengeCard(card, 3);
+                }
+              }}
+              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3 ? 'pointer' : 'default'}"
+              title={card.label}
+            >
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+          
+          <!-- Advantage cards -->
+          {#each player3AdvantageCards as advantageCard (advantageCard.id)}
+            <div
+              class="card tiny-card edge-advantage"
+              onclick={() => {
+                if (currentTurn === 3) {
+                  useAdvantageCard(advantageCard.id, 3);
+                }
+              }}
+              style="cursor: {currentTurn === 3 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 3 ? 1 : 0.4};"
+              title={advantageCard.message}
+            >
+              <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
+            </div>
+          {/each}
+        </div>
+
+        <!-- Bottom row: Action cards -->
+        <div class="drawn-cards" style="margin-top: 0.25rem;">
+          {#each player3Cards.filter(c => c.category === 'Action') as card (card.id)}
+            <div class="card small-card edge-action">
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
+  </div>
+
+   {#if gameOver && winner !== null}
+    <div
+      class="winner-overlay"
+      onclick={animateShuffle}
+      title="Tap to restart"
+    >
+      <div class="instructions-content">
+        <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
+        <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+          Balancedog
+        </div>
+         <div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);">
+        Ready, Sit, Play!
+      </div>
+        <h1 class="instructions-title">🎉 {#if winner === 1}{player1Name || 'Player 1'}{:else if winner === 2}{player2Name || 'Player 2'}{:else}{player3Name || 'Player 3'}{/if} Wins 🎉</h1>
+        <div class="instructions-section" style="--delay: 0.5s">
+          <p>Congratulations on the amazing teamwork with {dogName || 'your dog'}!</p>
+          <p>Tap anywhere to play again.</p>
+        </div>
+      </div>
+    </div>
+  {/if}
+</div>
+
+{#if showMiniGameExplanation}
+<div class="mini-game-explanation" onclick={hideMiniGameInstruction}>
+  <h4>{activeCard?.label} Rules</h4>
+  <div>{currentMiniGameExplanation}</div>
+  <button 
+    onclick={hideMiniGameInstruction} 
+    style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ffd700; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: block; margin-left: auto; margin-right: auto;"
+  >
+    Got it!
+  </button>
+</div>
+{/if}
+
+{#if showAdvantageOverlay}
+  <div class="advantage-message">
+    <div>{currentAdvantageMessage}</div>
+    <button onclick={dismissAdvantageOverlay} style="margin-top: 1rem; padding: 0.75rem 1.5rem; font-size: 1rem; background: #ff6b35; color: white; border: none; border-radius: 8px; cursor: pointer;">
+      Tap to Continue
+    </button>
+  </div>
+{/if}
+
+{#if showActionTooltip && actionTooltipCard}
+  <div class="action-tooltip" onclick={hideActionInstruction}>
+    <h4>{actionTooltipCard.label}</h4>
+    <p>{actionTooltipContent}</p>
+    <button 
+      onclick={hideActionInstruction} 
+      style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ffd700; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;"
+    >
+      Got it!
+    </button>
+  </div>
+{/if}
