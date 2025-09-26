@@ -1191,10 +1191,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .card-info-icon {
     position: absolute;
-    bottom: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
+    bottom: 6px;
+    right: 6px;
+    width: 32px;
+    height: 32px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     cursor: pointer;
