@@ -1472,8 +1472,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .timer-button {
     position: absolute;
-    top: 40%;
-    left: calc(50% + 200px);
+    top: 150px;
+    left: calc(50% + 130px);
     width: 40px;
     height: 40px;
     background: linear-gradient(45deg, #333, #000);
