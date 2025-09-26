@@ -585,6 +585,31 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         } else if (opponent === 2 && player === 1) {
           player1Cards = [...currentPlayerCards];
           player2Cards = [...opponentCards];
+        } else if (opponent === 2 && player === 3) {
+          player2Cards = [...opponentCards];
+          player3Cards = [...currentPlayerCards];
+        } else if (opponent === 3 && player === 2) {
+          player2Cards = [...currentPlayerCards];
+          player3Cards = [...opponentCards];
+        }
+      }
+    }
+    
+    // Remove the used advantage card
+    if (player === 1) {
+      player1AdvantageCards = player1AdvantageCards.filter(card => card.id !== cardId);
+    } else if (player === 2) {
+      player2AdvantageCards = player2AdvantageCards.filter(card => card.id !== cardId);
+    } else if (player === 3) {
+      player3AdvantageCards = player3AdvantageCards.filter(card => card.id !== cardId);
+    }
+  }
+
+  let videoRecorderComponent;
+  let showGameReview = false;
+</script>
+
+<!-- Your HTML content would go here -->
         } else if (opponent === 1 && player === 3) {
           player1Cards = [...opponentCards];
           player3Cards = [...currentPlayerCards];
