@@ -2,97 +2,17 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
-  
-  let { activeCardImage } = $props();
 
-  let videoStream = $state(null);
-  let mediaRecorder = $state(null);
-  let recordedChunks = $state([]);
-  let recordingStatus = $state('idle'); // 'idle', 'recording', 'recorded'
-  let recordedVideoUrl = $state('');
-  let countdown = $state(30);
-  let countdownInterval = $state(null);
-  let facingMode = $state('environment'); // Default to back camera
-  let liveVideoElement = $state(null);
-  let recordedVideoElement = $state(null);
-
-  // Effect to handle video element setup when it becomes available
-  $effect(() => {
-    if (recordingStatus === 'recording' && videoStream && liveVideoElement) {
-      console.log('Live video element found:', liveVideoElement);
-      console.log('Live video element initial state:', {
-        tagName: liveVideoElement.tagName,
-        readyState: liveVideoElement.readyState,
-        networkState: liveVideoElement.networkState,
-        currentSrc: liveVideoElement.currentSrc,
-        srcObject: liveVideoElement.srcObject
-      });
-      
-      liveVideoElement.srcObject = videoStream;
-      console.log('Live video element srcObject set:', liveVideoElement.srcObject);
-      console.log('Live video element after srcObject assignment:', {
-        readyState: liveVideoElement.readyState,
-        networkState: liveVideoElement.networkState,
-        videoWidth: liveVideoElement.videoWidth,
-        videoHeight: liveVideoElement.videoHeight
-      });
-      
-      console.log('Live video element dimensions:', {
-        width: liveVideoElement.offsetWidth,
-        height: liveVideoElement.offsetHeight,
-        clientWidth: liveVideoElement.clientWidth,
-        clientHeight: liveVideoElement.clientHeight,
-        scrollWidth: liveVideoElement.scrollWidth,
-        scrollHeight: liveVideoElement.scrollHeight
-      });
-      
-      // Add event listeners for debugging
-      liveVideoElement.addEventListener('loadstart', () => console.log('Video: loadstart event'));
-      liveVideoElement.addEventListener('loadedmetadata', () => {
-        console.log('Video: loadedmetadata event');
-        console.log('Video metadata:', {
-          videoWidth: liveVideoElement.videoWidth,
-          videoHeight: liveVideoElement.videoHeight,
-          duration: liveVideoElement.duration
-        });
-      });
-      liveVideoElement.addEventListener('loadeddata', () => console.log('Video: loadeddata event'));
-      liveVideoElement.addEventListener('canplay', () => console.log('Video: canplay event'));
-      liveVideoElement.addEventListener('canplaythrough', () => console.log('Video: canplaythrough event'));
-      liveVideoElement.addEventListener('playing', () => console.log('Video: playing event'));
-      liveVideoElement.addEventListener('error', (e) => {
-        console.error('Video: error event', e);
-        console.error('Video error details:', {
-          error: liveVideoElement.error,
-          code: liveVideoElement.error?.code,
-          message: liveVideoElement.error?.message
-        });
-      });
-      
-      // Explicitly try to play the video
-      (async () => {
-        try {
-          console.log('Attempting to play video...');
-          await liveVideoElement.play();
-          console.log('Live video play() succeeded');
-          console.log('Video state after play():', {
-            paused: liveVideoElement.paused,
-            ended: liveVideoElement.ended,
-            readyState: liveVideoElement.readyState,
-            currentTime: liveVideoElement.currentTime
-          });
-        } catch (playError) {
-          console.error('Live video play() failed:', playError);
-          console.error('Play error details:', playError.name, playError.message);
-          console.error('Video element state during play error:', {
-            readyState: liveVideoElement.readyState,
-            networkState: liveVideoElement.networkState,
-            error: liveVideoElement.error
-          });
-        }
-      })();
-    }
-  });
+  let videoStream = null;
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let recordingStatus = 'idle'; // 'idle', 'recording', 'recorded'
+  let recordedVideoUrl = '';
+  let countdown = 30;
+  let countdownInterval = null;
+  let facingMode = 'environment'; // Default to back camera
+  let liveVideoElement = null;
+  let recordedVideoElement = null;
 
   async function selectCamera() {
     // Toggle between front and back camera
@@ -125,6 +45,9 @@
       // Reset state and start new recording
       recordedChunks = [];
       
+      // Longer delay to ensure camera hardware is fully released
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       // Start recording with new camera
       await startRecording();
     }
@@ -147,6 +70,9 @@
       // Set recording status to render the video element in DOM
       recordingStatus = 'recording';
       
+      // Wait for the next tick to ensure DOM is updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Check if tracks are active
       const videoTracks = videoStream.getVideoTracks();
       const audioTracks = videoStream.getAudioTracks();
@@ -166,6 +92,83 @@
         readyState: track.readyState,
         muted: track.muted
       })));
+
+      // Display live feed
+      if (liveVideoElement) {
+        console.log('Live video element found:', liveVideoElement);
+        console.log('Live video element initial state:', {
+          tagName: liveVideoElement.tagName,
+          readyState: liveVideoElement.readyState,
+          networkState: liveVideoElement.networkState,
+          currentSrc: liveVideoElement.currentSrc,
+          srcObject: liveVideoElement.srcObject
+        });
+        
+        liveVideoElement.srcObject = videoStream;
+        console.log('Live video element srcObject set:', liveVideoElement.srcObject);
+        console.log('Live video element after srcObject assignment:', {
+          readyState: liveVideoElement.readyState,
+          networkState: liveVideoElement.networkState,
+          videoWidth: liveVideoElement.videoWidth,
+          videoHeight: liveVideoElement.videoHeight
+        });
+        
+        console.log('Live video element dimensions:', {
+          width: liveVideoElement.offsetWidth,
+          height: liveVideoElement.offsetHeight,
+          clientWidth: liveVideoElement.clientWidth,
+          clientHeight: liveVideoElement.clientHeight,
+          scrollWidth: liveVideoElement.scrollWidth,
+          scrollHeight: liveVideoElement.scrollHeight
+        });
+        
+        // Add event listeners for debugging
+        liveVideoElement.addEventListener('loadstart', () => console.log('Video: loadstart event'));
+        liveVideoElement.addEventListener('loadedmetadata', () => {
+          console.log('Video: loadedmetadata event');
+          console.log('Video metadata:', {
+            videoWidth: liveVideoElement.videoWidth,
+            videoHeight: liveVideoElement.videoHeight,
+            duration: liveVideoElement.duration
+          });
+        });
+        liveVideoElement.addEventListener('loadeddata', () => console.log('Video: loadeddata event'));
+        liveVideoElement.addEventListener('canplay', () => console.log('Video: canplay event'));
+        liveVideoElement.addEventListener('canplaythrough', () => console.log('Video: canplaythrough event'));
+        liveVideoElement.addEventListener('playing', () => console.log('Video: playing event'));
+        liveVideoElement.addEventListener('error', (e) => {
+          console.error('Video: error event', e);
+          console.error('Video error details:', {
+            error: liveVideoElement.error,
+            code: liveVideoElement.error?.code,
+            message: liveVideoElement.error?.message
+          });
+        });
+        
+        // Explicitly try to play the video
+        try {
+          console.log('Attempting to play video...');
+          await liveVideoElement.play();
+          console.log('Live video play() succeeded');
+          console.log('Video state after play():', {
+            paused: liveVideoElement.paused,
+            ended: liveVideoElement.ended,
+            readyState: liveVideoElement.readyState,
+            currentTime: liveVideoElement.currentTime
+          });
+        } catch (playError) {
+          console.error('Live video play() failed:', playError);
+          console.error('Play error details:', playError.name, playError.message);
+          console.error('Video element state during play error:', {
+            readyState: liveVideoElement.readyState,
+            networkState: liveVideoElement.networkState,
+            error: liveVideoElement.error
+          });
+        }
+      } else {
+        console.error('Live video element not found!');
+        console.error('Available elements:', document.querySelectorAll('video'));
+      }
 
       // Determine best supported MIME type for better mobile compatibility
       let mimeType = '';
@@ -277,8 +280,7 @@
     console.log('Video completed, dispatching event...');
     dispatch('videoAction', {
       url: recordedVideoUrl,
-      status: 'completed',
-      cardImage: activeCardImage
+      status: 'completed'
     });
     resetRecording();
   }
@@ -309,7 +311,7 @@
 <div class="video-recorder">
   {#if recordingStatus === 'idle'}
     <button class="record-btn" on:click={startRecording}>
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" zoomAndPan="magnify" viewBox="0 0 172.5 172.499994" height="15" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><clipPath id="13371a7e95"><path d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="dd1b12291b"><path d="M 81 0.558594 C 36.574219 0.558594 0.558594 36.574219 0.558594 81 C 0.558594 125.429688 36.574219 161.445312 81 161.445312 C 125.429688 161.445312 161.445312 125.429688 161.445312 81 C 161.445312 36.574219 125.429688 0.558594 81 0.558594 Z M 81 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="81397aa8c6"><path d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="23e127d511"><path d="M 81 0.558594 C 36.574219 0.558594 0.558594 36.574219 0.558594 81 C 0.558594 125.429688 36.574219 161.445312 81 161.445312 C 125.429688 161.445312 161.445312 125.429688 161.445312 81 C 161.445312 36.574219 125.429688 0.558594 81 0.558594 Z M 81 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="fcc2fc2742"><rect x="0" width="162" y="0" height="162"/></clipPath><clipPath id="4a44626ab5"><rect x="0" width="162" y="0" height="162"/></clipPath></defs><g transform="matrix(1, 0, 0, 1, 5, 5)"><g clip-path="url(#4a44626ab5)"><g clip-path="url(#13371a7e95)"><g clip-path="url(#dd1b12291b)"><g transform="matrix(1, 0, 0, 1, 0, 0.000000000000000888)"><g clip-path="url(#fcc2fc2742)"><g clip-path="url(#81397aa8c6)"><g clip-path="url(#23e127d511)"><path fill="#ffffff" d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " fill-opacity="1" fill-rule="nonzero"/></g></g></g></g></g></g></g></g></svg>
+     <img src="/public/Rec.svg" alt="Rec" />
     </button>
   {:else if recordingStatus === 'recording'}
     <div class="recording-container" class:fullscreen-recording={recordingStatus === 'recording'}>
@@ -395,7 +397,7 @@
 
   .record-btn {
     position: absolute;
-    top: 30%;
+    top: 24%;
     left: calc(50% + 110px);
     width: 40px;
     height: 40px;
