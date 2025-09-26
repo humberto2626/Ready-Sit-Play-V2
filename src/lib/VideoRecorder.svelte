@@ -5,16 +5,16 @@
   
   let activeCardImage = $props();
 
-  let videoStream = null;
-  let mediaRecorder = null;
-  let recordedChunks = [];
-  let recordingStatus = 'idle'; // 'idle', 'recording', 'recorded'
-  let recordedVideoUrl = '';
-  let countdown = 30;
-  let countdownInterval = null;
-  let facingMode = 'environment'; // Default to back camera
-  let liveVideoElement = null;
-  let recordedVideoElement = null;
+  let videoStream = $state(null);
+  let mediaRecorder = $state(null);
+  let recordedChunks = $state([]);
+  let recordingStatus = $state('idle'); // 'idle', 'recording', 'recorded'
+  let recordedVideoUrl = $state('');
+  let countdown = $state(30);
+  let countdownInterval = $state(null);
+  let facingMode = $state('environment'); // Default to back camera
+  let liveVideoElement = $state(null);
+  let recordedVideoElement = $state(null);
 
   // Effect to handle video element setup when it becomes available
   $effect(() => {
