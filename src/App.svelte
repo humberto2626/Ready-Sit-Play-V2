@@ -1212,12 +1212,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     backdrop-filter: blur(5px);
   }
 
-  .card-info-icon:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.1);
-  }
-
   .card-info-icon svg {
     width: 35px;
     height: 40px;
@@ -1242,6 +1236,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     justify-content: center;
     transition: all 0.2s ease;
     z-index: 10;
+  }
+
+  .instruction-icon:hover {
+    background: rgba(100, 108, 255, 1);
+    transform: scale(1.1);
   }
 
   @media (max-width: 800px) {
