@@ -1957,7 +1957,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
              class:flying-right={flying && flyingDirection === 'right'}>
           <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
           <button 
-            class="icon-only-button"
+            class="card-info-icon"
             onclick={() => {
               isReviewingInstructions = true;
               isReviewingInstructions = true;
@@ -1971,7 +1971,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             }}
             title="Show instructions for this card"
           >
-<svg class="card-info-icon" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
 <defs>
 <mask id="mask" mask-type="alpha">
 <g>
@@ -1993,12 +1993,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           <div class="card open edge-challenge">
           <img src="/card-images/{selectedChallengeCard.id}.png" alt="Card {selectedChallengeCard.id}" class="card-image" />
             <button 
-              class="icon-only-button"
+              class="card-info-icon"
               onclick={() => showChallengeInstruction(selectedChallengeCard)}
               title="Show instructions for this challenge card"
             >
           
-<svg class="card-info-icon" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
 <defs>
 <mask id="mask" mask-type="alpha">
 <g>
