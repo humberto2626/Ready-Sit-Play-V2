@@ -1563,7 +1563,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     gap: 1rem;
   }
   
-   .turn-indicator.player1 {
+   .player-section.player1 {
     border: 2px solid #22c55e;
     background-color: rgba(34, 197, 94, 0.1);
     
