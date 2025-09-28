@@ -2053,7 +2053,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   <div style="display:flex; justify-content: space-around; width: 100%; margin-top: 1rem;">
     <!-- Player 1 Cards -->
-    <div>
+    <div class="player-section" class:active-player-p1={currentTurn === 1}>
       {#if activeCard && activeCard.category === 'Mini Game'}
         <div 
           class="mini-game-win-btn mini-game-win-btn-p1" 
@@ -2112,7 +2112,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     </div>
 
     <!-- Player 2 Cards -->
-    <div>
+    <div class="player-section" class:active-player-p2={currentTurn === 2}>
       {#if activeCard && activeCard.category === 'Mini Game'}
         <div 
           class="mini-game-win-btn mini-game-win-btn-p2" 
@@ -2172,7 +2172,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     <!-- Player 3 Cards (only show if player3Name exists) -->
     {#if player3Name}
-      <div>
+      <div class="player-section" class:active-player-p3={currentTurn === 3}>
         {#if activeCard && activeCard.category === 'Mini Game'}
           <div 
             class="mini-game-win-btn mini-game-win-btn-p3" 
