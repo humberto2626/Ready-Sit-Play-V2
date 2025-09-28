@@ -1622,33 +1622,33 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .mini-game-win-btn-p1 {
-    background-color: #ff6b35;
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+    background-color: #22c55e;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
   }
 
   .mini-game-win-btn-p1:hover:not(.disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
   }
 
   .mini-game-win-btn-p2 {
-    background-color: #4ecdc4;
-    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+    background-color:  #1d4ed8;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
   }
 
   .mini-game-win-btn-p2:hover:not(.disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(78, 205, 196, 0.4);
+    box-shadow: 0 6px 16px rgba(29, 78, 216, 0.4);
   }
 
   .mini-game-win-btn-p3 {
-    background-color: #45b7d1;
-    box-shadow: 0 4px 12px rgba(69, 183, 209, 0.3);
+    background-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
   }
 
   .mini-game-win-btn-p3:hover:not(.disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(69, 183, 209, 0.4);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
   }
 
   .mini-game-win-btn.disabled {
