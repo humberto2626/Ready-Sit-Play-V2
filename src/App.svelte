@@ -987,8 +987,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .small-card {
-    width: 90px;
-    height: 125px;
+    width: 60px;
+    height: 85px;
     overflow: hidden;
   }
 
@@ -1412,8 +1412,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .tiny-card {
-    width: 70px;
-    height: 95px;
+    width: 45px;
+    height: 65px;
     border: 2px solid #333;
     border-radius: 12px;
     background: #fefefe;
