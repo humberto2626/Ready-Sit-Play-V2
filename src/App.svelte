@@ -714,9 +714,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   async function actionCompleted() {
-    if (!activeCard || activeCard.category 
-    )
-  }!== 'Action' || gameOver) return;
+    if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
 
     saveCurrentState();
 
@@ -766,7 +764,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     // If there was a challenge card active, put it back in the player's hand
     if (selectedChallengeCard) {
-      // Challenge card should be discarded regardless of action outcome
+      // Challeng
+    }
+  }e card should be discarded regardless of action outcome
       selectedChallengeCard = null;
       challengeCardPlayer = null;
     }
