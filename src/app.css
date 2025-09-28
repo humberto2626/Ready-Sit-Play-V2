@@ -203,6 +203,40 @@ button:focus-visible {
   transform: none;
 }
 
+.card-info-icon {
+  position: relative;
+  z-index: 10000;
+}
+
+.icon-only-button {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  transition: none;
+  outline: none;
+}
+
+.icon-only-button:hover,
+.icon-only-button:focus,
+.icon-only-button:active {
+  background: transparent;
+  border: none;
+  transform: none;
+  box-shadow: none;
+  outline: none;
+}
+
 .player-turn-countdown {
   width: 35px;
   height: 40px;
