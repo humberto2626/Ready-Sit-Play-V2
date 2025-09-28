@@ -112,10 +112,6 @@
   let showMiniGameExplanation = false;
   let currentMiniGameExplanation = '';
 
-  // Game review state
-  let showGameReview = false;
-  let recordedGameActions = [];
-
   // Action card instructions tooltip
   let showActionTooltip = false;
   let actionTooltipContent = '';
@@ -400,9 +396,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     // Clear state history when resetting game
     stateHistory = [];
-
-    // Clear recorded game actions for new game
-    recordedGameActions = [];
 
     shuffleDeck();
 
@@ -721,7 +714,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   async function actionCompleted() {
-    if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
+    if (!activeCard || activeCard.category 
+    )
+  }!== 'Action' || gameOver) return;
 
     saveCurrentState();
 
@@ -795,11 +790,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     console.log('Video action received:', event.detail);
     
     if (event.detail.status === 'completed') {
-      // Store the recorded video action
-      recordedGameActions = [...recordedGameActions, {
-        videoUrl: event.detail.url,
-        cardImage: event.detail.cardImage
-      }];
       actionCompleted();
     } else if (event.detail.status === 'failed') {
       actionCardFailed();
@@ -836,14 +826,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     if (shuffledDeck.length === 0 && player1Cards.length === 0 && player2Cards.length === 0) {
       animateShuffle();
     }
-  }
-
-  function openGameReview() {
-    showGameReview = true;
-  }
-
-  function closeGameReview() {
-    showGameReview = false;
   }
 
   function getCardBackType() {
@@ -896,10 +878,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     return 27; // Default fallback
   }
 </script>
-
-{#if showGameReview}
-  <GameReview recordedActions={recordedGameActions} onClose={closeGameReview} />
-{/if}
 
 <style>
   /* Same styles as before, plus container for active cards side-by-side */
@@ -1682,48 +1660,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     pointer-events: none;
   }
 
-  .overlay-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 1rem;
-  }
-
-  .primary-overlay-btn {
-    background: linear-gradient(45deg, #ff6b35, #ffd700);
-    color: #333;
-    border: none;
-    padding: 1rem 2rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .primary-overlay-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-  }
-
-  .secondary-overlay-btn {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 1rem 2rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .secondary-overlay-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: scale(1.05);
-  }
-
   @media (max-width: 800px) {
     .card { width: 120px; height: 150px; font-size: 1rem; }
     .small-card { width: 75px; height: 100px; }
@@ -1794,16 +1730,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       font-size: 0.9rem;
       margin-left: 0.5rem;
       margin-top: 0.5rem;
-    }
-
-    .overlay-buttons {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .primary-overlay-btn, .secondary-overlay-btn {
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
     }
   }
 
@@ -1970,12 +1896,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         <p>To settle this game and declare a winner, make sure to be standing at the opposite sides of the room with {dogName || 'your dog'} in the middle, call their name at the same time.</p>
       </div>
       
-      <div class="overlay-buttons">
-        <button class="primary-overlay-btn" onclick={animateShuffle}>
-          Play Again
-        </button>
-        <button class="secondary-overlay-btn" onclick={openGameReview}>
-          Review Game Videos
+      <div style="text-align: center;">
+        <button class="start-button" onclick={animateShuffle}>
+          Restart Game
         </button>
       </div>
     </div>
@@ -2350,15 +2273,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         <h1 class="instructions-title">🎉 {#if winner === 1}{player1Name || 'Player 1'}{:else if winner === 2}{player2Name || 'Player 2'}{:else}{player3Name || 'Player 3'}{/if} Wins 🎉</h1>
         <div class="instructions-section" style="--delay: 0.5s">
           <p>Congratulations on the amazing teamwork with {dogName || 'your dog'}!</p>
-        </div>
-        
-        <div class="overlay-buttons">
-          <button class="primary-overlay-btn" onclick={animateShuffle}>
-            Play Again
-          </button>
-          <button class="secondary-overlay-btn" onclick={openGameReview}>
-            Review Game Videos
-          </button>
+          <p>Tap anywhere to play again.</p>
         </div>
       </div>
     </div>
