@@ -67,10 +67,42 @@ main {
 }
 
 .player-section {
-  border: 2px solid #646cff;
+  border: 2px solid rgba(100, 108, 255, 0.3);
   border-radius: 12px;
   padding: 1.5rem;
-  background-color: rgba(100, 108, 255, 0.1);
+  background-color: rgba(100, 108, 255, 0.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.player-section.active-player-p1 {
+  border-color: #22c55e;
+  background-color: rgba(34, 197, 94, 0.05);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.player-section.active-player-p2 {
+  border-color: #1d4ed8;
+  background-color: rgba(29, 78, 216, 0.05);
+  box-shadow: 0 0 20px rgba(29, 78, 216, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.player-section.active-player-p3 {
+  border-color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.05);
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.player-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
 }
 
 .cards-container {
@@ -209,6 +241,15 @@ button:focus-visible {
 }
 
 .icon-only-button {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
   padding: 0;
@@ -229,18 +270,60 @@ button:focus-visible {
 }
 
 .player-turn-countdown {
-  font-weight: bold;
-  font-size: 1.5rem;
-  color: #ff6b35;
-  text-align: center;
-  margin-top: 0.5rem;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  width: 35px;
+  height: 40px;
+  color: rgba(255, 255, 255, 0.8);
   background-color: rgba(255, 107, 53, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 2px solid #ff6b35;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
-  white-space: nowrap;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.overlay-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.primary-overlay-btn {
+  background: linear-gradient(45deg, #ff6b35, #ffd700);
+  color: #333;
+  border: none;
+  padding: 1.2rem 2.5rem;
+  font-size: 1.4rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+  min-width: 200px;
+}
+
+.primary-overlay-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(255, 107, 53, 0.6);
+}
+
+.secondary-overlay-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  min-width: 200px;
+}
+
+.secondary-overlay-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.02);
 }
 
 @media (prefers-color-scheme: light) {
@@ -253,5 +336,48 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+/* Compact display styles for when players have many cards */
+.compact-display .tiny-card {
+  width: 50px;
+  height: 65px;
+  font-size: 0.55rem;
+}
+
+.compact-display .small-card {
+  width: 65px;
+  height: 85px;
+}
+
+.compact-display .top-row {
+  gap: 0.2rem;
+}
+
+.compact-display .drawn-cards {
+  gap: 0.2rem;
+}
+
+.player-cards-container {
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .overlay-buttons {
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .primary-overlay-btn {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    min-width: 180px;
+  }
+
+  .secondary-overlay-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    min-width: 180px;
   }
 }
