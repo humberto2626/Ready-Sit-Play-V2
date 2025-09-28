@@ -568,7 +568,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         
         // Update the reactive variables
         if (opponent === 1 && player === 2) {
-          player1Cards = [...opponentCards];
+     
+        }
+      }
+    }
+  }     player1Cards = [...opponentCards];
           player2Cards = [...currentPlayerCards];
         } else if (opponent === 2 && player === 1) {
           player1Cards = [...currentPlayerCards];
@@ -931,7 +935,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .card-back {
     width: 70px;
-    height: 100px;
+    height: 90px;
     border-radius: 12px;
     border: 2px solid #000;
     box-shadow: 0 0 8px rgba(0,0,0,0.4);
@@ -987,8 +991,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .small-card {
-    width: 60px;
-    height: 85px;
+    width: 90px;
+    height: 125px;
     overflow: hidden;
   }
 
@@ -1412,8 +1416,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .tiny-card {
-    width: 45px;
-    height: 65px;
+    width: 70px;
+    height: 95px;
     border: 2px solid #333;
     border-radius: 12px;
     background: #fefefe;
@@ -1553,33 +1557,20 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .player-section {
+    border: 2px solid #646cff;
     border-radius: 12px;
-    padding: 0.2rem;
+    padding: 1.5rem;
+    background-color: rgba(100, 108, 255, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-  }
-  
-   .player-section.player1 {
-    border: .5px solid #22c55e;
-    background-color: rgba(34, 197, 94, 0.1);
-  }
-
-  .player-section.player2 {
-    border: .5px solid #1d4ed8;
-    background-color: rgba(29, 78, 216, 0.1);
-  }
-  
-  .player-section.player3 {
-    border: .5px solid #dc2626;
-    background-color: rgba(220, 38, 38.1);
+    gap: 1rem;
   }
 
   .player-content {
     display: flex;
     align-items: center;
-    gap: 0.1rem;
+    gap: 1rem;
     width: 100%;
     justify-content: center;
   }
@@ -1594,7 +1585,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   .cards-container {
     display: flex;
     flex-wrap: wrap;
-    gap: .5rem;
+    gap: 3rem;
     justify-content: center;
   }
 
@@ -1622,33 +1613,33 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .mini-game-win-btn-p1 {
-    background-color: #22c55e;
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    background-color: #ff6b35;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
   }
 
   .mini-game-win-btn-p1:hover:not(.disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
   }
 
   .mini-game-win-btn-p2 {
-    background-color:  #1d4ed8;
-    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+    background-color: #4ecdc4;
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
   }
 
   .mini-game-win-btn-p2:hover:not(.disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(29, 78, 216, 0.4);
+    box-shadow: 0 6px 16px rgba(78, 205, 196, 0.4);
   }
 
   .mini-game-win-btn-p3 {
-    background-color: #dc2626;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    background-color: #45b7d1;
+    box-shadow: 0 4px 12px rgba(69, 183, 209, 0.3);
   }
 
   .mini-game-win-btn-p3:hover:not(.disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+    box-shadow: 0 6px 16px rgba(69, 183, 209, 0.4);
   }
 
   .mini-game-win-btn.disabled {
@@ -2078,10 +2069,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         </div>
       {/if}
 
-   <h3>{player1Name || 'Player 1'}'s Cards</h3>
-      <h3>{player1Cards.filter(c => c.category === 'Action').length}</h3>
-        
-      <div class="player-cards-container" class:compact-display={player1Cards.length > 2}>
+      <h3>{player1Name || 'Player 1'}'s Cards ({player1Cards.filter(c => c.category === 'Action').length})</h3>
+
+      <div class="player-cards-container" class:compact-display={player1Cards.length > 5}>
         <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
         <div class="top-row">
           {#each player1Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
@@ -2140,10 +2130,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         </div>
       {/if}
 
-      <h3>{player2Name || 'Player 2'}'s Cards</h3>
-        <h3>{player2Cards.filter(c => c.category === 'Action').length}</h3>
+      <h3>{player2Name || 'Player 2'}'s Cards ({player2Cards.filter(c => c.category === 'Action').length})</h3>
 
-      <div class="player-cards-container" class:compact-display={player2Cards.length > 2}>
+      <div class="player-cards-container" class:compact-display={player2Cards.length > 5}>
         <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
         <div class="top-row">
           {#each player2Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
@@ -2203,10 +2192,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           </div>
         {/if}
 
-        <h3>{player3Name}'s Cards</h3>
-          <h3>{player1Cards.filter(c => c.category === 'Action').length}</h3>
+        <h3>{player3Name}'s Cards ({player3Cards.filter(c => c.category === 'Action').length})</h3>
 
-        <div class="player-cards-container" class:compact-display={player3Cards.length > 2}>
+        <div class="player-cards-container" class:compact-display={player3Cards.length > 5}>
           <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
           <div class="top-row">
             {#each player3Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
