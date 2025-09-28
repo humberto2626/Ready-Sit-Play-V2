@@ -274,10 +274,44 @@ button:focus-visible {
   height: 40px;
   color: rgba(255, 255, 255, 0.8);
   background-color: rgba(255, 107, 53, 0.1);
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
   border-radius: 50%;
   transition: all 0.2s ease;
   backdrop-filter: blur(10px);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/* Compact display styles for when players have many cards */
+.compact-display .tiny-card {
+  width: 50px;
+  height: 65px;
+  font-size: 0.55rem;
+}
+
+.compact-display .small-card {
+  width: 65px;
+  height: 85px;
+}
+
+.compact-display .top-row {
+  gap: 0.2rem;
+}
+
+.compact-display .drawn-cards {
+  gap: 0.2rem;
+}
+
+.player-cards-container {
+  transition: all 0.3s ease;
 }
