@@ -206,7 +206,26 @@ button:focus-visible {
 .card-info-icon {
   position: relative;
   z-index: 1001;
-  cursor: pointer;
+}
+
+.icon-only-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  transition: none;
+  outline: none;
+}
+
+.icon-only-button:hover,
+.icon-only-button:focus,
+.icon-only-button:active {
+  background: transparent;
+  border: none;
+  transform: none;
+  box-shadow: none;
+  outline: none;
 }
 
 .player-turn-countdown {
