@@ -2067,47 +2067,49 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
       <h3>{player1Name || 'Player 1'}'s Cards ({player1Cards.filter(c => c.category === 'Action').length})</h3>
 
-      <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
-      <div class="top-row">
-        {#each player1Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
-          <div
-            class="card tiny-card edge-{card.category.toLowerCase()}"
-            onclick={() => {
-              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1) {
-                activateChallengeCard(card, 1);
-              }
-            }}
-            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1 ? 'pointer' : 'default'}"
-            title={card.label}
-          >
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
-        
-        <!-- Advantage cards -->
-        {#each player1AdvantageCards as advantageCard (advantageCard.id)}
-          <div
-            class="card tiny-card edge-advantage"
-            onclick={() => {
-              if (currentTurn === 1) {
-                useAdvantageCard(advantageCard.id, 1);
-              }
-            }}
-            style="cursor: {currentTurn === 1 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 1 ? 1 : 0.4};"
-            title={advantageCard.message}
-          >
-            <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
-          </div>
-        {/each}
-      </div>
+      <div class="player-cards-container" class:compact-display={player1Cards.length > 5}>
+        <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
+        <div class="top-row">
+          {#each player1Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
+            <div
+              class="card tiny-card edge-{card.category.toLowerCase()}"
+              onclick={() => {
+                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1) {
+                  activateChallengeCard(card, 1);
+                }
+              }}
+              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1 ? 'pointer' : 'default'}"
+              title={card.label}
+            >
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+          
+          <!-- Advantage cards -->
+          {#each player1AdvantageCards as advantageCard (advantageCard.id)}
+            <div
+              class="card tiny-card edge-advantage"
+              onclick={() => {
+                if (currentTurn === 1) {
+                  useAdvantageCard(advantageCard.id, 1);
+                }
+              }}
+              style="cursor: {currentTurn === 1 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 1 ? 1 : 0.4};"
+              title={advantageCard.message}
+            >
+              <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
+            </div>
+          {/each}
+        </div>
 
-      <!-- Bottom row: Action cards -->
-      <div class="drawn-cards" style="margin-top: 0.25rem;">
-        {#each player1Cards.filter(c => c.category === 'Action') as card (card.id)}
-          <div class="card small-card edge-action">
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
+        <!-- Bottom row: Action cards -->
+        <div class="drawn-cards" style="margin-top: 0.25rem;">
+          {#each player1Cards.filter(c => c.category === 'Action') as card (card.id)}
+            <div class="card small-card edge-action">
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+        </div>
       </div>
     </div>
 
@@ -2126,47 +2128,49 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
       <h3>{player2Name || 'Player 2'}'s Cards ({player2Cards.filter(c => c.category === 'Action').length})</h3>
 
-      <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
-      <div class="top-row">
-        {#each player2Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
-          <div
-            class="card tiny-card edge-{card.category.toLowerCase()}"
-            onclick={() => {
-              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2) {
-                activateChallengeCard(card, 2);
-              }
-            }}
-            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2 ? 'pointer' : 'default'}"
-            title={card.label}
-          >
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
-        
-        <!-- Advantage cards -->
-        {#each player2AdvantageCards as advantageCard (advantageCard.id)}
-          <div
-            class="card tiny-card edge-advantage"
-            onclick={() => {
-              if (currentTurn === 2) {
-                useAdvantageCard(advantageCard.id, 2);
-              }
-            }}
-            style="cursor: {currentTurn === 2 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 2 ? 1 : 0.4};"
-            title={advantageCard.message}
-          >
-            <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
-          </div>
-        {/each}
-      </div>
+      <div class="player-cards-container" class:compact-display={player2Cards.length > 5}>
+        <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
+        <div class="top-row">
+          {#each player2Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
+            <div
+              class="card tiny-card edge-{card.category.toLowerCase()}"
+              onclick={() => {
+                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2) {
+                  activateChallengeCard(card, 2);
+                }
+              }}
+              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2 ? 'pointer' : 'default'}"
+              title={card.label}
+            >
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+          
+          <!-- Advantage cards -->
+          {#each player2AdvantageCards as advantageCard (advantageCard.id)}
+            <div
+              class="card tiny-card edge-advantage"
+              onclick={() => {
+                if (currentTurn === 2) {
+                  useAdvantageCard(advantageCard.id, 2);
+                }
+              }}
+              style="cursor: {currentTurn === 2 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 2 ? 1 : 0.4};"
+              title={advantageCard.message}
+            >
+              <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
+            </div>
+          {/each}
+        </div>
 
-      <!-- Bottom row: Action cards -->
-      <div class="drawn-cards" style="margin-top: 0.25rem;">
-        {#each player2Cards.filter(c => c.category === 'Action') as card (card.id)}
-          <div class="card small-card edge-action">
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
+        <!-- Bottom row: Action cards -->
+        <div class="drawn-cards" style="margin-top: 0.25rem;">
+          {#each player2Cards.filter(c => c.category === 'Action') as card (card.id)}
+            <div class="card small-card edge-action">
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+        </div>
       </div>
     </div>
 
@@ -2186,47 +2190,49 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
         <h3>{player3Name}'s Cards ({player3Cards.filter(c => c.category === 'Action').length})</h3>
 
-        <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
-        <div class="top-row">
-          {#each player3Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
-            <div
-              class="card tiny-card edge-{card.category.toLowerCase()}"
-              onclick={() => {
-                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3) {
-                  activateChallengeCard(card, 3);
-                }
-              }}
-              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3 ? 'pointer' : 'default'}"
-              title={card.label}
-            >
-              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-            </div>
-          {/each}
-          
-          <!-- Advantage cards -->
-          {#each player3AdvantageCards as advantageCard (advantageCard.id)}
-            <div
-              class="card tiny-card edge-advantage"
-              onclick={() => {
-                if (currentTurn === 3) {
-                  useAdvantageCard(advantageCard.id, 3);
-                }
-              }}
-              style="cursor: {currentTurn === 3 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 3 ? 1 : 0.4};"
-              title={advantageCard.message}
-            >
-              <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
-            </div>
-          {/each}
-        </div>
+        <div class="player-cards-container" class:compact-display={player3Cards.length > 5}>
+          <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
+          <div class="top-row">
+            {#each player3Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
+              <div
+                class="card tiny-card edge-{card.category.toLowerCase()}"
+                onclick={() => {
+                  if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3) {
+                    activateChallengeCard(card, 3);
+                  }
+                }}
+                style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3 ? 'pointer' : 'default'}"
+                title={card.label}
+              >
+                <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+              </div>
+            {/each}
+            
+            <!-- Advantage cards -->
+            {#each player3AdvantageCards as advantageCard (advantageCard.id)}
+              <div
+                class="card tiny-card edge-advantage"
+                onclick={() => {
+                  if (currentTurn === 3) {
+                    useAdvantageCard(advantageCard.id, 3);
+                  }
+                }}
+                style="cursor: {currentTurn === 3 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 3 ? 1 : 0.4};"
+                title={advantageCard.message}
+              >
+                <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
+              </div>
+            {/each}
+          </div>
 
-        <!-- Bottom row: Action cards -->
-        <div class="drawn-cards" style="margin-top: 0.25rem;">
-          {#each player3Cards.filter(c => c.category === 'Action') as card (card.id)}
-            <div class="card small-card edge-action">
-              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-            </div>
-          {/each}
+          <!-- Bottom row: Action cards -->
+          <div class="drawn-cards" style="margin-top: 0.25rem;">
+            {#each player3Cards.filter(c => c.category === 'Action') as card (card.id)}
+              <div class="card small-card edge-action">
+                <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+              </div>
+            {/each}
+          </div>
         </div>
       </div>
     {/if}
