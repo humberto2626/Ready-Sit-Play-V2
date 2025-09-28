@@ -1218,22 +1218,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
      z-index: 1000;
   }
 
-  .instruction-icon {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: none;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    z-index: 10;
+
   }
 
   .instruction-icon:hover {
