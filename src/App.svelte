@@ -1966,7 +1966,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
              class:flying-left={flying && flyingDirection === 'left'}
              class:flying-right={flying && flyingDirection === 'right'}
              style="position: relative; cursor: pointer;"
-             on:click={() => handleCardClick(activeCard)}>
+             on:click={() => handleCardClick(activeCard)}
           <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
         </div>
 
