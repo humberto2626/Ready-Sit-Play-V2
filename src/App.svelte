@@ -1218,6 +1218,26 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
      z-index: 1000;
   }
 
+  .instruction-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(100, 108, 255, 0.9);
+    color: white;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
   .instruction-icon:hover {
     background: rgba(100, 108, 255, 1);
     transform: scale(1.1);
@@ -1566,7 +1586,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   .player-content {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 2rem;
     width: 100%;
     justify-content: center;
   }
@@ -1581,7 +1601,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   .cards-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 3rem;
+    gap: 1rem;
     justify-content: center;
   }
 
@@ -2006,8 +2026,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 </g>
 </mask>
 </defs>
-            <button class="icon-only-button" onclick={() => showCardInfo(activeCard)}>
-              <svg class="card-info-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="layer0">
+<g mask="url(#mask)">
 <path d="M85.9102,34.3984C57.4609,34.3984 34.3984,57.4609 34.3984,85.9102C34.3984,114.359 57.4609,137.422 85.9102,137.422C114.359,137.422 137.422,114.359 137.422,85.9102C137.422,57.4609 114.359,34.3984 85.9102,34.3984L85.9102,34.3984ZM94.582,113.18C94.582,114.254 93.5625,114.871 91.5234,114.871L80.3008,114.871C78.3633,114.871 77.2422,114.25 77.2422,113.18L77.2422,77.1211C77.2422,75.9922 78.3633,75.4297 80.3008,75.4297L91.5234,75.4297C93.5625,75.4297 94.582,75.9961 94.582,77.1211L94.582,113.18ZM85.9102,71.5859C80.8477,71.5859 76.7383,67.4805 76.7383,62.4141C76.7383,57.3516 80.8438,53.2422 85.9102,53.2422C90.9766,53.2422 95.0859,57.3477 95.0859,62.4141C95.0859,67.4844 90.9766,71.5859 85.9102,71.5859L85.9102,71.5859Z" fill="#231F20"/>
 </g>
 </g>
