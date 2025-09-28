@@ -1554,11 +1554,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .player-section {
     border-radius: 12px;
-    padding: 10rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.1rem;
+    gap: 10px;
   }
   
    .player-section.player1 {
