@@ -209,6 +209,7 @@ button:focus-visible {
 }
 
 .icon-only-button {
+  position: absolute;
   background: transparent;
   border: none;
   padding: 0;
