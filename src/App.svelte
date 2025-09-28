@@ -1953,66 +1953,28 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       <!-- Show the active card -->
       <div class="cards-row">
         <div class="card open edge-{activeCard.category.toLowerCase().replace(' ', '-')}" 
+             style="cursor: pointer;"
+             onclick={() => {
+               isReviewingInstructions = true;
+               if (activeCard.category === 'Action') {
+                 showActionInstruction(activeCard);
+               } else if (activeCard.category === 'Challenge') {
+                 showChallengeInstruction(activeCard);
+               } else if (activeCard.category === 'Mini Game') {
+                 showMiniGameInstruction(activeCard);
+               }
+             }}
              class:flying-left={flying && flyingDirection === 'left'}
              class:flying-right={flying && flyingDirection === 'right'}>
           <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
-          <button 
-            class="card-info-icon"
-            onclick={() => {
-              isReviewingInstructions = true;
-              isReviewingInstructions = true;
-              if (activeCard.category === 'Action') {
-                showActionInstruction(activeCard);
-              } else if (activeCard.category === 'Challenge') {
-                showChallengeInstruction(activeCard);
-              } else if (activeCard.category === 'Mini Game') {
-                showMiniGameInstruction(activeCard);
-              }
-            }}
-            title="Show instructions for this card"
-          >
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
-<defs>
-<mask id="mask" mask-type="alpha">
-<g>
-<path d="M34,34L139,34L139,139L34,139L34,34Z" fill="#000000"/>
-</g>
-</mask>
-</defs>
-<g id="layer0">
-<g mask="url(#mask)">
-<path d="M85.9102,34.3984C57.4609,34.3984 34.3984,57.4609 34.3984,85.9102C34.3984,114.359 57.4609,137.422 85.9102,137.422C114.359,137.422 137.422,114.359 137.422,85.9102C137.422,57.4609 114.359,34.3984 85.9102,34.3984L85.9102,34.3984ZM94.582,113.18C94.582,114.254 93.5625,114.871 91.5234,114.871L80.3008,114.871C78.3633,114.871 77.2422,114.25 77.2422,113.18L77.2422,77.1211C77.2422,75.9922 78.3633,75.4297 80.3008,75.4297L91.5234,75.4297C93.5625,75.4297 94.582,75.9961 94.582,77.1211L94.582,113.18ZM85.9102,71.5859C80.8477,71.5859 76.7383,67.4805 76.7383,62.4141C76.7383,57.3516 80.8438,53.2422 85.9102,53.2422C90.9766,53.2422 95.0859,57.3477 95.0859,62.4141C95.0859,67.4844 90.9766,71.5859 85.9102,71.5859L85.9102,71.5859Z" fill="#231F20"/>
-</g>
-</g>
-</svg>
-          </button>
         </div>
 
         <!-- If challenge card active, show it side by side -->
         {#if selectedChallengeCard}
-          <div class="card open edge-challenge">
+          <div class="card open edge-challenge"
+               style="cursor: pointer;"
+               onclick={() => showChallengeInstruction(selectedChallengeCard)}>
           <img src="/card-images/{selectedChallengeCard.id}.png" alt="Card {selectedChallengeCard.id}" class="card-image" />
-            <button 
-              class="card-info-icon"
-              onclick={() => showChallengeInstruction(selectedChallengeCard)}
-              title="Show instructions for this challenge card"
-            >
-          
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
-<defs>
-<mask id="mask" mask-type="alpha">
-<g>
-<path d="M34,34L139,34L139,139L34,139L34,34Z" fill="#000000"/>
-</g>
-</mask>
-</defs>
-<g id="layer0">
-<g mask="url(#mask)">
-<path d="M85.9102,34.3984C57.4609,34.3984 34.3984,57.4609 34.3984,85.9102C34.3984,114.359 57.4609,137.422 85.9102,137.422C114.359,137.422 137.422,114.359 137.422,85.9102C137.422,57.4609 114.359,34.3984 85.9102,34.3984L85.9102,34.3984ZM94.582,113.18C94.582,114.254 93.5625,114.871 91.5234,114.871L80.3008,114.871C78.3633,114.871 77.2422,114.25 77.2422,113.18L77.2422,77.1211C77.2422,75.9922 78.3633,75.4297 80.3008,75.4297L91.5234,75.4297C93.5625,75.4297 94.582,75.9961 94.582,77.1211L94.582,113.18ZM85.9102,71.5859C80.8477,71.5859 76.7383,67.4805 76.7383,62.4141C76.7383,57.3516 80.8438,53.2422 85.9102,53.2422C90.9766,53.2422 95.0859,57.3477 95.0859,62.4141C95.0859,67.4844 90.9766,71.5859 85.9102,71.5859L85.9102,71.5859Z" fill="#231F20"/>
-</g>
-</g>
-</svg>
-            </button>
             <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
               (Challenge Card Active)
             </div>
