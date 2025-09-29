@@ -469,7 +469,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           // Clear the active card and switch turn
           showChallengeInstruction(activeCard);
         }
-      }, 3000);
+      }, 1000);
     }
   }
 
@@ -714,9 +714,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   async function actionCompleted() {
-    if (!activeCard || activeCard.category 
-    )
-  }!== 'Action' || gameOver) return;
+    if (!activeCard || activeCard.category!== 'Action' || gameOver) return;
 
     saveCurrentState();
 
