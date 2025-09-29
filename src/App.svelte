@@ -421,7 +421,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     console.log('Drawing card. Deck before draw:', shuffledDeck.map(c => c.category));
     console.log('Selected challenge card:', selectedChallengeCard);
     
-    if (selectedChallengeCard) {
+    if (selectedChallengeCard
+    }
+  }) {
       // Find next Action card in deck
       const actionIndex = shuffledDeck.findIndex(c => c.category === 'Action');
       console.log('Action index found:', actionIndex);
