@@ -644,6 +644,5 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           miniGameTurn = 2;
         } else
       }
-    }
-    )
+    }, 1000);
   }
