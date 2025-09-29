@@ -2,7 +2,6 @@
   import { tick } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
   import GameReview from './lib/GameReview.svelte';
-  import MenuOverlay from './lib/MenuOverlay.svelte';
 
   let showVideoRecorder = false;
 
@@ -175,7 +174,8 @@
       3. How to Play: Each player gets a 30 second turn, as the canine player sits the human players count out loud the seconds.
       4. Tie Breaker: if both players reach the exact same count, repeat
   } the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
-    `,
+    
+  }`,
     'Pawathon': `
       1. Win by: Being the player to whom the canine player gives the most paws under 30 seconds.
       2. Set Up: Players take turns standing in front of the canine player to offer their hand repeatedly without reward until the end of the 30 seconds. 
@@ -215,7 +215,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   let showInstructions = true;
   let currentStep = 1;
   const totalSteps = 8;
-  let showMenuOverlay = false;
 
   function reviewInstructions() {
     showInstructions = true;
@@ -877,10 +876,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
     return 27; // Default fallback
   }
-
-  function toggleMenuOverlay() {
-    showMenuOverlay = !showMenuOverlay;
-  }
 </script>
 
 <style>
@@ -1433,7 +1428,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     overflow: hidden;
   }
 
-  .menu-icon-btn {
+  .review-button {
     position: fixed;
     top: .25rem;
     right: .25rem;
@@ -1447,7 +1442,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     transition: background 0.2s ease;
   }
 
-  .menu-icon-btn:hover {
+  .review-button:hover {
     background: rgba(255, 255, 255, 1);
   }
 
@@ -1910,14 +1905,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 {/if}
 
 <div class="deck-area">
-  <!-- Menu Icon Button -->
-  <button class="menu-icon-btn" onclick={toggleMenuOverlay}>
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-      <circle cx="12" cy="8" r="1" fill="currentColor"/>
-      <circle cx="12" cy="12" r="1" fill="currentColor"/>
-      <circle cx="12" cy="16" r="1" fill="currentColor"/>
-    </svg>
+  <button class="review-button" onclick={reviewInstructions} disabled={isShuffling || gameOver}>
+    Review Instructions
   </button>
   
   <button 
@@ -2324,12 +2313,3 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     </button>
   </div>
 {/if}
-
-<!-- Menu Overlay -->
-<MenuOverlay 
-  show={showMenuOverlay} 
-  onClose={toggleMenuOverlay}
-  onUndo={undoLastStep}
-  onToggleInstructions={reviewInstructions}
-  onOpenGameReview={() => {}}
-/>
