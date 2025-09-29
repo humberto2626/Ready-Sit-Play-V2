@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
   import GameReview from './lib/GameReview.svelte';
+  import MenuOverlay from './lib/MenuOverlay.svelte';
 
   let showVideoRecorder = false;
 
@@ -214,6 +215,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   let showInstructions = true;
   let currentStep = 1;
   const totalSteps = 8;
+  let showMenuOverlay = false;
 
   function reviewInstructions() {
     showInstructions = true;
@@ -875,6 +877,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
     return 27; // Default fallback
   }
+
+  function toggleMenuOverlay() {
+    showMenuOverlay = !showMenuOverlay;
+  }
 </script>
 
 <style>
@@ -1427,7 +1433,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     overflow: hidden;
   }
 
-  .review-button {
+  .menu-icon-btn {
     position: fixed;
     top: .25rem;
     right: .25rem;
@@ -1441,7 +1447,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     transition: background 0.2s ease;
   }
 
-  .review-button:hover {
+  .menu-icon-btn:hover {
     background: rgba(255, 255, 255, 1);
   }
 
@@ -1904,8 +1910,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 {/if}
 
 <div class="deck-area">
-  <button class="review-button" onclick={reviewInstructions} disabled={isShuffling || gameOver}>
-    Review Instructions
+  <!-- Menu Icon Button -->
+  <button class="menu-icon-btn" onclick={toggleMenuOverlay}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="8" r="1" fill="currentColor"/>
+      <circle cx="12" cy="12" r="1" fill="currentColor"/>
+      <circle cx="12" cy="16" r="1" fill="currentColor"/>
+    </svg>
   </button>
   
   <button 
@@ -2312,3 +2324,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     </button>
   </div>
 {/if}
+
+<!-- Menu Overlay -->
+<MenuOverlay 
+  show={showMenuOverlay} 
+  onClose={toggleMenuOverlay}
+  onUndo={undoLastStep}
+  onToggleInstructions={reviewInstructions}
+  onOpenGameReview={() => {}}
+/>
