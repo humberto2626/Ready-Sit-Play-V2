@@ -348,10 +348,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     shuffledDeck = [...actionAndChallenge, ...selectedMiniGames];
 
-    for (let i = shuffledDeck.length - 1; i > 0; i--) {
+    for (let i = shuffledDeck.length - 1; i > 0; i--; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffledDeck[i], shuffledDeck[j]] = [shuffledDeck[j], shuffledDeck[i]];
-     
     }
   }
 
@@ -882,17 +881,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 </script>
 
+</style>
 
 {#if showInstructions}
   <div class="instructions-overlay">
-
-<!-- Menu Overlay -->
-<MenuOverlay 
-  show={showMenuOverlay} 
-  onClose={toggleMenuOverlay}
-  onUndo={undoLastStep}
-  onToggleInstructions={reviewInstructions}
-  onOpenGameReview={() => {}}
-/>
-  </div>
-{/if}
