@@ -21,7 +21,7 @@
 </script>
 
 {#if show}
-  <div class="menu-overlay" onclick={onClose}>
+  <div class="menu-overlay" onclick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
     <div class="menu-content" onclick={(e) => e.stopPropagation()}>
       <div class="menu-header">
         <h3>Menu</h3>
