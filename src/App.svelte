@@ -1918,8 +1918,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   <circle cx="86" cy="86" r="12" fill="#000000" />
   <circle cx="117" cy="86" r="12" fill="#000000" />
 </svg>
-
-
   </button>
   
   <!-- Turn indicator above the deck -->
