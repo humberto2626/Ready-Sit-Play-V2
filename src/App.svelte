@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
   import GameReview from './lib/GameReview.svelte';
+  import MenuOverlay from './lib/MenuOverlay.svelte';
 
   let showVideoRecorder = false;
 
@@ -214,6 +215,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   let showInstructions = true;
   let currentStep = 1;
   const totalSteps = 8;
+  let showMenuOverlay = false;
 
   function reviewInstructions() {
     showInstructions = true;
@@ -419,7 +421,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     console.log('Drawing card. Deck before draw:', shuffledDeck.map(c => c.category));
     console.log('Selected challenge card:', selectedChallengeCard);
     
-    if (selectedChallengeCard) {
+    if (selectedChallengeCard
+    }
+  }) {
       // Find next Action card in deck
       const actionIndex = shuffledDeck.findIndex(c => c.category === 'Action');
       console.log('Action index found:', actionIndex);
@@ -469,7 +473,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           // Clear the active card and switch turn
           showChallengeInstruction(activeCard);
         }
-      }, 3000);
+      }, 1000);
     }
   }
 
@@ -714,7 +718,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   async function actionCompleted() {
-    if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
+    if (!activeCard || activeCard.category!== 'Action' || gameOver) return;
 
     saveCurrentState();
 
@@ -875,6 +879,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
     return 27; // Default fallback
   }
+
+  function toggleMenuOverlay() {
+    showMenuOverlay = !showMenuOverlay;
+  }
 </script>
 
 <style>
@@ -931,7 +939,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .card-back {
     width: 70px;
-    height: 90px;
+    height: 100px;
     border-radius: 12px;
     border: 2px solid #000;
     box-shadow: 0 0 8px rgba(0,0,0,0.4);
@@ -987,8 +995,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .small-card {
-    width: 90px;
-    height: 125px;
+    width: 60px;
+    height: 85px;
     overflow: hidden;
   }
 
@@ -1218,26 +1226,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
      z-index: 1000;
   }
 
-  .instruction-icon {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(100, 108, 255, 0.9);
-    color: white;
-    border: none;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    z-index: 10;
-  }
-
   .instruction-icon:hover {
     background: rgba(100, 108, 255, 1);
     transform: scale(1.1);
@@ -1432,8 +1420,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .tiny-card {
-    width: 70px;
-    height: 95px;
+    width: 45px;
+    height: 65px;
     border: 2px solid #333;
     border-radius: 12px;
     background: #fefefe;
@@ -1447,7 +1435,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     overflow: hidden;
   }
 
-  .review-button {
+  .menu-icon-btn {
     position: fixed;
     top: .25rem;
     right: .25rem;
@@ -1461,7 +1449,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     transition: background 0.2s ease;
   }
 
-  .review-button:hover {
+  .menu-icon-btn:hover {
     background: rgba(255, 255, 255, 1);
   }
 
@@ -1573,20 +1561,33 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .player-section {
-    border: 2px solid #646cff;
     border-radius: 12px;
-    padding: 1.5rem;
-    background-color: rgba(100, 108, 255, 0.1);
+    padding: 0.2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
+  }
+  
+   .player-section.player1 {
+    border: .5px solid #22c55e;
+    background-color: rgba(34, 197, 94, 0.1);
+  }
+
+  .player-section.player2 {
+    border: .5px solid #1d4ed8;
+    background-color: rgba(29, 78, 216, 0.1);
+  }
+  
+  .player-section.player3 {
+    border: .5px solid #dc2626;
+    background-color: rgba(220, 38, 38.1);
   }
 
   .player-content {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 0.1rem;
     width: 100%;
     justify-content: center;
   }
@@ -1601,7 +1602,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   .cards-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: .5rem;
     justify-content: center;
   }
 
@@ -1629,33 +1630,33 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .mini-game-win-btn-p1 {
-    background-color: #ff6b35;
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+    background-color: #22c55e;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
   }
 
   .mini-game-win-btn-p1:hover:not(.disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
   }
 
   .mini-game-win-btn-p2 {
-    background-color: #4ecdc4;
-    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+    background-color:  #1d4ed8;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
   }
 
   .mini-game-win-btn-p2:hover:not(.disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(78, 205, 196, 0.4);
+    box-shadow: 0 6px 16px rgba(29, 78, 216, 0.4);
   }
 
   .mini-game-win-btn-p3 {
-    background-color: #45b7d1;
-    box-shadow: 0 4px 12px rgba(69, 183, 209, 0.3);
+    background-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
   }
 
   .mini-game-win-btn-p3:hover:not(.disabled) {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(69, 183, 209, 0.4);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
   }
 
   .mini-game-win-btn.disabled {
@@ -1911,8 +1912,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 {/if}
 
 <div class="deck-area">
-  <button class="review-button" onclick={reviewInstructions} disabled={isShuffling || gameOver}>
-    Review Instructions
+  <!-- Menu Icon Button -->
+  <button class="menu-icon-btn" onclick={toggleMenuOverlay}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="8" r="1" fill="currentColor"/>
+      <circle cx="12" cy="12" r="1" fill="currentColor"/>
+      <circle cx="12" cy="16" r="1" fill="currentColor"/>
+    </svg>
   </button>
   
   <button 
@@ -1973,66 +1980,28 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       <!-- Show the active card -->
       <div class="cards-row">
         <div class="card open edge-{activeCard.category.toLowerCase().replace(' ', '-')}" 
+             style="cursor: pointer;"
+             onclick={() => {
+               isReviewingInstructions = true;
+               if (activeCard.category === 'Action') {
+                 showActionInstruction(activeCard);
+               } else if (activeCard.category === 'Challenge') {
+                 showChallengeInstruction(activeCard);
+               } else if (activeCard.category === 'Mini Game') {
+                 showMiniGameInstruction(activeCard);
+               }
+             }}
              class:flying-left={flying && flyingDirection === 'left'}
              class:flying-right={flying && flyingDirection === 'right'}>
           <img src="/card-images/{activeCard.id}.png" alt="Card {activeCard.id}" class="card-image" />
-          <button 
-            class="card-info-icon"
-            onclick={() => {
-              isReviewingInstructions = true;
-              isReviewingInstructions = true;
-              if (activeCard.category === 'Action') {
-                showActionInstruction(activeCard);
-              } else if (activeCard.category === 'Challenge') {
-                showChallengeInstruction(activeCard);
-              } else if (activeCard.category === 'Mini Game') {
-                showMiniGameInstruction(activeCard);
-              }
-            }}
-            title="Show instructions for this card"
-          >
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
-<defs>
-<mask id="mask" mask-type="alpha">
-<g>
-<path d="M34,34L139,34L139,139L34,139L34,34Z" fill="#000000"/>
-</g>
-</mask>
-</defs>
-<g id="layer0">
-<g mask="url(#mask)">
-<path d="M85.9102,34.3984C57.4609,34.3984 34.3984,57.4609 34.3984,85.9102C34.3984,114.359 57.4609,137.422 85.9102,137.422C114.359,137.422 137.422,114.359 137.422,85.9102C137.422,57.4609 114.359,34.3984 85.9102,34.3984L85.9102,34.3984ZM94.582,113.18C94.582,114.254 93.5625,114.871 91.5234,114.871L80.3008,114.871C78.3633,114.871 77.2422,114.25 77.2422,113.18L77.2422,77.1211C77.2422,75.9922 78.3633,75.4297 80.3008,75.4297L91.5234,75.4297C93.5625,75.4297 94.582,75.9961 94.582,77.1211L94.582,113.18ZM85.9102,71.5859C80.8477,71.5859 76.7383,67.4805 76.7383,62.4141C76.7383,57.3516 80.8438,53.2422 85.9102,53.2422C90.9766,53.2422 95.0859,57.3477 95.0859,62.4141C95.0859,67.4844 90.9766,71.5859 85.9102,71.5859L85.9102,71.5859Z" fill="#231F20"/>
-</g>
-</g>
-</svg>
-          </button>
         </div>
 
-        <!-- If challenge card active, show it below -->
+        <!-- If challenge card active, show it side by side -->
         {#if selectedChallengeCard}
-          <div class="card open edge-challenge">
+          <div class="card open edge-challenge"
+               style="cursor: pointer;"
+               onclick={() => showChallengeInstruction(selectedChallengeCard)}>
           <img src="/card-images/{selectedChallengeCard.id}.png" alt="Card {selectedChallengeCard.id}" class="card-image" />
-            <button 
-              class="card-info-icon"
-              onclick={() => showChallengeInstruction(selectedChallengeCard)}
-              title="Show instructions for this challenge card"
-            >
-          
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,172,172" style="enable-background:new 0 0 172 172;" version="1.1">
-<defs>
-<mask id="mask" mask-type="alpha">
-<g>
-<path d="M34,34L139,34L139,139L34,139L34,34Z" fill="#000000"/>
-</g>
-</mask>
-</defs>
-<g id="layer0">
-<g mask="url(#mask)">
-<path d="M85.9102,34.3984C57.4609,34.3984 34.3984,57.4609 34.3984,85.9102C34.3984,114.359 57.4609,137.422 85.9102,137.422C114.359,137.422 137.422,114.359 137.422,85.9102C137.422,57.4609 114.359,34.3984 85.9102,34.3984L85.9102,34.3984ZM94.582,113.18C94.582,114.254 93.5625,114.871 91.5234,114.871L80.3008,114.871C78.3633,114.871 77.2422,114.25 77.2422,113.18L77.2422,77.1211C77.2422,75.9922 78.3633,75.4297 80.3008,75.4297L91.5234,75.4297C93.5625,75.4297 94.582,75.9961 94.582,77.1211L94.582,113.18ZM85.9102,71.5859C80.8477,71.5859 76.7383,67.4805 76.7383,62.4141C76.7383,57.3516 80.8438,53.2422 85.9102,53.2422C90.9766,53.2422 95.0859,57.3477 95.0859,62.4141C95.0859,67.4844 90.9766,71.5859 85.9102,71.5859L85.9102,71.5859Z" fill="#231F20"/>
-</g>
-</g>
-</svg>
-            </button>
             <div style="font-size: 0.8rem; color: #555; margin-top: 0.25rem;">
               (Challenge Card Active)
             </div>
@@ -2111,7 +2080,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   <div style="display:flex; justify-content: space-around; width: 100%; margin-top: 1rem;">
     <!-- Player 1 Cards -->
-    <div>
+    <div class="player-section" class:active-player-p1={currentTurn === 1}>
       {#if activeCard && activeCard.category === 'Mini Game'}
         <div 
           class="mini-game-win-btn mini-game-win-btn-p1" 
@@ -2123,54 +2092,57 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         </div>
       {/if}
 
-      <h3>{player1Name || 'Player 1'}'s Cards ({player1Cards.filter(c => c.category === 'Action').length})</h3>
-
-      <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
-      <div class="top-row">
-        {#each player1Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
-          <div
-            class="card tiny-card edge-{card.category.toLowerCase()}"
-            onclick={() => {
-              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1) {
-                activateChallengeCard(card, 1);
-              }
-            }}
-            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1 ? 'pointer' : 'default'}"
-            title={card.label}
-          >
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
+   <h3>{player1Name || 'Player 1'}'s Cards</h3>
+      <h3>{player1Cards.filter(c => c.category === 'Action').length}</h3>
         
-        <!-- Advantage cards -->
-        {#each player1AdvantageCards as advantageCard (advantageCard.id)}
-          <div
-            class="card tiny-card edge-advantage"
-            onclick={() => {
-              if (currentTurn === 1) {
-                useAdvantageCard(advantageCard.id, 1);
-              }
-            }}
-            style="cursor: {currentTurn === 1 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 1 ? 1 : 0.4};"
-            title={advantageCard.message}
-          >
-            <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
-          </div>
-        {/each}
-      </div>
+      <div class="player-cards-container" class:compact-display={player1Cards.length > 2}>
+        <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
+        <div class="top-row">
+          {#each player1Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
+            <div
+              class="card tiny-card edge-{card.category.toLowerCase()}"
+              onclick={() => {
+                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1) {
+                  activateChallengeCard(card, 1);
+                }
+              }}
+              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 1 ? 'pointer' : 'default'}"
+              title={card.label}
+            >
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+          
+          <!-- Advantage cards -->
+          {#each player1AdvantageCards as advantageCard (advantageCard.id)}
+            <div
+              class="card tiny-card edge-advantage"
+              onclick={() => {
+                if (currentTurn === 1) {
+                  useAdvantageCard(advantageCard.id, 1);
+                }
+              }}
+              style="cursor: {currentTurn === 1 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 1 ? 1 : 0.4};"
+              title={advantageCard.message}
+            >
+              <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
+            </div>
+          {/each}
+        </div>
 
-      <!-- Bottom row: Action cards -->
-      <div class="drawn-cards" style="margin-top: 0.25rem;">
-        {#each player1Cards.filter(c => c.category === 'Action') as card (card.id)}
-          <div class="card small-card edge-action">
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
+        <!-- Bottom row: Action cards -->
+        <div class="drawn-cards" style="margin-top: 0.25rem;">
+          {#each player1Cards.filter(c => c.category === 'Action') as card (card.id)}
+            <div class="card small-card edge-action">
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+        </div>
       </div>
     </div>
 
     <!-- Player 2 Cards -->
-    <div>
+    <div class="player-section" class:active-player-p2={currentTurn === 2}>
       {#if activeCard && activeCard.category === 'Mini Game'}
         <div 
           class="mini-game-win-btn mini-game-win-btn-p2" 
@@ -2182,55 +2154,58 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         </div>
       {/if}
 
-      <h3>{player2Name || 'Player 2'}'s Cards ({player2Cards.filter(c => c.category === 'Action').length})</h3>
+      <h3>{player2Name || 'Player 2'}'s Cards</h3>
+        <h3>{player2Cards.filter(c => c.category === 'Action').length}</h3>
 
-      <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
-      <div class="top-row">
-        {#each player2Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
-          <div
-            class="card tiny-card edge-{card.category.toLowerCase()}"
-            onclick={() => {
-              if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2) {
-                activateChallengeCard(card, 2);
-              }
-            }}
-            style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2 ? 'pointer' : 'default'}"
-            title={card.label}
-          >
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
-        
-        <!-- Advantage cards -->
-        {#each player2AdvantageCards as advantageCard (advantageCard.id)}
-          <div
-            class="card tiny-card edge-advantage"
-            onclick={() => {
-              if (currentTurn === 2) {
-                useAdvantageCard(advantageCard.id, 2);
-              }
-            }}
-            style="cursor: {currentTurn === 2 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 2 ? 1 : 0.4};"
-            title={advantageCard.message}
-          >
-            <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
-          </div>
-        {/each}
-      </div>
+      <div class="player-cards-container" class:compact-display={player2Cards.length > 2}>
+        <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
+        <div class="top-row">
+          {#each player2Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
+            <div
+              class="card tiny-card edge-{card.category.toLowerCase()}"
+              onclick={() => {
+                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2) {
+                  activateChallengeCard(card, 2);
+                }
+              }}
+              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 2 ? 'pointer' : 'default'}"
+              title={card.label}
+            >
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+          
+          <!-- Advantage cards -->
+          {#each player2AdvantageCards as advantageCard (advantageCard.id)}
+            <div
+              class="card tiny-card edge-advantage"
+              onclick={() => {
+                if (currentTurn === 2) {
+                  useAdvantageCard(advantageCard.id, 2);
+                }
+              }}
+              style="cursor: {currentTurn === 2 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 2 ? 1 : 0.4};"
+              title={advantageCard.message}
+            >
+              <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
+            </div>
+          {/each}
+        </div>
 
-      <!-- Bottom row: Action cards -->
-      <div class="drawn-cards" style="margin-top: 0.25rem;">
-        {#each player2Cards.filter(c => c.category === 'Action') as card (card.id)}
-          <div class="card small-card edge-action">
-            <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-          </div>
-        {/each}
+        <!-- Bottom row: Action cards -->
+        <div class="drawn-cards" style="margin-top: 0.25rem;">
+          {#each player2Cards.filter(c => c.category === 'Action') as card (card.id)}
+            <div class="card small-card edge-action">
+              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+            </div>
+          {/each}
+        </div>
       </div>
     </div>
 
     <!-- Player 3 Cards (only show if player3Name exists) -->
     {#if player3Name}
-      <div>
+      <div class="player-section" class:active-player-p3={currentTurn === 3}>
         {#if activeCard && activeCard.category === 'Mini Game'}
           <div 
             class="mini-game-win-btn mini-game-win-btn-p3" 
@@ -2242,49 +2217,52 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           </div>
         {/if}
 
-        <h3>{player3Name}'s Cards ({player3Cards.filter(c => c.category === 'Action').length})</h3>
+        <h3>{player3Name}'s Cards</h3>
+          <h3>{player1Cards.filter(c => c.category === 'Action').length}</h3>
 
-        <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
-        <div class="top-row">
-          {#each player3Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
-            <div
-              class="card tiny-card edge-{card.category.toLowerCase()}"
-              onclick={() => {
-                if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3) {
-                  activateChallengeCard(card, 3);
-                }
-              }}
-              style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3 ? 'pointer' : 'default'}"
-              title={card.label}
-            >
-              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-            </div>
-          {/each}
-          
-          <!-- Advantage cards -->
-          {#each player3AdvantageCards as advantageCard (advantageCard.id)}
-            <div
-              class="card tiny-card edge-advantage"
-              onclick={() => {
-                if (currentTurn === 3) {
-                  useAdvantageCard(advantageCard.id, 3);
-                }
-              }}
-              style="cursor: {currentTurn === 3 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 3 ? 1 : 0.4};"
-              title={advantageCard.message}
-            >
-              <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
-            </div>
-          {/each}
-        </div>
+        <div class="player-cards-container" class:compact-display={player3Cards.length > 2}>
+          <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
+          <div class="top-row">
+            {#each player3Cards.filter(c => c.category === 'Challenge' || c.category === 'Mini Game') as card (card.id)}
+              <div
+                class="card tiny-card edge-{card.category.toLowerCase()}"
+                onclick={() => {
+                  if (card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3) {
+                    activateChallengeCard(card, 3);
+                  }
+                }}
+                style="cursor: {card.category === 'Challenge' && !selectedChallengeCard && !gameOver && currentTurn !== 3 ? 'pointer' : 'default'}"
+                title={card.label}
+              >
+                <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+              </div>
+            {/each}
+            
+            <!-- Advantage cards -->
+            {#each player3AdvantageCards as advantageCard (advantageCard.id)}
+              <div
+                class="card tiny-card edge-advantage"
+                onclick={() => {
+                  if (currentTurn === 3) {
+                    useAdvantageCard(advantageCard.id, 3);
+                  }
+                }}
+                style="cursor: {currentTurn === 3 ? 'pointer' : 'default'}; color: #333; opacity: {currentTurn === 3 ? 1 : 0.4};"
+                title={advantageCard.message}
+              >
+                <img src="/card-images/{getAdvantageCardId(advantageCard.message)}.png" alt="Advantage Card" class="card-image" />
+              </div>
+            {/each}
+          </div>
 
-        <!-- Bottom row: Action cards -->
-        <div class="drawn-cards" style="margin-top: 0.25rem;">
-          {#each player3Cards.filter(c => c.category === 'Action') as card (card.id)}
-            <div class="card small-card edge-action">
-              <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
-            </div>
-          {/each}
+          <!-- Bottom row: Action cards -->
+          <div class="drawn-cards" style="margin-top: 0.25rem;">
+            {#each player3Cards.filter(c => c.category === 'Action') as card (card.id)}
+              <div class="card small-card edge-action">
+                <img src="/card-images/{card.id}.png" alt={card.label} class="card-image" />
+              </div>
+            {/each}
+          </div>
         </div>
       </div>
     {/if}
@@ -2348,3 +2326,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     </button>
   </div>
 {/if}
+
+<!-- Menu Overlay -->
+<MenuOverlay 
+  show={showMenuOverlay} 
+  onClose={toggleMenuOverlay}
+  onUndo={undoLastStep}
+  onToggleInstructions={reviewInstructions}
+  onOpenGameReview={() => {}}
+/>
