@@ -1,9 +1,0 @@
-<svg class="menu-icon-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 172">
-  <!-- Outer circle -->
-  <circle cx="86" cy="86" r="82" fill="currentColor" />
-  
-  <!-- 3 dots -->
-  <circle cx="55" cy="86" r="12" fill="#fff" />
-  <circle cx="86" cy="86" r="12" fill="#fff" />
-  <circle cx="117" cy="86" r="12" fill="#fff" />
-</svg>
