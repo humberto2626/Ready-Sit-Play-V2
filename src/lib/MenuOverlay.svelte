@@ -1,27 +1,9 @@
 <script>
-  import { gameStore } from '../stores/gameStore.js';
-  
   let { show, onClose, onUndo, onToggleInstructions, onOpenGameReview } = $props();
-  
-  // Pause/resume timer based on menu visibility
-  $effect(() => {
-    if (show) {
-      gameStore.pause();
-    } else {
-      gameStore.resume();
-    }
-  });
-  
-  // Helper function to format time
-  function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  }
 </script>
 
 {#if show}
-  <div class="menu-overlay" onclick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+  <div class="menu-overlay" onclick={onClose}>
     <div class="menu-content" onclick={(e) => e.stopPropagation()}>
       <div class="menu-header">
         <h3>Menu</h3>
@@ -33,17 +15,6 @@
         </button>
       </div>
       
-      {#if $gameStore.firstCardDrawn && !$gameStore.gameOver}
-        <div class="menu-timer-display" class:blinking={show}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-            <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span class="timer-text">{formatTime($gameStore.timeLeft)}</span>
-          <span class="timer-status">Game Paused</span>
-        </div>
-      {/if}
-      
       <div class="menu-buttons">
         <button class="menu-action-btn" onclick={onUndo}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -53,7 +24,7 @@
           Undo Last Action
         </button>
         
-        <button class="menu-action-btn" onclick={() => { onToggleInstructions(); onClose(); }}>
+        <button class="menu-action-btn" onclick={onToggleInstructions}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -62,7 +33,7 @@
           Instructions
         </button>
         
-        <button class="menu-action-btn" onclick={() => { onOpenGameReview(); onClose(); }}>
+        <button class="menu-action-btn" onclick={onOpenGameReview}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polygon points="23 7 16 12 23 17 23 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
@@ -135,43 +106,6 @@
     transform: scale(1.1);
   }
 
-  .menu-timer-display {
-    background: rgba(255, 255, 255, 0.15);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 15px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    backdrop-filter: blur(10px);
-  }
-
-  .menu-timer-display.blinking {
-    animation: blink 1s infinite;
-  }
-
-  @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0.3; }
-  }
-
-  .timer-text {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #ffd700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-    font-family: 'Courier New', monospace;
-  }
-
-  .timer-status {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
   .menu-buttons {
     display: flex;
     flex-direction: column;
@@ -214,10 +148,6 @@
     .menu-action-btn {
       padding: 0.875rem 1.25rem;
       font-size: 0.95rem;
-    }
-
-    .timer-text {
-      font-size: 1.5rem;
     }
   }
 </style>
