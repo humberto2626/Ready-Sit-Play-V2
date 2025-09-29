@@ -158,13 +158,11 @@ button:focus-visible {
 }
 
 .menu-icon-btn:hover {
-  background: rgba(0, 0, 0, 0.8);
-  transform: scale(1.1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+
 }
 
 .menu-icon-btn:active {
-  transform: scale(0.95);
+ 
 }
 
 .menu-icon-btn svg {
