@@ -424,7 +424,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     // Start timer on first card draw
     if (!gameState.firstCardDrawn) {
-      gameStore.startTimer();
+      gameStore.startInitialTimer();
     }
 
     console.log('Drawing card. Deck before draw:', shuffledDeck.map(c => c.category));
