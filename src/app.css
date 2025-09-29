@@ -161,7 +161,6 @@ button:focus-visible {
   height: 40px;
   z-index: 1000;
   color: white;
-  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
@@ -170,12 +169,10 @@ button:focus-visible {
   display: flex;
   align-items: center;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .menu-icon-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
   border-color: rgba(255, 255, 255, 0.4);
 }
 
