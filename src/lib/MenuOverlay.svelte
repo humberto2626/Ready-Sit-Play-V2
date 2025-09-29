@@ -16,7 +16,7 @@
       </div>
       
       <div class="menu-buttons">
-        <button class="menu-action-btn" onclick={() => { onUndo(); onClose(); }}>
+        <button class="menu-action-btn" onclick={onUndo}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M3 7v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -24,7 +24,7 @@
           Undo Last Action
         </button>
         
-        <button class="menu-action-btn" onclick={() => { onToggleInstructions(); onClose(); }}>
+        <button class="menu-action-btn" onclick={onToggleInstructions}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -33,7 +33,7 @@
           Instructions
         </button>
         
-        <button class="menu-action-btn" onclick={() => { onOpenGameReview(); onClose(); }}>
+        <button class="menu-action-btn" onclick={onOpenGameReview}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polygon points="23 7 16 12 23 17 23 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
