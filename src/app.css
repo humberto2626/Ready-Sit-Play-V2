@@ -166,6 +166,7 @@ button:focus-visible {
   cursor: pointer;
   display: flex;
   align-items: center;
+  overflow: hidden;
   justify-content: center;
   z-index: 1000;
   transition: all 0.3s ease;
