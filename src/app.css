@@ -153,25 +153,6 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.menu-icon-btn {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  color: #667eea; 
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.menu-icon-btn:hover {
-
-}
-
-.menu-icon-btn:active {
- 
-}
-
 .video-recorder-btn {
   position: fixed;
   top: 20px;
