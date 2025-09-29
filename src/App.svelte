@@ -589,7 +589,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           player2Cards = [...currentPlayerCards];
           player3Cards = [...opponentCards];
         }
-      }
+      
+  }}
     }
     
     if (player === 1) {
