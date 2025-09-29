@@ -600,7 +600,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     } else if (player === 3) {
       player3AdvantageCards = player3AdvantageCards.filter(card => card.id !== cardId);
     }
-  }
 
   function dismissAdvantageOverlay() {
     showAdvantageOverlay = false;
