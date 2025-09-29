@@ -1,10 +1,17 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import { gameStore } from './stores/gameStore.js';
   import VideoRecorder from './lib/VideoRecorder.svelte';
   import GameReview from './lib/GameReview.svelte';
   import MenuOverlay from './lib/MenuOverlay.svelte';
 
   let showVideoRecorder = false;
+
+  // Subscribe to game store
+  let gameState = $state({});
+  gameStore.subscribe(value => {
+    gameState = value;
+  });
 
   type Card = {
     id: number;
@@ -127,8 +134,7 @@
     'Heel': `With a treat in your hand, guide the canine player to walk right next to you for at least five steps.`,
     'Focus': `Holding a treat between your index finger and thumb, grace just above the canine player nose and then place it between your eyebrows, count out loud for at least three seconds.`,
     'Paw': `With a treat in your hand, grace and hold just below the ear of the canine player, wait for them to use their paw to push off your hand.`,
-    'Down': `With a treat in your hand, grace the canine player chin and chest as
-  } you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
+    'Down': `With a treat in your hand, grace the canine player chin and chest as you place your hand flat on the ground in between their front legs, waiting for them to lay down.`,
     'Back': `With the canine player sitting, hold a treat in your hand just above the top of the canine player head, putting your foot in between their front paws, move your hand towards their tail, waiting for them to move back.`,
     'Stay': `With the canine player sitting or laying down, show the palm of your hand and slowly take at least three steps backwards, return and reward the canine player self-control.`,
     'Place': `With a towel on the floor, guide the canine player near it and drop a treat in the towel, the moment they step on it, praise and reward them again.`
@@ -173,15 +179,13 @@
       1. Win by: Keeping the canine player sitting the longest time possible up to 30 seconds.
       2. Set Up: Each player positions the canine player in a "Sit" about 3 feet away from them, the timer starts the moment the canine player's bottom touches the floor.
       3. How to Play: Each player gets a 30 second turn, as the canine player sits the human players count out loud the seconds.
-      4. Tie Breaker: if both players reach the exact same count, repeat
-  } the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
+      4. Tie Breaker: if both players reach the exact same count, repeat the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
     `,
     'Pawathon': `
       1. Win by: Being the player to whom the canine player gives the most paws under 30 seconds.
       2. Set Up: Players take turns standing in front of the canine player to offer their hand repeatedly without reward until the end of the 30 seconds. 
 *Both players reward at the end of their turn as to not discourage the canine player.
-      3. How to Play: the canine player sits and each player 
-  }asks for paw repeatedly. 
+      3. How to Play: the canine player sits and each player asks for paw repeatedly. 
 *only one paw at a time, double paws or high 10s don't count.
       4. Tie Breaker: Both players stand in front of the seated canina player , they both ask for Paw at the same time. whoever gets the paw wins.
     `,
@@ -417,6 +421,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     if (isShuffling || activeCard !== null || shuffledDeck.length === 0 || gameOver) return;
 
     saveCurrentState();
+
+    // Start timer on first card draw
+    if (!gameState.firstCardDrawn) {
+      gameStore.startTimer();
+    }
 
     console.log('Drawing card. Deck before draw:', shuffledDeck.map(c => c.category));
     console.log('Selected challenge card:', selectedChallengeCard);
@@ -720,6 +729,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     if (!activeCard || activeCard.category!== 'Action' || gameOver) return;
 
     saveCurrentState();
+
+    // Record action card for scoring
+    gameStore.recordActionCard(currentTurn);
 
     // Action card goes to current player
     if (currentTurn === 1) {
@@ -1665,6 +1677,140 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     pointer-events: none;
   }
 
+  .global-timer {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-family: monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .timer-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .timer-status {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+
+  .game-over-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+
+  .game-over-content {
+    max-width: 600px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 3rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .winner-announcement {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 1.5rem 0;
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  }
+
+  .final-scores {
+    margin: 2rem 0;
+  }
+
+  .final-scores h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: white;
+  }
+
+  .score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+  }
+
+  .player-name {
+    font-weight: bold;
+  }
+
+  .player-score {
+    color: #ffd700;
+    font-weight: bold;
+  }
+
+  .game-over-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .primary-overlay-btn {
+    background: linear-gradient(45deg, #ff6b35, #ffd700);
+    color: #333;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .primary-overlay-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  }
+
+  .secondary-overlay-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .secondary-overlay-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+  }
+
   @media (max-width: 800px) {
     .card { width: 120px; height: 150px; font-size: 1rem; }
     .small-card { width: 75px; height: 100px; }
@@ -1735,6 +1881,23 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       font-size: 0.9rem;
       margin-left: 0.5rem;
       margin-top: 0.5rem;
+    }
+
+    .global-timer {
+      top: 0.5rem;
+      left: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+    }
+
+    .game-over-content {
+      padding: 2rem;
+      max-width: 90vw;
+    }
+
+    .game-over-actions {
+      flex-direction: column;
+      align-items: center;
     }
   }
 
@@ -1904,6 +2067,61 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       <div style="text-align: center;">
         <button class="start-button" onclick={animateShuffle}>
           Restart Game
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- Global Timer Display -->
+<div class="global-timer">
+  <div class="timer-display">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    {gameStore.formatTime(gameState.timeLeft || 1200)}
+  </div>
+  {#if gameState.isRunning}
+    <div class="timer-status">Game in Progress</div>
+  {/if}
+</div>
+
+<!-- Game Over Overlay -->
+{#if gameState.gameOver}
+  <div class="game-over-overlay">
+    <div class="game-over-content">
+      <h1>🎉 Game Over! 🎉</h1>
+      <div class="winner-announcement">
+        {gameState.winner}
+      </div>
+      <div class="final-scores">
+        <h3>Final Scores:</h3>
+        {#each Object.entries(gameState.playerScores || {}) as [playerId, score]}
+          <div class="score-item">
+            <span class="player-name">{playerId}:</span>
+            <span class="player-score">{score} action cards</span>
+          </div>
+        {/each}
+      </div>
+      <div class="game-over-actions">
+        <button class="primary-overlay-btn" onclick={() => {
+          gameStore.resetTimer();
+          // Reset other game state as needed
+          player1Cards = [];
+          player2Cards = [];
+          player3Cards = [];
+          shuffledDeck = [];
+          currentTurn = 1;
+          timer = 0;
+          gameOver = false;
+          winner = null;
+          animateShuffle();
+        }}>
+          New Game
+        </button>
+        <button class="secondary-overlay-btn" onclick={() => {}}>
+          Review Game
         </button>
       </div>
     </div>
@@ -2208,7 +2426,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         {/if}
 
         <h3>{player3Name}'s Cards</h3>
-          <h3>{player1Cards.filter(c => c.category === 'Action').length}</h3>
+          <h3>{player3Cards.filter(c => c.category === 'Action').length}</h3>
 
         <div class="player-cards-container" class:compact-display={player3Cards.length > 2}>
           <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->

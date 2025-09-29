@@ -14,7 +14,7 @@ function createGameStore() {
 
   return {
     subscribe,
-    startTimer() {
+    startInitialTimer() {
       update(state => {
         if (!state.firstCardDrawn) {
           state.firstCardDrawn = true;
@@ -32,7 +32,7 @@ function createGameStore() {
                 currentState.timeLeft -= 1;
               } else {
                 // Time's up - end the game
-                gameStore.endGame();
+                this.endGame();
               }
               return currentState;
             });
@@ -42,7 +42,7 @@ function createGameStore() {
       });
     },
     
-    stopTimer() {
+    pause() {
       if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -53,11 +53,35 @@ function createGameStore() {
       }));
     },
     
+    resume() {
+      update(state => {
+        if (state.firstCardDrawn && !state.gameOver && !state.isRunning) {
+          state.isRunning = true;
+          
+          // Clear any existing interval
+          if (timerInterval) {
+            clearInterval(timerInterval);
+          }
+          
+          // Start the countdown
+          timerInterval = setInterval(() => {
+            update(currentState => {
+              if (currentState.timeLeft > 0) {
+                currentState.timeLeft -= 1;
+              } else {
+                // Time's up - end the game
+                this.endGame();
+              }
+              return currentState;
+            });
+          }, 1000);
+        }
+        return state;
+      });
+    },
+    
     resetTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
+      this.pause();
       set({
         timeLeft: 1200,
         isRunning: false,
@@ -80,7 +104,7 @@ function createGameStore() {
     },
     
     endGame() {
-      gameStore.stopTimer();
+      this.pause();
       update(state => {
         // Find the player with the most action cards
         let maxScore = -1;
