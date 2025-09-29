@@ -166,7 +166,7 @@ button:focus-visible {
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
-  transform: rotate(45deg);
+  transform: rotate(90deg);
   display: flex;
   justify-content: center;
   align-items: center;
