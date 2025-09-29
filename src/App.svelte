@@ -75,6 +75,14 @@
   let dogName = '';
   let email = '';
 
+  function openGameReview() {
+    showGameReview = true;
+  }
+
+  function closeGameReview() {
+    showGameReview = false;
+  }
+
   // Helper function to get number of players
   function getNumPlayers() {
     return player3Name.trim() ? 3 : 2;
