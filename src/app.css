@@ -148,6 +148,10 @@ button {
 button:hover {
   border-color: #646cff;
 }
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
 
 .menu-icon-btn {
   position: fixed;
@@ -155,8 +159,7 @@ button:hover {
     right: 20px:
     width: 40px;
     height: 40px;
-    background: linear-gradient(45deg, #ff6b35, #ff3535);
-    color: #ffffff;
+    background: none
     border: none;
     padding: 0;
     border-radius: 50%;
