@@ -172,11 +172,6 @@ button:focus-visible {
     justify-content: center;
 }
 
-.menu-icon-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
-}
-
 .video-recorder-btn {
   position: fixed;
   top: 20px;
