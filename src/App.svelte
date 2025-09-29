@@ -885,3 +885,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
 {#if showInstructions}
   <div class="instructions-overlay">
+
+<!-- Menu Overlay -->
+<MenuOverlay 
+  show={showMenuOverlay} 
+  onClose={toggleMenuOverlay}
+  onUndo={undoLastStep}
+  onToggleInstructions={reviewInstructions}
+  onOpenGameReview={() => {}}
+/>
+  </div>
+{/if}
