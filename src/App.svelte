@@ -182,7 +182,8 @@
 *Both players reward at the end of their turn as to not discourage the canine player.
       3. How to Play: the canine player sits and each player 
   }asks for paw repeatedly. 
-*only one paw at a time, double paws or high 10s don't count.
+*onl
+  }y one paw at a time, double paws or high 10s don't count.
       4. Tie Breaker: Both players stand in front of the seated canina player , they both ask for Paw at the same time. whoever gets the paw wins.
     `,
     'Treasure Hunt': `
@@ -589,7 +590,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           player2Cards = [...currentPlayerCards];
           player3Cards = [...opponentCards];
         }
-      }
+      
+  }}
     }
     
     if (player === 1) {
@@ -598,8 +600,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       player2AdvantageCards = player2AdvantageCards.filter(card => card.id !== cardId);
     } else if (player === 3) {
       player3AdvantageCards = player3AdvantageCards.filter(card => card.id !== cardId);
-    }
-  }
 
   function dismissAdvantageOverlay() {
     showAdvantageOverlay = false;
