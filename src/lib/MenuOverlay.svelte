@@ -1,10 +1,22 @@
 <script>
-  let { show, onClose, onUndo, onToggleInstructions, onOpenGameReview } = $props();
+  let { show, onClose, onUndo, onToggleInstructions, onOpenGameReview, timer, isTimerWarning, globalTimerStarted } = $props();
+
+  function formatGlobalTimer(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
 </script>
 
 {#if show}
   <div class="menu-overlay" onclick={onClose}>
     <div class="menu-content" onclick={(e) => e.stopPropagation()}>
+      {#if globalTimerStarted}
+        <div class="menu-countdown-display" class:warning={isTimerWarning}>
+          {formatGlobalTimer(timer)}
+        </div>
+      {/if}
+
       <div class="menu-header">
         <h3>Pause</h3>
         <button class="close-menu-btn" onclick={onClose}>
@@ -139,6 +151,34 @@
     flex-shrink: 0;
   }
 
+  .menu-countdown-display {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .menu-countdown-display.warning {
+    color: #FF6B6B;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.8), 0 2px 4px rgba(0, 0, 0, 0.3);
+    animation: pulse-warning 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-warning {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+
   @media (max-width: 600px) {
     .menu-content {
       padding: 1.5rem;
@@ -148,6 +188,12 @@
     .menu-action-btn {
       padding: 0.875rem 1.25rem;
       font-size: 0.95rem;
+    }
+
+    .menu-countdown-display {
+      font-size: 2.5rem;
+      padding: 1rem 0.75rem;
+      letter-spacing: 0.08em;
     }
   }
 </style>

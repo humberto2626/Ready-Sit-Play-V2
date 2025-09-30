@@ -2437,10 +2437,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 {/if}
 
 <!-- Menu Overlay -->
-<MenuOverlay 
-  show={showMenuOverlay} 
+<MenuOverlay
+  show={showMenuOverlay}
   onClose={toggleMenuOverlay}
   onUndo={undoLastStep}
   onToggleInstructions={reviewInstructions}
   onOpenGameReview={() => {}}
+  timer={globalTimer}
+  isTimerWarning={isTimerWarning}
+  globalTimerStarted={globalTimerStarted}
 />
