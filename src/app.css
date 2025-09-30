@@ -87,7 +87,7 @@ main {
 
 .player-section.active-player-p2 {
   border-color: #1d4ed8;
-  background-color: rgba(29, 78, 216, 0.03);
+  background-color: rgba(29, 78, 216, 0.09);
   box-shadow: 0 0 20px rgba(29, 78, 216, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
