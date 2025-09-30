@@ -157,6 +157,8 @@ button:focus-visible {
   position: fixed;
   top: 20px;
   right: 20px;
+  width: 60px
+  height: 60px
   z-index: 1000;
   background-color: #ff6b35;
   color: white;
