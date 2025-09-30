@@ -159,6 +159,8 @@ button:focus-visible {
   right: 20px;
   width: 60px;
   height: 60px;
+  border-radius: 50%
+  overflow: hidden;
   color: #667eea;
   cursor: pointer;
   transition: transform 0.3s ease;
