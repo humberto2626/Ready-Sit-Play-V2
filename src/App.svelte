@@ -118,6 +118,7 @@
   let globalTimerRunning = false;
   let globalTimerInterval: any = null;
   let globalTimerStarted = false;
+  let isTimerWarning = false; // Warning state for final 5 minutes (300 seconds)
 
   // Action card instructions tooltip
   let showActionTooltip = false;
@@ -410,6 +411,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     globalTimer = 1200;
     globalTimerRunning = false;
     globalTimerStarted = false;
+    isTimerWarning = false;
 
     shuffleDeck();
 
@@ -903,6 +905,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     globalTimerRunning = true;
     globalTimerInterval = setInterval(() => {
       globalTimer--;
+
+      // Update warning state when 5 minutes (300 seconds) or less remain
+      isTimerWarning = globalTimer <= 300;
 
       if (globalTimer <= 0) {
         clearInterval(globalTimerInterval);
@@ -1553,6 +1558,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     font-family: 'Courier New', monospace;
     letter-spacing: 0.05em;
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+
+  .global-timer-display.warning {
+    background: #DC2626;
+    border-color: #991B1B;
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.6);
   }
 
   .timer-button {
@@ -2021,7 +2033,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   <!-- Global Timer Display -->
   {#if globalTimerStarted && !gameOver}
-    <div class="global-timer-display">
+    <div class="global-timer-display" class:warning={isTimerWarning}>
       {formatGlobalTimer(globalTimer)}
     </div>
   {/if}
