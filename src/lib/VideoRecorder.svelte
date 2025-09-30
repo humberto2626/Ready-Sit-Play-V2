@@ -336,7 +336,7 @@
       ></video>
       <div class="recording-controls">
         <div class="camera-selection">
-          <button class="camera-switch-btn" on:click={selectCamera}>
+          <button class="camera-switch-btn" onclick={selectCamera}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M16 3l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M20 7H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -348,7 +348,7 @@
         <div class="countdown-display">
           {countdown}s
         </div>
-        <button class="stop-btn-container" on:click={stopRecording}>
+        <button class="stop-btn-container" onclick={stopRecording}>
           <div class="stop-btn-circle">
             <div class="stop-btn-square"></div>
           </div>
@@ -365,10 +365,10 @@
         class="recorded-video"
       ></video>
       <div class="recorded-controls">
-        <button class="action-completed-btn" on:click={handleVideoCompleted}>
+        <button class="action-completed-btn" onclick={handleVideoCompleted}>
           ✓
         </button>
-        <button class="action-failed-btn" on:click={handleVideoFailed}>
+        <button class="action-failed-btn" onclick={handleVideoFailed}>
           ✗
         </button>
       </div>
