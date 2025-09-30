@@ -67,10 +67,10 @@ main {
 }
 
 .player-section {
-  border: 0.1px solid rgba(100, 108, 255, 0.3);
+  border: 0.1px solid rgba(224, 224, 224, 0.3);
   border-radius: 12px;
   padding: 1.5rem;
-  background-color: rgba(100, 108, 255, 0.03);
+  background-color: rgba(224, 224, 224, 0.03);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   display: flex;
