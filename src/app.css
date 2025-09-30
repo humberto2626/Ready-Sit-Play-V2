@@ -156,7 +156,7 @@ button:focus-visible {
 .menu-icon-btn {
   position: fixed;
   top: 20px;
-  left: 20px;
+  left: 10px;
   width: 40px;
   height: 40px;
   z-index: 1000;
