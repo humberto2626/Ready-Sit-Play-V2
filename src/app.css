@@ -305,6 +305,31 @@ button:focus-visible {
   transform: scale(1.02);
 }
 
+.global-timer-display {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: linear-gradient(135deg, #ff6b35, #ffd700);
+  color: #333;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  min-width: 100px;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.global-timer-display:hover {
+  transform: translateX(-50%) scale(1.02);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
