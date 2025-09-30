@@ -81,21 +81,21 @@ main {
 
 .player-section.active-player-p1 {
   border-color: #22c55e;
-  border: 0.1px #22c55e;
+  border: 1px #22c55e;
   background-color: rgba(34, 197, 94, 0.03);
   box-shadow: 0 0 20px rgba(34, 197, 94, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .player-section.active-player-p2 {
   border-color: #1d4ed8;
-  border: 0.1px #1d4ed8;
+  border: 0.2px #1d4ed8;
   background-color: rgba(29, 78, 216, 0.03);
   box-shadow: 0 0 20px rgba(29, 78, 216, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .player-section.active-player-p3 {
   border-color: #dc2626;
-  border: 0.1px #1d4ed8;
+  border: 0.2px #1d4ed8;
   background-color: rgba(220, 38, 38, 0.03);
   box-shadow: 0 0 20px rgba(220, 38, 38, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -303,6 +303,31 @@ button:focus-visible {
   background: rgba(255, 255, 255, 0.3);
   border-color: rgba(255, 255, 255, 0.6);
   transform: scale(1.02);
+}
+
+.global-timer-display {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: linear-gradient(135deg, #ff6b35, #ffd700);
+  color: #333;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  min-width: 100px;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.global-timer-display:hover {
+  transform: translateX(-50%) scale(1.02);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
 }
 
 @media (prefers-color-scheme: light) {
