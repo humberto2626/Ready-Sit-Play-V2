@@ -113,6 +113,12 @@
   let showMiniGameExplanation = false;
   let currentMiniGameExplanation = '';
 
+  // Global 20-minute game timer
+  let globalTimer = 1200; // 20 minutes in seconds
+  let globalTimerRunning = false;
+  let globalTimerInterval: any = null;
+  let globalTimerStarted = false;
+
   // Action card instructions tooltip
   let showActionTooltip = false;
   let actionTooltipContent = '';
@@ -399,6 +405,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     // Clear state history when resetting game
     stateHistory = [];
 
+    // Reset global timer
+    clearInterval(globalTimerInterval);
+    globalTimer = 1200;
+    globalTimerRunning = false;
+    globalTimerStarted = false;
+
     shuffleDeck();
 
     await tick();
@@ -418,11 +430,17 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     saveCurrentState();
 
+    // Start global timer on first card draw
+    if (!globalTimerStarted && player1Cards.length === 0 && player2Cards.length === 0 && player3Cards.length === 0) {
+      globalTimerStarted = true;
+      startGlobalTimer();
+    }
+
     console.log('Drawing card. Deck before draw:', shuffledDeck.map(c => c.category));
     console.log('Selected challenge card:', selectedChallengeCard);
-    
+
     if (selectedChallengeCard) {
-      
+
       // Find next Action card in deck
       const actionIndex = shuffledDeck.findIndex(c => c.category === 'Action');
       console.log('Action index found:', actionIndex);
@@ -879,7 +897,75 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     return 27; // Default fallback
   }
 
+  function startGlobalTimer() {
+    if (globalTimerRunning || gameOver) return;
+
+    globalTimerRunning = true;
+    globalTimerInterval = setInterval(() => {
+      globalTimer--;
+
+      if (globalTimer <= 0) {
+        clearInterval(globalTimerInterval);
+        globalTimerRunning = false;
+        endGameByTimer();
+      }
+    }, 1000);
+  }
+
+  function pauseGlobalTimer() {
+    if (globalTimerRunning) {
+      clearInterval(globalTimerInterval);
+      globalTimerRunning = false;
+    }
+  }
+
+  function resumeGlobalTimer() {
+    if (!globalTimerRunning && globalTimerStarted && !gameOver && globalTimer > 0) {
+      startGlobalTimer();
+    }
+  }
+
+  function endGameByTimer() {
+    gameOver = true;
+
+    const numPlayers = getNumPlayers();
+    const player1ActionCount = player1Cards.filter(c => c.category === 'Action').length;
+    const player2ActionCount = player2Cards.filter(c => c.category === 'Action').length;
+    const player3ActionCount = numPlayers === 3 ? player3Cards.filter(c => c.category === 'Action').length : 0;
+
+    if (numPlayers === 3) {
+      if (player1ActionCount > player2ActionCount && player1ActionCount > player3ActionCount) {
+        winner = 1;
+      } else if (player2ActionCount > player1ActionCount && player2ActionCount > player3ActionCount) {
+        winner = 2;
+      } else if (player3ActionCount > player1ActionCount && player3ActionCount > player2ActionCount) {
+        winner = 3;
+      } else {
+        showTieOverlay = true;
+      }
+    } else {
+      if (player1ActionCount > player2ActionCount) {
+        winner = 1;
+      } else if (player2ActionCount > player1ActionCount) {
+        winner = 2;
+      } else {
+        showTieOverlay = true;
+      }
+    }
+  }
+
+  function formatGlobalTimer(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
   function toggleMenuOverlay() {
+    if (!showMenuOverlay) {
+      pauseGlobalTimer();
+    } else {
+      resumeGlobalTimer();
+    }
     showMenuOverlay = !showMenuOverlay;
   }
 </script>
@@ -1452,6 +1538,23 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     background: rgba(255, 255, 255, 1);
   }
 
+  .global-timer-display {
+    position: fixed;
+    top: .25rem;
+    right: 3.5rem;
+    padding: 0.13rem 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    z-index: 1000;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+  }
+
   .timer-button {
     position: absolute;
     top: 150px;
@@ -1915,6 +2018,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   <button class="menu-icon-btn" onclick={toggleMenuOverlay}>
     Pause
   </button>
+
+  <!-- Global Timer Display -->
+  {#if globalTimerStarted && !gameOver}
+    <div class="global-timer-display">
+      {formatGlobalTimer(globalTimer)}
+    </div>
+  {/if}
+
   <!-- Turn indicator above the deck -->
   {#if !gameOver && !isShuffling}
     <div class="turn-indicator player{currentTurn}">
