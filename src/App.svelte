@@ -1913,12 +1913,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 <div class="deck-area">
   <!-- Menu Icon Button -->
   <button 
-    <svg class="menu-icon-btn" onclick={toggleMenuOverlay}> xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 172" width="60" height="60" 
- 
- <circle cx="55" cy="86" r="12" fill="#000000" />
-  <circle cx="86" cy="86" r="12" fill="#000000" />
-  <circle cx="117" cy="86" r="12" fill="#000000" />
+    <svg class="menu-icon-btn" onclick={toggleMenuOverlay} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 172">
 
+  <circle cx="55" cy="86" r="12" fill="#fff" />
+  <circle cx="86" cy="86" r="12" fill="#fff" />
+  <circle cx="117" cy="86" r="12" fill="#fff" />
 
   </button>
   
