@@ -322,7 +322,7 @@
 
 <div class="video-recorder">
   {#if recordingStatus === 'idle'}
-    <button class="record-btn" onclick={startRecording}>
+    <button class="record-btn" on:click={startRecording}>
      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" zoomAndPan="magnify" viewBox="0 0 172.5 172.499994" height="15" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><clipPath id="13371a7e95"><path d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="dd1b12291b"><path d="M 81 0.558594 C 36.574219 0.558594 0.558594 36.574219 0.558594 81 C 0.558594 125.429688 36.574219 161.445312 81 161.445312 C 125.429688 161.445312 161.445312 125.429688 161.445312 81 C 161.445312 36.574219 125.429688 0.558594 81 0.558594 Z M 81 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="81397aa8c6"><path d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="23e127d511"><path d="M 81 0.558594 C 36.574219 0.558594 0.558594 36.574219 0.558594 81 C 0.558594 125.429688 36.574219 161.445312 81 161.445312 C 125.429688 161.445312 161.445312 125.429688 161.445312 81 C 161.445312 36.574219 125.429688 0.558594 81 0.558594 Z M 81 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="fcc2fc2742"><rect x="0" width="162" y="0" height="162"/></clipPath><clipPath id="4a44626ab5"><rect x="0" width="162" y="0" height="162"/></clipPath></defs><g transform="matrix(1, 0, 0, 1, 5, 5)"><g clip-path="url(#4a44626ab5)"><g clip-path="url(#13371a7e95)"><g clip-path="url(#dd1b12291b)"><g transform="matrix(1, 0, 0, 1, 0, 0.000000000000000888)"><g clip-path="url(#fcc2fc2742)"><g clip-path="url(#81397aa8c6)"><g clip-path="url(#23e127d511)"><path fill="#ffffff" d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " fill-opacity="1" fill-rule="nonzero"/></g></g></g></g></g></g></g></g></svg>
     </button>
   {:else if recordingStatus === 'recording'}
@@ -336,7 +336,7 @@
       ></video>
       <div class="recording-controls">
         <div class="camera-selection">
-          <button class="camera-switch-btn" onclick={selectCamera}>
+          <button class="camera-switch-btn" on:click={selectCamera}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M16 3l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M20 7H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -348,7 +348,7 @@
         <div class="countdown-display">
           {countdown}s
         </div>
-        <button class="stop-btn-container" onclick={stopRecording}>
+        <button class="stop-btn-container" on:click={stopRecording}>
           <div class="stop-btn-circle">
             <div class="stop-btn-square"></div>
           </div>
@@ -365,10 +365,10 @@
         class="recorded-video"
       ></video>
       <div class="recorded-controls">
-        <button class="action-completed-btn" onclick={handleVideoCompleted}>
+        <button class="action-completed-btn" on:click={handleVideoCompleted}>
           ✓
         </button>
-        <button class="action-failed-btn" onclick={handleVideoFailed}>
+        <button class="action-failed-btn" on:click={handleVideoFailed}>
           ✗
         </button>
       </div>
