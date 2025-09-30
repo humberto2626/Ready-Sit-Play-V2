@@ -67,7 +67,7 @@ main {
 }
 
 .player-section {
-  border: 2px solid rgba(100, 108, 255, 0.3);
+  border: 0.1px solid rgba(100, 108, 255, 0.3);
   border-radius: 12px;
   padding: 1.5rem;
   background-color: rgba(100, 108, 255, 0.05);
