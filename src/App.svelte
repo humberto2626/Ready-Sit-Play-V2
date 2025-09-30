@@ -875,6 +875,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
     return 27; // Default fallback
   }
+
+  function toggleMenuOverlay() {
+    // Function to be implemented
+  }
 </script>
 
 <style>
@@ -1663,6 +1667,28 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     cursor: not-allowed;
     transform: none;
     pointer-events: none;
+  }
+
+  .menu-icon-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .menu-icon-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
   }
 
   @media (max-width: 800px) {
