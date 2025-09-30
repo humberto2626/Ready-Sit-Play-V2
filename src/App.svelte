@@ -1574,7 +1574,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .player-section.player2 {
-    border: 0.1px #1d4ed8;
+    border: 7px #1d4ed8;
     background-color: rgba(29, 78, 216, 0.1);
   }
   
