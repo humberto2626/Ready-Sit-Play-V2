@@ -88,12 +88,14 @@ main {
 
 .player-section.active-player-p2 {
   border-color: #1d4ed8;
+  border: 0.1px #1d4ed8;
   background-color: rgba(29, 78, 216, 0.03);
   box-shadow: 0 0 20px rgba(29, 78, 216, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .player-section.active-player-p3 {
   border-color: #dc2626;
+  border: 0.1px #1d4ed8;
   background-color: rgba(220, 38, 38, 0.03);
   box-shadow: 0 0 20px rgba(220, 38, 38, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
