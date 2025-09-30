@@ -1914,21 +1914,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   <!-- Menu Icon Button -->
   <button class="menu-icon-btn" onclick={toggleMenuOverlay}>
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
       <circle cx="12" cy="8" r="1" fill="currentColor"/>
       <circle cx="12" cy="12" r="1" fill="currentColor"/>
       <circle cx="12" cy="16" r="1" fill="currentColor"/>
     </svg>
   </button>
   
-  <button 
-    class="undo-btn" 
-    onclick={undoLastStep}
-    disabled={stateHistory.length === 0 || isShuffling || gameOver}
-  >
-   <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30
-" zoomAndPan="magnify" viewBox="0 0 172.5 172.499994" height="30" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><clipPath id="7e6b23ce85"><path d="M 0 0 L 171.703125 0 L 171.703125 171.703125 L 0 171.703125 Z M 0 0 " clip-rule="nonzero"/></clipPath><clipPath id="3441266832"><path d="M 32.914062 32.914062 L 71 32.914062 L 71 86 L 32.914062 86 Z M 32.914062 32.914062 " clip-rule="nonzero"/></clipPath><clipPath id="c0eceb7a6b"><path d="M 32.914062 32.914062 L 138.921875 32.914062 L 138.921875 138.921875 L 32.914062 138.921875 Z M 32.914062 32.914062 " clip-rule="nonzero"/></clipPath><clipPath id="98c06b94d8"><rect x="0" width="172" y="0" height="172"/></clipPath></defs><path fill="#ffffff" d="M 0 0 L 172 0 L 172 172 L 0 172 Z M 0 0 " fill-opacity="1" fill-rule="nonzero"/><g transform="matrix(1, 0, 0, 1, 0, 0)"><g clip-path="url(#98c06b94d8)"><g clip-path="url(#7e6b23ce85)"><path fill="#ffffff" d="M 0 0 L 171.703125 0 L 171.703125 171.703125 L 0 171.703125 Z M 0 0 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#3441266832)"><path fill="#000000" d="M 70.019531 85.917969 L 32.914062 59.417969 L 70.019531 32.914062 Z M 70.019531 85.917969 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#c0eceb7a6b)"><path stroke-linecap="butt" transform="matrix(5.300392, 0, 0, 5.300392, 22.314432, 22.314429)" fill="none" stroke-linejoin="miter" d="M 1.999783 19.999632 L 13.50026 19.999632 C 17.09964 19.999632 19.999632 17.09964 19.999632 13.50026 C 19.999632 9.900143 17.09964 7.000151 13.50026 7.000151 L 6.000077 7.000151 " stroke="#000000" stroke-width="4" stroke-opacity="1" stroke-miterlimit="10"/></g></g></g></svg>
-  </button>
 
   <!-- Turn indicator above the deck -->
   {#if !gameOver && !isShuffling}
