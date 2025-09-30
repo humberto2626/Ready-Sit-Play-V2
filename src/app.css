@@ -160,9 +160,7 @@ button:focus-visible {
   width: 40px;
   height: 40px;
   z-index: 1000;
-  background: linear-gradient(135deg, #667eea 25%, #764ba2 75%);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
