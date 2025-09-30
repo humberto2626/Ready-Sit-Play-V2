@@ -132,6 +132,7 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   background: #646cff;
   border: 2px solid currentColor;
   cursor: pointer;
