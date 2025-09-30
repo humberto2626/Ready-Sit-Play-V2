@@ -1542,7 +1542,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     position: fixed;
     top: 45px;
     left: 4px;
-    padding: 0.13rem 0.7rem;
+    padding: 0.1rem 0.4rem;
     font-size: 0.5rem;
     font-weight: 600;
     color: white;
