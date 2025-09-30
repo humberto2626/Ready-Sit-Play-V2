@@ -167,7 +167,6 @@ button:focus-visible {
   cursor: pointer;
   transition: all 0.25s;
 }
-}
 
 .menu-icon-btn:hover {
   transform: scale(1.1);
