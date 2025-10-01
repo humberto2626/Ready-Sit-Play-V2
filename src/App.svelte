@@ -2030,7 +2030,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 <div class="deck-area">
   <!-- Menu Icon Button -->
   <button class="menu-icon-btn" onclick={toggleMenuOverlay}>
-    <h2>||</h2>
+    <h1>||</h1>
   </button>
 
   <!-- Global Timer Display -->
