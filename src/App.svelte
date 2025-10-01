@@ -3,6 +3,14 @@
   import VideoRecorder from './lib/VideoRecorder.svelte';
   import GameReview from './lib/GameReview.svelte';
   import MenuOverlay from './lib/MenuOverlay.svelte';
+  import {
+    findOrCreatePlayer,
+    findOrCreateDog,
+    createGame,
+    recordGameAction,
+    updateParticipantCardCounts,
+    completeGame
+  } from './lib/gameDatabase.js';
 
   let showVideoRecorder = false;
 
@@ -74,6 +82,16 @@
   let player3Name = '';
   let dogName = '';
   let email = '';
+
+  // Database IDs
+  let player1Id = null;
+  let player2Id = null;
+  let player3Id = null;
+  let dogId = null;
+  let currentGameId = null;
+
+  // Track action start time for completion time calculation
+  let actionStartTime = null;
 
   // Helper function to get number of players
   function getNumPlayers() {
@@ -415,14 +433,60 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     shuffleDeck();
 
+    // Initialize database records for players and dog
+    try {
+      if (player1Name && player2Name && dogName) {
+        const player1 = await findOrCreatePlayer(player1Name, email, !!email);
+        const player2 = await findOrCreatePlayer(player2Name);
+
+        if (player1) player1Id = player1.id;
+        if (player2) player2Id = player2.id;
+
+        if (player3Name.trim()) {
+          const player3 = await findOrCreatePlayer(player3Name);
+          if (player3) player3Id = player3.id;
+        }
+
+        if (player1Id) {
+          const dog = await findOrCreateDog(dogName, player1Id);
+          if (dog) dogId = dog.id;
+        }
+
+        // Create game session
+        if (dogId && player1Id && player2Id) {
+          const players = [
+            { id: player1Id },
+            { id: player2Id }
+          ];
+
+          if (player3Id) {
+            players.push({ id: player3Id });
+          }
+
+          const game = await createGame({
+            dogId: dogId,
+            numPlayers: getNumPlayers(),
+            players: players
+          });
+
+          if (game) {
+            currentGameId = game.id;
+            console.log('Game session created:', currentGameId);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error initializing database records:', error);
+    }
+
     await tick();
     await new Promise((r) => setTimeout(r, 100));
 
     isShuffling = false;
-    
+
     // Ensure we start with Player 1's turn
     currentTurn = 1;
-    
+
     // Force a re-render to update the card back
     await tick();
   }
@@ -475,6 +539,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     miniGameTurn = null;
     actionTimerUsed = false;
     goldenBoneActive = false;
+
+    // Track action start time for completion time calculation
+    if (activeCard.category === 'Action') {
+      actionStartTime = Date.now();
+    }
 
     // Handle Challenge cards - show them for 3 seconds then move to reserve
     if (activeCard.category === 'Challenge') {
@@ -666,25 +735,63 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   async function checkForWinner() {
     const numPlayers = getNumPlayers();
     const winThreshold = numPlayers === 3 ? 4 : 6;
-    
+
     const player1ActionCount = player1Cards.filter(c => c.category === 'Action').length;
     const player2ActionCount = player2Cards.filter(c => c.category === 'Action').length;
-    
+    const player3ActionCount = player3Cards.filter(c => c.category === 'Action').length;
+
+    let hasWinner = false;
+    let winnerPlayerId = null;
+
     if (player1ActionCount >= winThreshold) {
       winner = 1;
+      winnerPlayerId = player1Id;
       gameOver = true;
+      hasWinner = true;
     } else if (player2ActionCount >= winThreshold) {
       winner = 2;
+      winnerPlayerId = player2Id;
       gameOver = true;
-    } else if (numPlayers === 3 && player3Cards.filter(c => c.category === 'Action').length >= winThreshold) {
+      hasWinner = true;
+    } else if (numPlayers === 3 && player3ActionCount >= winThreshold) {
       winner = 3;
+      winnerPlayerId = player3Id;
       gameOver = true;
+      hasWinner = true;
     } else {
       // Check for tie
       const tieThreshold = winThreshold - 1;
       if (numPlayers === 2 && player1ActionCount === tieThreshold && player2ActionCount === tieThreshold) {
         showTieOverlay = true;
         return;
+      }
+    }
+
+    // If game is over, complete it in database
+    if (hasWinner && currentGameId) {
+      try {
+        // Update participant card counts
+        if (player1Id) {
+          const advantageCount = player1AdvantageCards.length;
+          await updateParticipantCardCounts(currentGameId, player1Id, player1ActionCount, advantageCount);
+        }
+        if (player2Id) {
+          const advantageCount = player2AdvantageCards.length;
+          await updateParticipantCardCounts(currentGameId, player2Id, player2ActionCount, advantageCount);
+        }
+        if (player3Id) {
+          const advantageCount = player3AdvantageCards.length;
+          await updateParticipantCardCounts(currentGameId, player3Id, player3ActionCount, advantageCount);
+        }
+
+        // Calculate game duration
+        const gameDuration = 1200 - globalTimer; // 20 minutes minus remaining time
+
+        // Complete the game
+        await completeGame(currentGameId, winnerPlayerId, gameDuration);
+        console.log('Game completed in database');
+      } catch (error) {
+        console.error('Error completing game in database:', error);
       }
     }
   }
@@ -741,6 +848,32 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     saveCurrentState();
 
+    // Calculate completion time
+    const completionTime = actionStartTime ? Math.floor((Date.now() - actionStartTime) / 1000) : null;
+
+    // Get current player ID
+    const currentPlayerId = currentTurn === 1 ? player1Id : currentTurn === 2 ? player2Id : player3Id;
+
+    // Record action in database
+    if (currentGameId && currentPlayerId && activeCard) {
+      try {
+        await recordGameAction({
+          gameId: currentGameId,
+          playerId: currentPlayerId,
+          cardId: activeCard.id,
+          cardCategory: activeCard.category,
+          cardLabel: activeCard.label,
+          success: true,
+          hadChallenge: !!selectedChallengeCard,
+          completionTime: completionTime,
+          videoRecorded: false
+        });
+        console.log('Action recorded successfully');
+      } catch (error) {
+        console.error('Error recording action:', error);
+      }
+    }
+
     // Action card goes to current player
     if (currentTurn === 1) {
       player1Cards = [activeCard, ...player1Cards];
@@ -769,7 +902,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       flyingDirection = null;
       miniGameTurn = null;
       actionTimerUsed = false;
-      
+      actionStartTime = null;
+
       // Switch turn after card is resolved
       currentTurn = getNextTurn(currentTurn);
 
@@ -781,6 +915,32 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     if (!activeCard || activeCard.category !== 'Action' || gameOver) return;
 
     saveCurrentState();
+
+    // Calculate completion time
+    const completionTime = actionStartTime ? Math.floor((Date.now() - actionStartTime) / 1000) : null;
+
+    // Get current player ID
+    const currentPlayerId = currentTurn === 1 ? player1Id : currentTurn === 2 ? player2Id : player3Id;
+
+    // Record failed action in database
+    if (currentGameId && currentPlayerId && activeCard) {
+      try {
+        await recordGameAction({
+          gameId: currentGameId,
+          playerId: currentPlayerId,
+          cardId: activeCard.id,
+          cardCategory: activeCard.category,
+          cardLabel: activeCard.label,
+          success: false,
+          hadChallenge: !!selectedChallengeCard,
+          completionTime: completionTime,
+          videoRecorded: false
+        });
+        console.log('Failed action recorded successfully');
+      } catch (error) {
+        console.error('Error recording failed action:', error);
+      }
+    }
 
     // Put the action card at the bottom of the deck
     shuffledDeck = [activeCard, ...shuffledDeck];
@@ -800,7 +960,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     flyingDirection = null;
     miniGameTurn = null;
     actionTimerUsed = false;
-    
+    actionStartTime = null;
+
     // Switch turn after failed action
     currentTurn = getNextTurn(currentTurn);
 
@@ -930,7 +1091,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
   }
 
-  function endGameByTimer() {
+  async function endGameByTimer() {
     gameOver = true;
 
     const numPlayers = getNumPlayers();
@@ -938,23 +1099,55 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     const player2ActionCount = player2Cards.filter(c => c.category === 'Action').length;
     const player3ActionCount = numPlayers === 3 ? player3Cards.filter(c => c.category === 'Action').length : 0;
 
+    let winnerPlayerId = null;
+
     if (numPlayers === 3) {
       if (player1ActionCount > player2ActionCount && player1ActionCount > player3ActionCount) {
         winner = 1;
+        winnerPlayerId = player1Id;
       } else if (player2ActionCount > player1ActionCount && player2ActionCount > player3ActionCount) {
         winner = 2;
+        winnerPlayerId = player2Id;
       } else if (player3ActionCount > player1ActionCount && player3ActionCount > player2ActionCount) {
         winner = 3;
+        winnerPlayerId = player3Id;
       } else {
         showTieOverlay = true;
       }
     } else {
       if (player1ActionCount > player2ActionCount) {
         winner = 1;
+        winnerPlayerId = player1Id;
       } else if (player2ActionCount > player1ActionCount) {
         winner = 2;
+        winnerPlayerId = player2Id;
       } else {
         showTieOverlay = true;
+      }
+    }
+
+    // Complete game in database
+    if (currentGameId && winnerPlayerId) {
+      try {
+        // Update participant card counts
+        if (player1Id) {
+          const advantageCount = player1AdvantageCards.length;
+          await updateParticipantCardCounts(currentGameId, player1Id, player1ActionCount, advantageCount);
+        }
+        if (player2Id) {
+          const advantageCount = player2AdvantageCards.length;
+          await updateParticipantCardCounts(currentGameId, player2Id, player2ActionCount, advantageCount);
+        }
+        if (player3Id) {
+          const advantageCount = player3AdvantageCards.length;
+          await updateParticipantCardCounts(currentGameId, player3Id, player3ActionCount, advantageCount);
+        }
+
+        // Game ran for full 20 minutes
+        await completeGame(currentGameId, winnerPlayerId, 1200);
+        console.log('Game completed by timer in database');
+      } catch (error) {
+        console.error('Error completing game by timer in database:', error);
       }
     }
   }
