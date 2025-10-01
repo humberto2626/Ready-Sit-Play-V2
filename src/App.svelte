@@ -202,7 +202,8 @@
   } the game, but this time, the player who is not counting takes a ball and bounces it for each second the canine player remains seated.
     `,
     'Pawathon': `
-      1. Win by: Being the player to whom the canine player gives the most paws under 30 seconds.
+      1. Win by: Being the player
+  } to whom the canine player gives the most paws under 30 seconds.
       2. Set Up: Players take turns standing in front of the canine player to offer their hand repeatedly without reward until the end of the 30 seconds. 
 *Both players reward at the end of their turn as to not discourage the canine player.
       3. How to Play: the canine player sits and each player 
