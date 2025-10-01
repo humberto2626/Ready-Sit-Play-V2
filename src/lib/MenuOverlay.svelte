@@ -157,6 +157,9 @@
     color: white;
     text-align: center;
     padding: 1.5rem 1rem;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
     font-family: 'Courier New', monospace;
     letter-spacing: 0.1em;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
