@@ -1,9 +1,11 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  import { saveVideo } from './indexedDBStore.js';
+  import { generateVideoThumbnail } from './videoUtils.js';
 
   const dispatch = createEventDispatcher();
-  
-  let { activeCardImage } = $props();
+
+  let { activeCardImage, currentGameId, currentPlayerId, currentPlayerName, currentCard } = $props();
 
   let videoStream = $state(null);
   let mediaRecorder = $state(null);
@@ -16,6 +18,7 @@
   let liveVideoElement = $state(null);
   let recordedVideoElement = $state(null);
   let isSwitchingCamera = $state(false);
+  let recordedVideoBlob = $state(null);
 
   // Effect to handle video element setup when it becomes available
   $effect(() => {
@@ -221,7 +224,8 @@
         const blobType = mimeType || 'video/webm';
         const blob = new Blob(recordedChunks, { type: blobType });
         console.log('Blob created:', blob.size, 'bytes, type:', blob.type);
-        
+
+        recordedVideoBlob = blob;
         recordedVideoUrl = URL.createObjectURL(blob);
         console.log('Video URL created:', recordedVideoUrl);
         recordingStatus = 'recorded';
@@ -268,41 +272,95 @@
 
   async function resetRecording() {
     console.log('Resetting recording...');
-    
+
     if (recordedVideoUrl) {
       URL.revokeObjectURL(recordedVideoUrl);
       recordedVideoUrl = '';
     }
-    
-    // Stop video stream if it exists
+
     if (videoStream) {
       videoStream.getTracks().forEach(track => track.stop());
       videoStream = null;
     }
-    
+
     recordedChunks = [];
+    recordedVideoBlob = null;
     countdown = 30;
     recordingStatus = 'idle';
-    
-    // Don't automatically start recording - let user decide
   }
 
-  function handleVideoCompleted() {
-    console.log('Video completed, dispatching event...');
-    dispatch('videoAction', {
-      url: recordedVideoUrl,
-      status: 'completed',
-      cardImage: activeCardImage
-    });
+  async function handleVideoCompleted() {
+    console.log('Video completed, saving to IndexedDB...');
+
+    try {
+      const thumbnailBlob = await generateVideoThumbnail(recordedVideoBlob);
+      console.log('Thumbnail generated:', thumbnailBlob.size, 'bytes');
+
+      const videoId = await saveVideo({
+        gameId: currentGameId,
+        playerId: currentPlayerId,
+        playerName: currentPlayerName,
+        cardId: currentCard?.id,
+        cardLabel: currentCard?.label,
+        cardCategory: currentCard?.category,
+        cardImage: activeCardImage,
+        videoBlob: recordedVideoBlob,
+        thumbnailBlob: thumbnailBlob,
+        success: true,
+        completionTime: 30 - countdown
+      });
+
+      console.log('Video saved to IndexedDB with ID:', videoId);
+
+      dispatch('videoAction', {
+        videoId: videoId,
+        status: 'completed',
+        cardImage: activeCardImage
+      });
+    } catch (error) {
+      console.error('Error saving video:', error);
+      dispatch('videoAction', {
+        status: 'completed',
+        cardImage: activeCardImage
+      });
+    }
+
     resetRecording();
   }
 
-  function handleVideoFailed() {
-    console.log('Video failed, dispatching event...');
-    dispatch('videoAction', {
-      url: recordedVideoUrl,
-      status: 'failed'
-    });
+  async function handleVideoFailed() {
+    console.log('Video failed, saving to IndexedDB...');
+
+    try {
+      const thumbnailBlob = await generateVideoThumbnail(recordedVideoBlob);
+
+      const videoId = await saveVideo({
+        gameId: currentGameId,
+        playerId: currentPlayerId,
+        playerName: currentPlayerName,
+        cardId: currentCard?.id,
+        cardLabel: currentCard?.label,
+        cardCategory: currentCard?.category,
+        cardImage: activeCardImage,
+        videoBlob: recordedVideoBlob,
+        thumbnailBlob: thumbnailBlob,
+        success: false,
+        completionTime: 30 - countdown
+      });
+
+      console.log('Failed video saved to IndexedDB with ID:', videoId);
+
+      dispatch('videoAction', {
+        videoId: videoId,
+        status: 'failed'
+      });
+    } catch (error) {
+      console.error('Error saving failed video:', error);
+      dispatch('videoAction', {
+        status: 'failed'
+      });
+    }
+
     resetRecording();
   }
 

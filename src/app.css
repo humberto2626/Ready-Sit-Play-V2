@@ -361,3 +361,26 @@ button:focus-visible {
     min-width: 180px;
   }
 }
+
+.review-videos-btn {
+  background: linear-gradient(45deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  margin: 1rem 0;
+}
+
+.review-videos-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.review-videos-btn:active {
+  transform: scale(0.98);
+}

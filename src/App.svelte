@@ -1,8 +1,9 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
-  import GameReview from './lib/GameReview.svelte';
+  import EnhancedGameReview from './lib/EnhancedGameReview.svelte';
   import MenuOverlay from './lib/MenuOverlay.svelte';
+  import StorageWarning from './lib/StorageWarning.svelte';
   import {
     findOrCreatePlayer,
     findOrCreateDog,
@@ -13,6 +14,8 @@
   } from './lib/gameDatabase.js';
 
   let showVideoRecorder = false;
+  let showGameReview = false;
+  let localGameId = null;
 
   type Card = {
     id: number;
@@ -399,6 +402,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     gameOver = false;
     winner = null;
     showTieOverlay = false;
+
+    localGameId = `game_${Date.now()}`;
+    showGameReview = false;
 
     currentTurn = 1;
 
@@ -971,14 +977,25 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   function handleRecordedVideo(event) {
     console.log('Video action received:', event.detail);
-    
+
     if (event.detail.status === 'completed') {
       actionCompleted();
     } else if (event.detail.status === 'failed') {
       actionCardFailed();
     }
-    
+
     showVideoRecorder = false;
+  }
+
+  function openGameReview() {
+    if (!localGameId) {
+      localGameId = `game_${Date.now()}`;
+    }
+    showGameReview = true;
+  }
+
+  function closeGameReview() {
+    showGameReview = false;
   }
 
   function startGame() {
@@ -2336,7 +2353,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       
       <!-- Video Recording for Action and Mini Game cards -->
       {#if activeCard.category === 'Action' || activeCard.category === 'Mini Game'}
-        <VideoRecorder on:videoAction={handleRecordedVideo} />
+        <VideoRecorder
+          on:videoAction={handleRecordedVideo}
+          activeCardImage={`/card-images/${activeCard.id}.png`}
+          currentGameId={localGameId || `game_${Date.now()}`}
+          currentPlayerId={currentTurn === 1 ? player1Id : currentTurn === 2 ? player2Id : player3Id}
+          currentPlayerName={currentTurn === 1 ? player1Name : currentTurn === 2 ? player2Name : player3Name}
+          currentCard={activeCard}
+        />
       {/if}
 
       <!-- Timer Button positioned below the recording button -->
@@ -2588,7 +2612,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         <h1 class="instructions-title">🎉 {#if winner === 1}{player1Name || 'Player 1'}{:else if winner === 2}{player2Name || 'Player 2'}{:else}{player3Name || 'Player 3'}{/if} Wins 🎉</h1>
         <div class="instructions-section" style="--delay: 0.5s">
           <p>Congratulations on the amazing teamwork with {dogName || 'your dog'}!</p>
-          <p>Tap anywhere to play again.</p>
+          <button
+            class="review-videos-btn"
+            onclick={(e) => { e.stopPropagation(); openGameReview(); }}
+          >
+            📹 Review Videos
+          </button>
+          <p style="margin-top: 1rem;">Tap anywhere to play again.</p>
         </div>
       </div>
     </div>
@@ -2636,8 +2666,19 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   onClose={toggleMenuOverlay}
   onUndo={undoLastStep}
   onToggleInstructions={reviewInstructions}
-  onOpenGameReview={() => {}}
+  onOpenGameReview={openGameReview}
   timer={globalTimer}
   isTimerWarning={isTimerWarning}
   globalTimerStarted={globalTimerStarted}
 />
+
+<!-- Game Review Modal -->
+{#if showGameReview && localGameId}
+  <EnhancedGameReview
+    gameId={localGameId}
+    onClose={closeGameReview}
+  />
+{/if}
+
+<!-- Storage Warning -->
+<StorageWarning />
