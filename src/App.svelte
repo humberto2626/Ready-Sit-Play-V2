@@ -1385,6 +1385,15 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     justify-content: center;
   }
 
+  @media (max-width: 800px) {
+    .drawn-cards {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.25rem;
+    }
+  }
+
   .small-card {
     width: 60px;
     height: 85px;
@@ -1814,6 +1823,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     margin-bottom: 0.5rem;
   }
 
+  @media (max-width: 800px) {
+    .top-row {
+      gap: 0.2rem;
+      margin-bottom: 0.3rem;
+    }
+  }
+
   .tiny-card {
     width: 45px;
     height: 65px;
@@ -2094,11 +2110,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .players-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: flex-start;
     width: 100%;
     margin-top: 0.5rem;
-    gap: 1rem;
+    gap: 0.5rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   @media (max-width: 800px) {
@@ -2184,16 +2203,52 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     .players-container {
       justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.75rem;
+      align-items: flex-start;
+      flex-wrap: nowrap;
+      gap: 0.3rem;
       margin: 0.5rem auto 0;
       max-width: 100%;
     }
 
     .player-section {
-      flex: 0 1 auto;
-      max-width: 100%;
+      flex: 1 1 48%;
+      min-width: 0;
+      max-width: 48%;
+    }
+
+    .small-card {
+      width: 60px !important;
+      height: 80px !important;
+    }
+
+    .tiny-card {
+      width: 45px !important;
+      height: 60px !important;
+      font-size: 0.55rem !important;
+    }
+  }
+
+  /* Three-player mobile optimization */
+  @media (max-width: 800px) {
+    .players-container:has(.player-section:nth-child(3)) .player-section {
+      flex: 1 1 31%;
+      max-width: 31%;
+      padding: 0.1rem;
+    }
+
+    .players-container:has(.player-section:nth-child(3)) .small-card {
+      width: 50px !important;
+      height: 70px !important;
+    }
+
+    .players-container:has(.player-section:nth-child(3)) .tiny-card {
+      width: 38px !important;
+      height: 52px !important;
+      font-size: 0.5rem !important;
+    }
+
+    .players-container:has(.player-section:nth-child(3)) {
+      gap: 0.2rem;
     }
   }
 
