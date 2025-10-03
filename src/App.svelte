@@ -1975,6 +1975,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     line-height: 1;
     gap: 0.5rem;
   }
+
+  .player-section h3 {
+    margin: 0.1rem 0;
+    line-height: 1.2;
+  }
   
    .player-section.player1 {
     border: 0.2px #22c55e;
@@ -2079,7 +2084,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     justify-content: space-around;
     align-items: flex-start;
     width: 100%;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     gap: 1rem;
   }
 
@@ -2169,7 +2174,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       align-items: center;
       flex-wrap: wrap;
       gap: 0.75rem;
-      margin: 1rem auto 0;
+      margin: 0.5rem auto 0;
       max-width: 100%;
     }
 
