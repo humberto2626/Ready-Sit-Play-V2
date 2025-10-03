@@ -605,14 +605,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   function addMiniGameAdvantage(player: 1 | 2 | 3, count: number) {
     const message = getMiniGameAdvantageMessage(count);
     if (message) {
-      const advantag
-      }
-    }
-  }eCard = {
+      const advantageCard = {
         id: `advantage-${player}-${count}-${Date.now()}`,
         message: message
       };
-      
+
       if (player === 1) {
         player1AdvantageCards = [...player1AdvantageCards, advantageCard];
       } else if (player === 2) {
@@ -1081,6 +1078,19 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   onMount(async () => {
+    const collapseAddressBar = () => {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          window.scrollTo(0, 1);
+          setTimeout(() => {
+            window.scrollTo(0, 0);
+          }, 50);
+        }, 100);
+      });
+    };
+
+    collapseAddressBar();
+
     const { data: { session } } = await supabase.auth.getSession();
 
     if (session?.user) {
