@@ -1299,8 +1299,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   .card {
-    width: 140px;
-    height: 195px;
+    width: 280px;
+    height: 390px;
     border: 2px solid #333;
     border-radius: 12px;
     background-color: transparent;
@@ -1380,12 +1380,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .active-card-container {
     position: relative;
-    min-height: 350px;
+    min-height: 700px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: 0.3rem;
     margin: 0 auto;
     width: 100%;
   }
@@ -1406,11 +1406,11 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   @keyframes fly-left {
     0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateX(-300px) translateY(-100px) rotate(-30deg); opacity: 0; }
+    100% { transform: translateX(-400px) translateY(-150px) rotate(-30deg); opacity: 0; }
   }
   @keyframes fly-right {
     0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateX(300px) translateY(-100px) rotate(30deg); opacity: 0; }
+    100% { transform: translateX(400px) translateY(-150px) rotate(30deg); opacity: 0; }
   }
 
   @keyframes gradient-shift {
@@ -1766,7 +1766,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   .turn-indicator {
     font-size: 1.2rem;
     font-weight: bold;
-    margin-bottom: 1rem;
+    margin-bottom: 0.3rem;
     text-align: center;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     color: white;
@@ -2084,7 +2084,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   }
 
   @media (max-width: 800px) {
-    .card { width: 120px; height: 150px; font-size: 1rem; }
+    .card { width: 240px; height: 300px; font-size: 1rem; }
     .small-card { width: 75px; height: 100px; }
     .tiny-card { width: 55px; height: 70px; font-size: 0.6rem; }
     .deck-area { min-height: 380px; }
@@ -2102,7 +2102,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
 
     .active-card-container {
-      min-height: 200px;
+      min-height: 400px;
       margin: 0 auto;
       width: 100%;
       display: flex;
@@ -2472,7 +2472,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
     <!-- Timer controls below the cards -->
   {#if activeCard}
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.1rem;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.05rem;">
       
       {#if activeCard.category === 'Action'}
         <button 

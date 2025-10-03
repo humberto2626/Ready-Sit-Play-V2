@@ -264,10 +264,10 @@ button:focus-visible {
   font-size: 1.5rem;
   color: #ff6b35;
   text-align: center;
-  margin-top: 0.5rem;
+  margin-top: 0.2rem;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
   background-color: rgba(255, 107, 53, 0.1);
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 0.75rem;
   border-radius: 8px;
   border: 2px solid #ff6b35;
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
