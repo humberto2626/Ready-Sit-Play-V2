@@ -2685,7 +2685,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         {/if}
 
         <h3>{player3Name}'s Cards</h3>
-          <h3>{player1Cards.filter(c => c.category === 'Action').length}</h3>
+          <h3>{player3Cards.filter(c => c.category === 'Action').length}</h3>
 
         <div class="player-cards-container" class:compact-display={player3Cards.length > 2}>
           <!-- Top row: Challenge and Mini Game cards (non-action) with click for Challenge -->
