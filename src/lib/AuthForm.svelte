@@ -303,6 +303,8 @@
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
   }
 
   .auth-tabs {
@@ -382,6 +384,8 @@
     color: #fca5a5;
     font-size: 0.9rem;
     margin-bottom: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .success-message {
@@ -392,6 +396,8 @@
     color: #86efac;
     font-size: 0.9rem;
     margin-bottom: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .submit-btn {
@@ -409,6 +415,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    box-sizing: border-box;
   }
 
   .submit-btn:hover:not(:disabled) {
@@ -470,6 +477,7 @@
     justify-content: center;
     gap: 0.75rem;
     margin-bottom: 1rem;
+    box-sizing: border-box;
   }
 
   .google-btn:hover:not(:disabled) {
@@ -494,6 +502,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-sizing: border-box;
   }
 
   .guest-btn:hover:not(:disabled) {
@@ -532,11 +541,39 @@
 
   @media (max-width: 600px) {
     .auth-form-container {
+      max-width: calc(100vw - 2rem);
       padding: 0 1rem;
     }
 
     .form-group input {
       font-size: 16px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .auth-form-container {
+      max-width: 100%;
+      padding: 0 0.75rem;
+    }
+
+    .auth-tabs {
+      gap: 0.25rem;
+    }
+
+    .auth-tab {
+      padding: 0.625rem 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .submit-btn,
+    .google-btn,
+    .guest-btn {
+      font-size: 15px;
+    }
+
+    .divider span {
+      padding: 0 0.5rem;
     }
   }
 </style>
