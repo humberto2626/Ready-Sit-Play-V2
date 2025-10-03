@@ -605,7 +605,10 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   function addMiniGameAdvantage(player: 1 | 2 | 3, count: number) {
     const message = getMiniGameAdvantageMessage(count);
     if (message) {
-      const advantageCard = {
+      const advantag
+      }
+    }
+  }eCard = {
         id: `advantage-${player}-${count}-${Date.now()}`,
         message: message
       };
