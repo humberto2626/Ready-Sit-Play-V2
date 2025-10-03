@@ -1384,14 +1384,18 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 1rem;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .cards-row {
-    display: fixed;
-     width: 185px;
+    display: flex;
     justify-content: center;
+    align-items: center;
     gap: 1rem;
+    margin: 0 auto;
   }
   .flying-left {
     animation: fly-left 0.8s forwards cubic-bezier(0.4, 0, 0.2, 1);
@@ -2070,30 +2074,48 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     pointer-events: none;
   }
 
+  .players-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    width: 100%;
+    margin-top: 1rem;
+    gap: 1rem;
+  }
+
   @media (max-width: 800px) {
     .card { width: 120px; height: 150px; font-size: 1rem; }
     .small-card { width: 75px; height: 100px; }
     .tiny-card { width: 55px; height: 70px; font-size: 0.6rem; }
     .deck-area { min-height: 380px; }
-    
+
     .advantage-message {
       max-width: 90vw;
       padding: 1.5rem;
       font-size: 1rem;
     }
-    
+
     .mini-game-explanation {
       max-width: 90vw;
       padding: 1.5rem;
       font-size: 0.9rem;
     }
-    
+
     .active-card-container {
       min-height: 200px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    
+
     .active-card-container + div {
       margin-top: 0.05rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
     }
 
     .instructions-overlay {
@@ -2140,6 +2162,20 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       font-size: 0.9rem;
       margin-left: 0.5rem;
       margin-top: 0.5rem;
+    }
+
+    .players-container {
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin: 1rem auto 0;
+      max-width: 100%;
+    }
+
+    .player-section {
+      flex: 0 1 auto;
+      max-width: 100%;
     }
   }
 
@@ -2509,7 +2545,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   {/if}
   {/if}
 
-  <div style="display:flex; justify-content: space-around; width: 100%; margin-top: 1rem;">
+  <div class="players-container">
     <!-- Player 1 Cards -->
     <div class="player-section" class:active-player-p1={currentTurn === 1}>
       {#if activeCard && activeCard.category === 'Mini Game'}
