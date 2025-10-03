@@ -1,5 +1,5 @@
 <script>
-  let { show, onClose, onUndo, onToggleInstructions, onOpenGameReview, timer, isTimerWarning, globalTimerStarted } = $props();
+  let { show, onClose, onUndo, onToggleInstructions, onOpenGameReview, onLogout, isAuthenticated, timer, isTimerWarning, globalTimerStarted } = $props();
 
   function formatGlobalTimer(seconds) {
     const minutes = Math.floor(seconds / 60);
@@ -52,6 +52,17 @@
           </svg>
           Review Game Videos
         </button>
+
+        {#if isAuthenticated && onLogout}
+          <button class="menu-action-btn logout-btn" onclick={() => { onLogout(); onClose(); }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Logout
+          </button>
+        {/if}
       </div>
     </div>
   </div>
@@ -149,6 +160,16 @@
 
   .menu-action-btn svg {
     flex-shrink: 0;
+  }
+
+  .logout-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+  }
+
+  .logout-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.6);
   }
 
   .menu-countdown-display {

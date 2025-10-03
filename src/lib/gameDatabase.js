@@ -6,15 +6,98 @@ import { supabase } from './supabase.js';
  */
 
 /**
- * Find or create a player by name
+ * Get current authenticated user
+ * @returns {Promise<Object|null>} Current user or null
+ */
+export async function getCurrentUser() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    return user;
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    return null;
+  }
+}
+
+/**
+ * Find or create a player by name (supports both authenticated and guest users)
  * @param {string} name - Player name
  * @param {string} email - Optional email address
  * @param {boolean} emailConsent - Whether player consents to emails
+ * @param {string} userId - Optional authenticated user ID
  * @returns {Promise<{id: string, name: string}>} Player object
  */
-export async function findOrCreatePlayer(name, email = null, emailConsent = false) {
+export async function findOrCreatePlayer(name, email = null, emailConsent = false, userId = null) {
   try {
-    // First, try to find existing player by name
+    if (userId) {
+      const { data: existingPlayer, error: findError } = await supabase
+        .from('players')
+        .select('id, name, email, total_games, total_wins, user_id, is_guest, display_name')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (findError) {
+        console.error('Error finding authenticated player:', findError);
+        throw findError;
+      }
+
+      if (existingPlayer) {
+        return existingPlayer;
+      }
+
+      const { data: guestPlayer } = await supabase
+        .from('players')
+        .select('id, name, email, total_games, total_wins')
+        .eq('name', name)
+        .eq('is_guest', true)
+        .is('user_id', null)
+        .maybeSingle();
+
+      if (guestPlayer) {
+        const { data: claimedPlayer, error: updateError } = await supabase
+          .from('players')
+          .update({
+            user_id: userId,
+            is_guest: false,
+            email: email,
+            display_name: name,
+            email_consent: emailConsent,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', guestPlayer.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('Error claiming guest account:', updateError);
+        } else {
+          return claimedPlayer;
+        }
+      }
+
+      const { data: newPlayer, error: createError } = await supabase
+        .from('players')
+        .insert({
+          name,
+          email,
+          email_consent: emailConsent,
+          user_id: userId,
+          is_guest: false,
+          display_name: name,
+          total_games: 0,
+          total_wins: 0
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating authenticated player:', createError);
+        throw createError;
+      }
+
+      return newPlayer;
+    }
+
     const { data: existingPlayer, error: findError } = await supabase
       .from('players')
       .select('id, name, email, total_games, total_wins')
@@ -27,7 +110,6 @@ export async function findOrCreatePlayer(name, email = null, emailConsent = fals
     }
 
     if (existingPlayer) {
-      // Update email if provided and different
       if (email && email !== existingPlayer.email) {
         const { error: updateError } = await supabase
           .from('players')
@@ -41,13 +123,14 @@ export async function findOrCreatePlayer(name, email = null, emailConsent = fals
       return existingPlayer;
     }
 
-    // Create new player
     const { data: newPlayer, error: createError } = await supabase
       .from('players')
       .insert({
         name,
         email,
         email_consent: emailConsent,
+        is_guest: true,
+        user_id: null,
         total_games: 0,
         total_wins: 0
       })

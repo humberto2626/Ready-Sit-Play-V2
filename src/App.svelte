@@ -1,16 +1,19 @@
 <script lang="ts">
-  import { tick } from 'svelte';
+  import { tick, onMount } from 'svelte';
   import VideoRecorder from './lib/VideoRecorder.svelte';
   import EnhancedGameReview from './lib/EnhancedGameReview.svelte';
   import MenuOverlay from './lib/MenuOverlay.svelte';
   import StorageWarning from './lib/StorageWarning.svelte';
+  import AuthForm from './lib/AuthForm.svelte';
+  import { supabase } from './lib/supabase.js';
   import {
     findOrCreatePlayer,
     findOrCreateDog,
     createGame,
     recordGameAction,
     updateParticipantCardCounts,
-    completeGame
+    completeGame,
+    getCurrentUser
   } from './lib/gameDatabase.js';
 
   let showVideoRecorder = false;
@@ -85,6 +88,12 @@
   let player3Name = '';
   let dogName = '';
   let email = '';
+
+  // Authentication state
+  let currentUser = null;
+  let currentPlayerRecord = null;
+  let isAuthenticated = false;
+  let showAuthOnStep2 = true;
 
   // Database IDs
   let player1Id = null;
@@ -443,14 +452,15 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     // Initialize database records for players and dog
     try {
       if (player1Name && player2Name && dogName) {
-        const player1 = await findOrCreatePlayer(player1Name, email, !!email);
-        const player2 = await findOrCreatePlayer(player2Name);
+        const userId = currentUser?.id || null;
+        const player1 = await findOrCreatePlayer(player1Name, email, !!email, userId);
+        const player2 = await findOrCreatePlayer(player2Name, null, false, null);
 
         if (player1) player1Id = player1.id;
         if (player2) player2Id = player2.id;
 
         if (player3Name.trim()) {
-          const player3 = await findOrCreatePlayer(player3Name);
+          const player3 = await findOrCreatePlayer(player3Name, null, false, null);
           if (player3) player3Id = player3.id;
         }
 
@@ -1064,6 +1074,73 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   function goBack() {
     if (currentStep > 1) {
       currentStep--;
+    }
+  }
+
+  onMount(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session?.user) {
+      currentUser = session.user;
+      isAuthenticated = true;
+
+      const { data: playerData } = await supabase
+        .from('players')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (playerData) {
+        currentPlayerRecord = playerData;
+        player1Name = playerData.display_name || playerData.name;
+        email = playerData.email || '';
+      }
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        currentUser = session.user;
+        isAuthenticated = true;
+      } else if (event === 'SIGNED_OUT') {
+        currentUser = null;
+        currentPlayerRecord = null;
+        isAuthenticated = false;
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  });
+
+  async function handleAuthSuccess(user, playerRecord) {
+    currentUser = user;
+    currentPlayerRecord = playerRecord;
+    isAuthenticated = true;
+    showAuthOnStep2 = false;
+
+    if (playerRecord) {
+      player1Name = playerRecord.display_name || playerRecord.name;
+      email = playerRecord.email || '';
+    }
+  }
+
+  function handleSkipAuth() {
+    showAuthOnStep2 = false;
+    isAuthenticated = false;
+  }
+
+  async function handleLogout() {
+    try {
+      await supabase.auth.signOut();
+      currentUser = null;
+      currentPlayerRecord = null;
+      isAuthenticated = false;
+      player1Name = '';
+      email = '';
+      showAuthOnStep2 = true;
+    } catch (error) {
+      console.error('Error logging out:', error);
     }
   }
 
@@ -2085,26 +2162,53 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       {/if}
 
       {#if currentStep === 2}
-        <h1 class="instructions-title">Player Setup</h1>
-        <div class="instructions-section" style="--delay: 0.5s">
-          <p>Let's get you and your furry friend ready to play!</p>
-          <div style="margin-top: 1rem;">
-            <label for="player1Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 1:</label>
-            <input type="text" id="player1Name" bind:value={player1Name} placeholder="Enter Player 1's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-
-            <label for="player2Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 2:</label>
-            <input type="text" id="player2Name" bind:value={player2Name} placeholder="Enter Player 2's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-
-            <label for="player3Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 3 (Optional):</label>
-            <input type="text" id="player3Name" bind:value={player3Name} placeholder="Enter Player 3's name (optional)" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-
-            <label for="dogName" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Canine Player:</label>
-            <input type="text" id="dogName" bind:value={dogName} placeholder="Enter your dog's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
-
-            <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email (Optional):</label>
-            <input type="email" id="email" bind:value={email} placeholder="Enter your email" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+        {#if !isAuthenticated && showAuthOnStep2}
+          <h1 class="instructions-title">Create Your Account</h1>
+          <div class="instructions-section" style="--delay: 0.5s">
+            <p style="margin-bottom: 1.5rem;">Sign up to save your game history and track progress!</p>
+            <AuthForm
+              onSuccess={handleAuthSuccess}
+              onSkip={handleSkipAuth}
+            />
           </div>
-        </div>
+        {:else}
+          <h1 class="instructions-title">Player Setup</h1>
+          <div class="instructions-section" style="--delay: 0.5s">
+            {#if isAuthenticated}
+              <p style="text-align: center; color: #ffd700; font-weight: bold; margin-bottom: 1rem;">
+                Welcome back, {player1Name}!
+              </p>
+            {:else}
+              <p>Let's get you and your furry friend ready to play!</p>
+            {/if}
+
+            <div style="margin-top: 1rem;">
+              <label for="player1Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 1:</label>
+              <input
+                type="text"
+                id="player1Name"
+                bind:value={player1Name}
+                placeholder="Enter Player 1's name"
+                disabled={isAuthenticated}
+                style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: {isAuthenticated ? '#555' : '#333'};"
+              />
+
+              <label for="player2Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 2:</label>
+              <input type="text" id="player2Name" bind:value={player2Name} placeholder="Enter Player 2's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+
+              <label for="player3Name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Human Player 3 (Optional):</label>
+              <input type="text" id="player3Name" bind:value={player3Name} placeholder="Enter Player 3's name (optional)" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+
+              <label for="dogName" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Canine Player:</label>
+              <input type="text" id="dogName" bind:value={dogName} placeholder="Enter your dog's name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+
+              {#if !isAuthenticated}
+                <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email (Optional):</label>
+                <input type="email" id="email" bind:value={email} placeholder="Enter your email" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 1rem; box-sizing: border-box; color: white; background-color: #333;" />
+              {/if}
+            </div>
+          </div>
+        {/if}
       {/if}
 
       {#if currentStep === 3}
@@ -2667,6 +2771,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   onUndo={undoLastStep}
   onToggleInstructions={reviewInstructions}
   onOpenGameReview={openGameReview}
+  onLogout={handleLogout}
+  isAuthenticated={isAuthenticated}
   timer={globalTimer}
   isTimerWarning={isTimerWarning}
   globalTimerStarted={globalTimerStarted}
