@@ -340,13 +340,13 @@ button:focus-visible {
 /* Compact display styles for when players have many cards */
 .compact-display .tiny-card {
   width: 50px;
-  height: 65px;
+  height: 70px;
   font-size: 0.55rem;
 }
 
 .compact-display .small-card {
   width: 65px;
-  height: 85px;
+  height: 90px;
 }
 
 .compact-display .top-row {
