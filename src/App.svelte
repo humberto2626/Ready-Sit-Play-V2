@@ -2217,13 +2217,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     }
 
     .small-card {
-      width: 65px !important;
-      height: 85px !important;
+      width: 90px !important;
+      height: 120px !important;
     }
 
     .tiny-card {
-      width: 50px !important;
-      height: 65px !important;
+      width: 60px !important;
+      height: 80px !important;
       font-size: 0.55rem !important;
     }
   }
