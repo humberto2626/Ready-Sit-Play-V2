@@ -1832,7 +1832,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
 
   .tiny-card {
     width: 45px;
-    height: 65px;
+    height: 70px;
     border: 2px solid #333;
     border-radius: 12px;
     background: #fefefe;
