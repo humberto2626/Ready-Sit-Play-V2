@@ -199,7 +199,8 @@
     'Hot Potato': `
       1. Win by: Not having the ball in your hands when the 30 second timer runs out.
       2. Set Up: Players stand on opposite sides of the room, one of them holding a ball.
-      3. How to Play: The player that's empty handed calls the canine player's name, only then the player that has the ball passes it, the player receiving the ball lowers it in such a way that the canine player comes closer to take it, only then the player that is now empty handed calls the canine player's name to continue playing.
+      3. How to Play: The player that's empty handed calls the canine player's name, only then the player that has the ball passes it, the player receiving the ba
+  }ll lowers it in such a way that the canine player comes closer to take it, only then the player that is now empty handed calls the canine player's name to continue playing.
       4. Tie Breaker: In the event of the ball being mid air when the timer goes off, the game is repeated.
     `,
     'Hide and Seek': `
