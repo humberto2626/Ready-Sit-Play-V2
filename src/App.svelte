@@ -15,6 +15,7 @@
     completeGame,
     getCurrentUser
   } from './lib/gameDatabase.js';
+  import { migrateExistingVideos } from './lib/indexedDBStore.js';
 
   let showVideoRecorder = false;
   let showGameReview = false;
@@ -1090,6 +1091,13 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     };
 
     collapseAddressBar();
+
+    // Migrate existing videos to include mimeType field
+    try {
+      await migrateExistingVideos();
+    } catch (error) {
+      console.error('Failed to migrate existing videos:', error);
+    }
 
     const { data: { session } } = await supabase.auth.getSession();
 

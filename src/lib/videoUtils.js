@@ -65,7 +65,7 @@ export function formatBytes(bytes) {
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }
 
-export function generateVideoFilename(playerName, cardLabel, success, timestamp) {
+export function generateVideoFilename(playerName, cardLabel, success, timestamp, mimeType = 'video/webm') {
   const date = new Date(timestamp);
   const dateStr = date.toISOString().split('T')[0];
   const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, '-');
@@ -73,7 +73,15 @@ export function generateVideoFilename(playerName, cardLabel, success, timestamp)
 
   const sanitize = (str) => str.replace(/[^a-z0-9]/gi, '_');
 
-  return `${sanitize(playerName)}_${sanitize(cardLabel)}_${status}_${dateStr}_${timeStr}.webm`;
+  // Determine file extension based on MIME type
+  let extension = 'webm';
+  if (mimeType.includes('mp4')) {
+    extension = 'mp4';
+  } else if (mimeType.includes('webm')) {
+    extension = 'webm';
+  }
+
+  return `${sanitize(playerName)}_${sanitize(cardLabel)}_${status}_${dateStr}_${timeStr}.${extension}`;
 }
 
 export async function compileVideos(videoBlobs, options = {}) {
@@ -94,10 +102,33 @@ export async function compileVideos(videoBlobs, options = {}) {
   const ctx = canvas.getContext('2d');
 
   const stream = canvas.captureStream(fps);
-  const mediaRecorder = new MediaRecorder(stream, {
-    mimeType: 'video/webm;codecs=vp8',
+
+  // Select best supported MIME type for compilation
+  const supportedTypes = [
+    'video/mp4;codecs=avc1',
+    'video/mp4',
+    'video/webm;codecs=h264',
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm'
+  ];
+
+  let selectedMimeType = 'video/webm';
+  for (const type of supportedTypes) {
+    if (MediaRecorder.isTypeSupported(type)) {
+      selectedMimeType = type;
+      break;
+    }
+  }
+
+  console.log('Compilation using MIME type:', selectedMimeType);
+
+  const recorderOptions = {
+    mimeType: selectedMimeType,
     videoBitsPerSecond: 2500000
-  });
+  };
+
+  const mediaRecorder = new MediaRecorder(stream, recorderOptions);
 
   const chunks = [];
   mediaRecorder.ondataavailable = (e) => {
@@ -108,7 +139,7 @@ export async function compileVideos(videoBlobs, options = {}) {
 
   return new Promise((resolve, reject) => {
     mediaRecorder.onstop = () => {
-      const compiledBlob = new Blob(chunks, { type: 'video/webm' });
+      const compiledBlob = new Blob(chunks, { type: selectedMimeType });
       resolve(compiledBlob);
     };
 

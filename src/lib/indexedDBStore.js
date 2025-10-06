@@ -1,5 +1,5 @@
 const DB_NAME = 'ReadySitPlayDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const VIDEO_STORE = 'videos';
 const GAME_STORE = 'games';
 
@@ -26,6 +26,7 @@ function openDatabase() {
 
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
+      const oldVersion = event.oldVersion;
 
       if (!db.objectStoreNames.contains(VIDEO_STORE)) {
         const videoStore = db.createObjectStore(VIDEO_STORE, { keyPath: 'id', autoIncrement: true });
@@ -37,6 +38,12 @@ function openDatabase() {
       if (!db.objectStoreNames.contains(GAME_STORE)) {
         const gameStore = db.createObjectStore(GAME_STORE, { keyPath: 'id', autoIncrement: true });
         gameStore.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+
+      // Migration for version 2: Add mimeType to existing videos
+      if (oldVersion < 2 && db.objectStoreNames.contains(VIDEO_STORE)) {
+        // Migration will be handled by migrateExistingVideos function after DB is opened
+        console.log('Database upgraded to version 2 - mimeType field will be added to existing videos');
       }
     };
   });
@@ -58,6 +65,7 @@ export async function saveVideo(videoData) {
       cardImage: videoData.cardImage,
       videoBlob: videoData.videoBlob,
       thumbnailBlob: videoData.thumbnailBlob,
+      mimeType: videoData.mimeType || 'video/webm',
       success: videoData.success,
       completionTime: videoData.completionTime,
       timestamp: Date.now()
@@ -177,5 +185,38 @@ export function createBlobURL(blob) {
 export function revokeBlobURL(url) {
   if (url && url.startsWith('blob:')) {
     URL.revokeObjectURL(url);
+  }
+}
+
+export async function migrateExistingVideos() {
+  try {
+    const db = await openDatabase();
+    const transaction = db.transaction([VIDEO_STORE], 'readwrite');
+    const store = transaction.objectStore(VIDEO_STORE);
+
+    return new Promise((resolve, reject) => {
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const videos = request.result;
+        let updateCount = 0;
+
+        videos.forEach(video => {
+          if (!video.mimeType) {
+            video.mimeType = 'video/webm';
+            store.put(video);
+            updateCount++;
+          }
+        });
+
+        console.log(`Migrated ${updateCount} videos with default mimeType`);
+        resolve(updateCount);
+      };
+
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    console.error('Error migrating existing videos:', error);
+    return 0;
   }
 }

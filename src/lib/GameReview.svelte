@@ -17,7 +17,7 @@
               {/if}
             </div>
             <div class="video-display">
-              <video src={action.videoUrl} controls playsinline class="review-video"></video>
+              <video src={action.videoUrl} controls playsinline class="review-video" type={action.mimeType || 'video/webm'}></video>
             </div>
           </div>
         {/each}

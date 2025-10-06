@@ -38,7 +38,8 @@
       video.playerName,
       video.cardLabel,
       video.success,
-      video.timestamp
+      video.timestamp,
+      video.mimeType
     );
     downloadVideo(video.videoBlob, filename);
   }
@@ -78,7 +79,9 @@
 
       compilationProgress = 100;
 
-      const filename = `Game_Compilation_${new Date().toISOString().split('T')[0]}.webm`;
+      // Determine extension based on compiled blob type
+      const extension = compiledBlob.type.includes('mp4') ? 'mp4' : 'webm';
+      const filename = `Game_Compilation_${new Date().toISOString().split('T')[0]}.${extension}`;
       downloadVideo(compiledBlob, filename);
 
       isCompiling = false;
@@ -101,10 +104,11 @@
           video.playerName,
           video.cardLabel,
           video.success,
-          video.timestamp
+          video.timestamp,
+          video.mimeType
         );
 
-        const file = new File([video.videoBlob], filename, { type: 'video/webm' });
+        const file = new File([video.videoBlob], filename, { type: video.mimeType || 'video/webm' });
         const shareData = {
           title: `${video.playerName} - ${video.cardLabel}`,
           text: `${video.success ? 'Success' : 'Failed'} in ${video.completionTime}s`,
@@ -228,7 +232,7 @@
             <dialog id="video-modal-{video.id}" class="video-modal">
               <div class="modal-content">
                 <button class="modal-close" onclick={(e) => e.target.closest('dialog').close()}>✕</button>
-                <video src={video.videoUrl} controls playsinline class="fullsize-video"></video>
+                <video src={video.videoUrl} controls playsinline class="fullsize-video" type={video.mimeType || 'video/webm'}></video>
                 <div class="modal-info">
                   <h3>{video.playerName} - {video.cardLabel}</h3>
                   <p class="modal-stats">

@@ -19,6 +19,7 @@
   let recordedVideoElement = $state(null);
   let isSwitchingCamera = $state(false);
   let recordedVideoBlob = $state(null);
+  let selectedMimeType = $state('');
 
   // Effect to handle video element setup when it becomes available
   $effect(() => {
@@ -176,27 +177,35 @@
       })));
 
       // Determine best supported MIME type for better mobile compatibility
-      let mimeType = '';
+      // Priority: H.264 (MP4) > H.264 (WebM) > VP9 > VP8 > Default WebM
       const supportedTypes = [
+        'video/mp4;codecs=avc1',
         'video/mp4',
         'video/webm;codecs=h264',
+        'video/webm;codecs=vp9',
         'video/webm;codecs=vp8',
         'video/webm'
       ];
-      
+
+      selectedMimeType = '';
       for (const type of supportedTypes) {
         if (MediaRecorder.isTypeSupported(type)) {
-          mimeType = type;
+          selectedMimeType = type;
           break;
         }
       }
-      
-      console.log('Selected MIME type:', mimeType);
-      
-      // Set up MediaRecorder with optimal MIME type
-      mediaRecorder = mimeType 
-        ? new MediaRecorder(videoStream, { mimeType })
-        : new MediaRecorder(videoStream);
+
+      // Fallback to default if no explicit type is supported
+      if (!selectedMimeType) {
+        selectedMimeType = 'video/webm';
+      }
+
+      console.log('Selected MIME type:', selectedMimeType);
+      console.log('Browser supports:', supportedTypes.filter(type => MediaRecorder.isTypeSupported(type)));
+
+      // Set up MediaRecorder with optimal MIME type and timeslice for better reliability
+      const recorderOptions = selectedMimeType ? { mimeType: selectedMimeType } : {};
+      mediaRecorder = new MediaRecorder(videoStream, recorderOptions);
         
       console.log('MediaRecorder created with state:', mediaRecorder.state);
       recordedChunks = [];
@@ -211,7 +220,7 @@
       mediaRecorder.onstop = () => {
         console.log('Recording stopped, total chunks:', recordedChunks.length);
         console.log('Total data size:', recordedChunks.reduce((sum, chunk) => sum + chunk.size, 0));
-        
+
         if (isSwitchingCamera) {
           console.log('Recording stopped due to camera switch, discarding chunks.');
           isSwitchingCamera = false; // Reset flag
@@ -220,9 +229,9 @@
           // The recordingStatus will be set to 'recording' again by startRecording()
           return;
         }
-        
-        const blobType = mimeType || 'video/webm';
-        const blob = new Blob(recordedChunks, { type: blobType });
+
+        // Use the actual MIME type that was used for recording
+        const blob = new Blob(recordedChunks, { type: selectedMimeType });
         console.log('Blob created:', blob.size, 'bytes, type:', blob.type);
 
         recordedVideoBlob = blob;
@@ -237,9 +246,10 @@
         }
       };
 
-      // Start recording
-      mediaRecorder.start();
+      // Start recording with timeslice for better reliability (1 second chunks)
+      mediaRecorder.start(1000);
       console.log('Recording started, status:', recordingStatus);
+      console.log('Using MIME type:', selectedMimeType);
       countdown = 30;
 
       // Start countdown
@@ -306,6 +316,7 @@
         cardImage: activeCardImage,
         videoBlob: recordedVideoBlob,
         thumbnailBlob: thumbnailBlob,
+        mimeType: selectedMimeType,
         success: true,
         completionTime: 30 - countdown
       });
@@ -344,6 +355,7 @@
         cardImage: activeCardImage,
         videoBlob: recordedVideoBlob,
         thumbnailBlob: thumbnailBlob,
+        mimeType: selectedMimeType,
         success: false,
         completionTime: 30 - countdown
       });
