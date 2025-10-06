@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  import { saveVideo } from './indexedDBStore.js';
   import { generateVideoThumbnail } from './videoUtils.js';
-  import { saveAndUploadVideo } from './videoUploadService.js';
 
   const dispatch = createEventDispatcher();
 
@@ -19,9 +19,6 @@
   let recordedVideoElement = $state(null);
   let isSwitchingCamera = $state(false);
   let recordedVideoBlob = $state(null);
-  let uploadProgress = $state(0);
-  let uploadStatus = $state('');
-  let isUploading = $state(false);
 
   // Effect to handle video element setup when it becomes available
   $effect(() => {
@@ -293,114 +290,78 @@
   }
 
   async function handleVideoCompleted() {
-    console.log('Video completed, saving and uploading...');
+    console.log('Video completed, saving to IndexedDB...');
 
     try {
-      isUploading = true;
-      uploadStatus = 'Generating thumbnail...';
       const thumbnailBlob = await generateVideoThumbnail(recordedVideoBlob);
       console.log('Thumbnail generated:', thumbnailBlob.size, 'bytes');
 
-      uploadStatus = 'Saving video...';
-      const result = await saveAndUploadVideo(
-        {
-          gameId: currentGameId,
-          playerId: currentPlayerId,
-          playerName: currentPlayerName,
-          cardId: currentCard?.id,
-          cardLabel: currentCard?.label,
-          cardCategory: currentCard?.category,
-          cardImage: activeCardImage,
-          videoBlob: recordedVideoBlob,
-          thumbnailBlob: thumbnailBlob,
-          success: true,
-          completionTime: 30 - countdown
-        },
-        {
-          uploadToCloud: true,
-          onProgress: (progress) => {
-            uploadProgress = progress.progress || 0;
-            uploadStatus = progress.status === 'uploading' ? 'Uploading video...' : progress.status;
-          }
-        }
-      );
+      const videoId = await saveVideo({
+        gameId: currentGameId,
+        playerId: currentPlayerId,
+        playerName: currentPlayerName,
+        cardId: currentCard?.id,
+        cardLabel: currentCard?.label,
+        cardCategory: currentCard?.category,
+        cardImage: activeCardImage,
+        videoBlob: recordedVideoBlob,
+        thumbnailBlob: thumbnailBlob,
+        success: true,
+        completionTime: 30 - countdown
+      });
 
-      console.log('Video saved with result:', result);
+      console.log('Video saved to IndexedDB with ID:', videoId);
 
       dispatch('videoAction', {
-        videoId: result.id,
+        videoId: videoId,
         status: 'completed',
-        cardImage: activeCardImage,
-        uploadStatus: result.uploadStatus
+        cardImage: activeCardImage
       });
     } catch (error) {
       console.error('Error saving video:', error);
-      uploadStatus = 'Upload failed - saved locally';
       dispatch('videoAction', {
         status: 'completed',
-        cardImage: activeCardImage,
-        uploadStatus: 'failed'
+        cardImage: activeCardImage
       });
-    } finally {
-      isUploading = false;
-      setTimeout(() => {
-        resetRecording();
-      }, 1500);
     }
+
+    resetRecording();
   }
 
   async function handleVideoFailed() {
-    console.log('Video failed, saving and uploading...');
+    console.log('Video failed, saving to IndexedDB...');
 
     try {
-      isUploading = true;
-      uploadStatus = 'Generating thumbnail...';
       const thumbnailBlob = await generateVideoThumbnail(recordedVideoBlob);
 
-      uploadStatus = 'Saving video...';
-      const result = await saveAndUploadVideo(
-        {
-          gameId: currentGameId,
-          playerId: currentPlayerId,
-          playerName: currentPlayerName,
-          cardId: currentCard?.id,
-          cardLabel: currentCard?.label,
-          cardCategory: currentCard?.category,
-          cardImage: activeCardImage,
-          videoBlob: recordedVideoBlob,
-          thumbnailBlob: thumbnailBlob,
-          success: false,
-          completionTime: 30 - countdown
-        },
-        {
-          uploadToCloud: true,
-          onProgress: (progress) => {
-            uploadProgress = progress.progress || 0;
-            uploadStatus = progress.status === 'uploading' ? 'Uploading video...' : progress.status;
-          }
-        }
-      );
+      const videoId = await saveVideo({
+        gameId: currentGameId,
+        playerId: currentPlayerId,
+        playerName: currentPlayerName,
+        cardId: currentCard?.id,
+        cardLabel: currentCard?.label,
+        cardCategory: currentCard?.category,
+        cardImage: activeCardImage,
+        videoBlob: recordedVideoBlob,
+        thumbnailBlob: thumbnailBlob,
+        success: false,
+        completionTime: 30 - countdown
+      });
 
-      console.log('Failed video saved with result:', result);
+      console.log('Failed video saved to IndexedDB with ID:', videoId);
 
       dispatch('videoAction', {
-        videoId: result.id,
-        status: 'failed',
-        uploadStatus: result.uploadStatus
+        videoId: videoId,
+        status: 'failed'
       });
     } catch (error) {
       console.error('Error saving failed video:', error);
-      uploadStatus = 'Upload failed - saved locally';
       dispatch('videoAction', {
-        status: 'failed',
-        uploadStatus: 'failed'
+        status: 'failed'
       });
-    } finally {
-      isUploading = false;
-      setTimeout(() => {
-        resetRecording();
-      }, 1500);
     }
+
+    resetRecording();
   }
 
   onDestroy(() => {
@@ -419,7 +380,7 @@
 
 <div class="video-recorder">
   {#if recordingStatus === 'idle'}
-    <button class="record-btn" onclick={startRecording}>
+    <button class="record-btn" on:click={startRecording}>
      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" zoomAndPan="magnify" viewBox="0 0 172.5 172.499994" height="15" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><clipPath id="13371a7e95"><path d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="dd1b12291b"><path d="M 81 0.558594 C 36.574219 0.558594 0.558594 36.574219 0.558594 81 C 0.558594 125.429688 36.574219 161.445312 81 161.445312 C 125.429688 161.445312 161.445312 125.429688 161.445312 81 C 161.445312 36.574219 125.429688 0.558594 81 0.558594 Z M 81 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="81397aa8c6"><path d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="23e127d511"><path d="M 81 0.558594 C 36.574219 0.558594 0.558594 36.574219 0.558594 81 C 0.558594 125.429688 36.574219 161.445312 81 161.445312 C 125.429688 161.445312 161.445312 125.429688 161.445312 81 C 161.445312 36.574219 125.429688 0.558594 81 0.558594 Z M 81 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="fcc2fc2742"><rect x="0" width="162" y="0" height="162"/></clipPath><clipPath id="4a44626ab5"><rect x="0" width="162" y="0" height="162"/></clipPath></defs><g transform="matrix(1, 0, 0, 1, 5, 5)"><g clip-path="url(#4a44626ab5)"><g clip-path="url(#13371a7e95)"><g clip-path="url(#dd1b12291b)"><g transform="matrix(1, 0, 0, 1, 0, 0.000000000000000888)"><g clip-path="url(#fcc2fc2742)"><g clip-path="url(#81397aa8c6)"><g clip-path="url(#23e127d511)"><path fill="#ffffff" d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " fill-opacity="1" fill-rule="nonzero"/></g></g></g></g></g></g></g></g></svg>
     </button>
   {:else if recordingStatus === 'recording'}
@@ -433,7 +394,7 @@
       ></video>
       <div class="recording-controls">
         <div class="camera-selection">
-          <button class="camera-switch-btn" onclick={selectCamera}>
+          <button class="camera-switch-btn" on:click={selectCamera}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M16 3l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M20 7H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -445,7 +406,7 @@
         <div class="countdown-display">
           {countdown}s
         </div>
-        <button class="stop-btn-container" onclick={stopRecording}>
+        <button class="stop-btn-container" on:click={stopRecording}>
           <div class="stop-btn-circle">
             <div class="stop-btn-square"></div>
           </div>
@@ -462,21 +423,12 @@
         class="recorded-video"
       ></video>
       <div class="recorded-controls">
-        {#if isUploading}
-          <div class="upload-progress">
-            <div class="upload-status-text">{uploadStatus}</div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: {uploadProgress}%"></div>
-            </div>
-          </div>
-        {:else}
-          <button class="action-completed-btn" onclick={handleVideoCompleted}>
-            ✓
-          </button>
-          <button class="action-failed-btn" onclick={handleVideoFailed}>
-            ✗
-          </button>
-        {/if}
+        <button class="action-completed-btn" on:click={handleVideoCompleted}>
+          ✓
+        </button>
+        <button class="action-failed-btn" on:click={handleVideoFailed}>
+          ✗
+        </button>
       </div>
     </div>
   {/if}
@@ -763,38 +715,6 @@
   .action-failed-btn:hover {
     background: #dc2626;
     transform: scale(1.05);
-  }
-
-  .upload-progress {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 12px;
-    min-width: 200px;
-  }
-
-  .upload-status-text {
-    color: white;
-    font-size: 0.9rem;
-    text-align: center;
-  }
-
-  .progress-bar {
-    width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #22c55e, #16a34a);
-    border-radius: 4px;
-    transition: width 0.3s ease;
   }
 
   @media (max-width: 800px) {

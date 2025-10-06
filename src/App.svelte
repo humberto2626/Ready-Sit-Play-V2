@@ -15,7 +15,6 @@
     completeGame,
     getCurrentUser
   } from './lib/gameDatabase.js';
-  import { initializeStorageBuckets } from './lib/videoStorage.js';
 
   let showVideoRecorder = false;
   let showGameReview = false;
@@ -455,11 +454,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       if (player1Name && player2Name && dogName) {
         const userId = currentUser?.id || null;
         const player1 = await findOrCreatePlayer(player1Name, email, !!email, userId);
-        const player2 = await findOrCreat
-        )
-      }
-    }
-  }ePlayer(player2Name, null, false, null);
+        const player2 = await findOrCreatePlayer(player2Name, null, false, null);
 
         if (player1) player1Id = player1.id;
         if (player2) player2Id = player2.id;
@@ -1095,8 +1090,6 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     };
 
     collapseAddressBar();
-
-    await initializeStorageBuckets();
 
     const { data: { session } } = await supabase.auth.getSession();
 
