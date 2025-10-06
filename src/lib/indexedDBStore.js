@@ -51,6 +51,14 @@ function openDatabase() {
 
 export async function saveVideo(videoData) {
   try {
+    if (!videoData.videoBlob || !(videoData.videoBlob instanceof Blob)) {
+      throw new Error('Invalid video blob');
+    }
+
+    if (videoData.videoBlob.size === 0) {
+      throw new Error('Empty video blob');
+    }
+
     const db = await openDatabase();
     const transaction = db.transaction([VIDEO_STORE], 'readwrite');
     const store = transaction.objectStore(VIDEO_STORE);
@@ -66,6 +74,7 @@ export async function saveVideo(videoData) {
       videoBlob: videoData.videoBlob,
       thumbnailBlob: videoData.thumbnailBlob,
       mimeType: videoData.mimeType || 'video/webm',
+      videoSize: videoData.videoBlob.size,
       success: videoData.success,
       completionTime: videoData.completionTime,
       timestamp: Date.now()
@@ -73,8 +82,14 @@ export async function saveVideo(videoData) {
 
     return new Promise((resolve, reject) => {
       const request = store.add(video);
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        console.log('Video saved successfully, ID:', request.result, 'Size:', video.videoSize);
+        resolve(request.result);
+      };
+      request.onerror = () => {
+        console.error('Failed to save video:', request.error);
+        reject(request.error);
+      };
     });
   } catch (error) {
     console.error('Error saving video to IndexedDB:', error);
@@ -178,14 +193,48 @@ export async function getStorageEstimate() {
   return null;
 }
 
+const activeBlobURLs = new Set();
+
 export function createBlobURL(blob) {
-  return URL.createObjectURL(blob);
+  if (!blob || !(blob instanceof Blob)) {
+    console.error('Invalid blob passed to createBlobURL');
+    return null;
+  }
+
+  try {
+    const url = URL.createObjectURL(blob);
+    activeBlobURLs.add(url);
+    return url;
+  } catch (error) {
+    console.error('Failed to create blob URL:', error);
+    return null;
+  }
 }
 
 export function revokeBlobURL(url) {
   if (url && url.startsWith('blob:')) {
-    URL.revokeObjectURL(url);
+    try {
+      URL.revokeObjectURL(url);
+      activeBlobURLs.delete(url);
+    } catch (error) {
+      console.error('Failed to revoke blob URL:', error);
+    }
   }
+}
+
+export function revokeAllBlobURLs() {
+  activeBlobURLs.forEach(url => {
+    try {
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to revoke blob URL:', error);
+    }
+  });
+  activeBlobURLs.clear();
+}
+
+export function getActiveBlobURLCount() {
+  return activeBlobURLs.size;
 }
 
 export async function migrateExistingVideos() {

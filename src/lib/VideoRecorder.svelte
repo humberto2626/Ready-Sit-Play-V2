@@ -2,6 +2,7 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { saveVideo } from './indexedDBStore.js';
   import { generateVideoThumbnail } from './videoUtils.js';
+  import { getOptimalRecordingSettings, validateVideoBlob } from './videoCompatibility.js';
 
   const dispatch = createEventDispatcher();
 
@@ -14,88 +15,67 @@
   let recordedVideoUrl = $state('');
   let countdown = $state(30);
   let countdownInterval = $state(null);
-  let facingMode = $state('environment'); // Default to back camera
+  let facingMode = $state('environment');
   let liveVideoElement = $state(null);
   let recordedVideoElement = $state(null);
   let isSwitchingCamera = $state(false);
   let recordedVideoBlob = $state(null);
   let selectedMimeType = $state('');
+  let videoLoadTimeout = $state(null);
+  let isVideoLoading = $state(false);
+  let blobUrlRegistry = $state(new Set());
 
-  // Effect to handle video element setup when it becomes available
   $effect(() => {
     if (recordingStatus === 'recording' && videoStream && liveVideoElement) {
-      console.log('Live video element found:', liveVideoElement);
-      console.log('Live video element initial state:', {
-        tagName: liveVideoElement.tagName,
-        readyState: liveVideoElement.readyState,
-        networkState: liveVideoElement.networkState,
-        currentSrc: liveVideoElement.currentSrc,
-        srcObject: liveVideoElement.srcObject
-      });
-      
-      liveVideoElement.srcObject = videoStream;
-      console.log('Live video element srcObject set:', liveVideoElement.srcObject);
-      console.log('Live video element after srcObject assignment:', {
-        readyState: liveVideoElement.readyState,
-        networkState: liveVideoElement.networkState,
-        videoWidth: liveVideoElement.videoWidth,
-        videoHeight: liveVideoElement.videoHeight
-      });
-      
-      console.log('Live video element dimensions:', {
-        width: liveVideoElement.offsetWidth,
-        height: liveVideoElement.offsetHeight,
-        clientWidth: liveVideoElement.clientWidth,
-        clientHeight: liveVideoElement.clientHeight,
-        scrollWidth: liveVideoElement.scrollWidth,
-        scrollHeight: liveVideoElement.scrollHeight
-      });
-      
-      // Add event listeners for debugging
-      liveVideoElement.addEventListener('loadstart', () => console.log('Video: loadstart event'));
-      liveVideoElement.addEventListener('loadedmetadata', () => {
-        console.log('Video: loadedmetadata event');
-        console.log('Video metadata:', {
-          videoWidth: liveVideoElement.videoWidth,
-          videoHeight: liveVideoElement.videoHeight,
-          duration: liveVideoElement.duration
-        });
-      });
-      liveVideoElement.addEventListener('loadeddata', () => console.log('Video: loadeddata event'));
-      liveVideoElement.addEventListener('canplay', () => console.log('Video: canplay event'));
-      liveVideoElement.addEventListener('canplaythrough', () => console.log('Video: canplaythrough event'));
-      liveVideoElement.addEventListener('playing', () => console.log('Video: playing event'));
-      liveVideoElement.addEventListener('error', (e) => {
-        console.error('Video: error event', e);
-        console.error('Video error details:', {
-          error: liveVideoElement.error,
-          code: liveVideoElement.error?.code,
-          message: liveVideoElement.error?.message
-        });
-      });
-      
-      // Explicitly try to play the video
-      (async () => {
-        try {
-          console.log('Attempting to play video...');
-          await liveVideoElement.play();
-          console.log('Live video play() succeeded');
-          console.log('Video state after play():', {
-            paused: liveVideoElement.paused,
-            ended: liveVideoElement.ended,
-            readyState: liveVideoElement.readyState,
-            currentTime: liveVideoElement.currentTime
-          });
-        } catch (playError) {
-          console.error('Live video play() failed:', playError);
-          console.error('Play error details:', playError.name, playError.message);
-          console.error('Video element state during play error:', {
-            readyState: liveVideoElement.readyState,
-            networkState: liveVideoElement.networkState,
-            error: liveVideoElement.error
-          });
+      isVideoLoading = true;
+
+      if (videoLoadTimeout) {
+        clearTimeout(videoLoadTimeout);
+      }
+
+      videoLoadTimeout = setTimeout(() => {
+        if (isVideoLoading) {
+          console.warn('Video loading timeout - stream may have issues');
+          isVideoLoading = false;
         }
-      })();
+      }, 5000);
+
+      const handleLoadedMetadata = () => {
+        isVideoLoading = false;
+        if (videoLoadTimeout) {
+          clearTimeout(videoLoadTimeout);
+        }
+      };
+
+      const handleCanPlay = () => {
+        isVideoLoading = false;
+      };
+
+      liveVideoElement.addEventListener('loadedmetadata', handleLoadedMetadata, { once: true });
+      liveVideoElement.addEventListener('canplay', handleCanPlay, { once: true });
+
+      liveVideoElement.srcObject = videoStream;
+
+      liveVideoElement.play().catch(error => {
+        console.error('Failed to play video stream:', error);
+        if (error.name === 'NotAllowedError') {
+          console.warn('Autoplay blocked - user interaction may be required');
+        }
+      });
+    }
+  });
+
+  $effect(() => {
+    if (recordingStatus === 'recorded' && recordedVideoElement && recordedVideoUrl) {
+      recordedVideoElement.load();
+
+      const playWhenReady = () => {
+        recordedVideoElement.play().catch(error => {
+          console.warn('Recorded video autoplay prevented:', error);
+        });
+      };
+
+      recordedVideoElement.addEventListener('loadeddata', playWhenReady, { once: true });
     }
   });
 
@@ -176,36 +156,25 @@
         muted: track.muted
       })));
 
-      // Determine best supported MIME type for better mobile compatibility
-      // Priority: H.264 (MP4) > H.264 (WebM) > VP9 > VP8 > Default WebM
-      const supportedTypes = [
-        'video/mp4;codecs=avc1',
-        'video/mp4',
-        'video/webm;codecs=h264',
-        'video/webm;codecs=vp9',
-        'video/webm;codecs=vp8',
-        'video/webm'
-      ];
+      const recordingSettings = getOptimalRecordingSettings();
+      selectedMimeType = recordingSettings.mimeType;
 
-      selectedMimeType = '';
-      for (const type of supportedTypes) {
-        if (MediaRecorder.isTypeSupported(type)) {
-          selectedMimeType = type;
-          break;
+      console.log('Optimal recording settings:', recordingSettings);
+
+      try {
+        mediaRecorder = new MediaRecorder(videoStream, recordingSettings);
+        console.log('MediaRecorder created with MIME type:', selectedMimeType);
+      } catch (error) {
+        console.warn('Failed to create MediaRecorder with optimal settings:', error);
+        try {
+          mediaRecorder = new MediaRecorder(videoStream, { mimeType: selectedMimeType });
+        } catch (fallbackError) {
+          console.warn('Fallback with MIME type failed, using defaults:', fallbackError);
+          mediaRecorder = new MediaRecorder(videoStream);
+          selectedMimeType = mediaRecorder.mimeType || 'video/webm';
         }
+        console.log('Using fallback MIME type:', selectedMimeType);
       }
-
-      // Fallback to default if no explicit type is supported
-      if (!selectedMimeType) {
-        selectedMimeType = 'video/webm';
-      }
-
-      console.log('Selected MIME type:', selectedMimeType);
-      console.log('Browser supports:', supportedTypes.filter(type => MediaRecorder.isTypeSupported(type)));
-
-      // Set up MediaRecorder with optimal MIME type and timeslice for better reliability
-      const recorderOptions = selectedMimeType ? { mimeType: selectedMimeType } : {};
-      mediaRecorder = new MediaRecorder(videoStream, recorderOptions);
         
       console.log('MediaRecorder created with state:', mediaRecorder.state);
       recordedChunks = [];
@@ -234,8 +203,16 @@
         const blob = new Blob(recordedChunks, { type: selectedMimeType });
         console.log('Blob created:', blob.size, 'bytes, type:', blob.type);
 
+        const validation = validateVideoBlob(blob);
+        if (!validation.valid) {
+          console.error('Video validation failed:', validation.error);
+          alert(`Recording error: ${validation.error}`);
+          return;
+        }
+
         recordedVideoBlob = blob;
         recordedVideoUrl = URL.createObjectURL(blob);
+        blobUrlRegistry.add(recordedVideoUrl);
         console.log('Video URL created:', recordedVideoUrl);
         recordingStatus = 'recorded';
         
@@ -285,6 +262,7 @@
 
     if (recordedVideoUrl) {
       URL.revokeObjectURL(recordedVideoUrl);
+      blobUrlRegistry.delete(recordedVideoUrl);
       recordedVideoUrl = '';
     }
 
@@ -293,10 +271,16 @@
       videoStream = null;
     }
 
+    if (videoLoadTimeout) {
+      clearTimeout(videoLoadTimeout);
+      videoLoadTimeout = null;
+    }
+
     recordedChunks = [];
     recordedVideoBlob = null;
     countdown = 30;
     recordingStatus = 'idle';
+    isVideoLoading = false;
   }
 
   async function handleVideoCompleted() {
@@ -377,16 +361,20 @@
   }
 
   onDestroy(() => {
-    // Clean up resources
     if (videoStream) {
       videoStream.getTracks().forEach(track => track.stop());
     }
     if (countdownInterval) {
       clearInterval(countdownInterval);
     }
-    if (recordedVideoUrl) {
-      URL.revokeObjectURL(recordedVideoUrl);
+    if (videoLoadTimeout) {
+      clearTimeout(videoLoadTimeout);
     }
+
+    blobUrlRegistry.forEach(url => {
+      URL.revokeObjectURL(url);
+    });
+    blobUrlRegistry.clear();
   });
 </script>
 
@@ -427,11 +415,13 @@
     </div>
   {:else if recordingStatus === 'recorded'}
     <div class="recorded-container fullscreen-recording">
-      <video 
+      <video
         bind:this={recordedVideoElement}
         src={recordedVideoUrl}
+        type={selectedMimeType}
         controls
         playsinline
+        preload="auto"
         class="recorded-video"
       ></video>
       <div class="recorded-controls">
