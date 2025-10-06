@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import { getVideosByGameId, createBlobURL, revokeBlobURL } from './indexedDBStore.js';
   import { downloadVideo, generateVideoFilename, compileVideos, formatBytes, copyToClipboard } from './videoUtils.js';
-  import { canShareFiles, getShareCompatibleMimeType } from './videoCompatibility.js';
 
   let { gameId, onClose } = $props();
 
@@ -11,8 +10,6 @@
   let selectedVideos = $state(new Set());
   let isCompiling = $state(false);
   let compilationProgress = $state(0);
-  let blobUrlRegistry = $state(new Map());
-  let thumbnailLoadErrors = $state(new Set());
 
   onMount(async () => {
     await loadVideos();
@@ -23,31 +20,17 @@
       loading = true;
       const videoData = await getVideosByGameId(gameId);
 
-      videos = videoData.map((video, index) => {
-        const videoUrl = createBlobURL(video.videoBlob);
-        const thumbnailUrl = video.thumbnailBlob ? createBlobURL(video.thumbnailBlob) : null;
+      videos = videoData.map(video => ({
+        ...video,
+        videoUrl: createBlobURL(video.videoBlob),
+        thumbnailUrl: video.thumbnailBlob ? createBlobURL(video.thumbnailBlob) : null
+      }));
 
-        blobUrlRegistry.set(video.id, { videoUrl, thumbnailUrl });
-
-        return {
-          ...video,
-          videoUrl,
-          thumbnailUrl,
-          index
-        };
-      });
-
-      console.log(`Loaded ${videos.length} videos for game ${gameId}`);
       loading = false;
     } catch (error) {
       console.error('Error loading videos:', error);
       loading = false;
     }
-  }
-
-  function handleThumbnailError(videoId) {
-    thumbnailLoadErrors.add(videoId);
-    thumbnailLoadErrors = thumbnailLoadErrors;
   }
 
   function handleDownloadVideo(video) {
@@ -89,34 +72,23 @@
       compilationProgress = 0;
 
       const selectedVideoData = videos.filter(v => selectedVideos.has(v.id));
-      console.log(`Compiling ${selectedVideoData.length} videos`);
 
-      compilationProgress = 10;
+      compilationProgress = 50;
 
-      const compiledBlob = await compileVideos(selectedVideoData, {
-        width: 1280,
-        height: 720,
-        fps: 30,
-        transitionDuration: 0.5
-      });
-
-      compilationProgress = 90;
-
-      const extension = compiledBlob.type.includes('mp4') ? 'mp4' : 'webm';
-      const filename = `Game_Compilation_${new Date().toISOString().split('T')[0]}.${extension}`;
-
-      console.log(`Compilation complete: ${compiledBlob.size} bytes`);
-      downloadVideo(compiledBlob, filename);
+      const compiledBlob = await compileVideos(selectedVideoData);
 
       compilationProgress = 100;
 
-      setTimeout(() => {
-        isCompiling = false;
-        compilationProgress = 0;
-      }, 500);
+      // Determine extension based on compiled blob type
+      const extension = compiledBlob.type.includes('mp4') ? 'mp4' : 'webm';
+      const filename = `Game_Compilation_${new Date().toISOString().split('T')[0]}.${extension}`;
+      downloadVideo(compiledBlob, filename);
+
+      isCompiling = false;
+      compilationProgress = 0;
     } catch (error) {
       console.error('Error compiling videos:', error);
-      alert(`Failed to compile videos: ${error.message || 'Unknown error'}`);
+      alert('Failed to compile videos. Please try again.');
       isCompiling = false;
       compilationProgress = 0;
     }
@@ -126,40 +98,36 @@
     const video = videos.find(v => v.id === videoId);
     if (!video) return;
 
-    const filename = generateVideoFilename(
-      video.playerName,
-      video.cardLabel,
-      video.success,
-      video.timestamp,
-      video.mimeType
-    );
+    if (navigator.share && navigator.canShare) {
+      try {
+        const filename = generateVideoFilename(
+          video.playerName,
+          video.cardLabel,
+          video.success,
+          video.timestamp,
+          video.mimeType
+        );
 
-    if (!canShareFiles()) {
-      console.log('Web Share API not available, falling back to download');
-      handleDownloadVideo(video);
-      return;
-    }
+        const file = new File([video.videoBlob], filename, { type: video.mimeType || 'video/webm' });
+        const shareData = {
+          title: `${video.playerName} - ${video.cardLabel}`,
+          text: `${video.success ? 'Success' : 'Failed'} in ${video.completionTime}s`,
+          files: [file]
+        };
 
-    try {
-      const shareType = getShareCompatibleMimeType(video.mimeType || 'video/webm');
-      console.log('Sharing with MIME type:', shareType);
-
-      const file = new File([video.videoBlob], filename, { type: shareType });
-      const shareData = {
-        files: [file],
-        title: `${video.playerName} - ${video.cardLabel}`,
-        text: `${video.success ? 'Success' : 'Failed'} in ${video.completionTime}s`
-      };
-
-      await navigator.share(shareData);
-      console.log('Video shared successfully');
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        console.log('Share cancelled by user');
-      } else {
-        console.error('Error sharing video:', error);
-        handleDownloadVideo(video);
+        if (navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+        } else {
+          handleDownloadVideo(video);
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing:', error);
+          handleDownloadVideo(video);
+        }
       }
+    } else {
+      handleDownloadVideo(video);
     }
   }
 
@@ -188,11 +156,10 @@
   }
 
   function handleCloseReview() {
-    blobUrlRegistry.forEach(({ videoUrl, thumbnailUrl }) => {
-      if (videoUrl) revokeBlobURL(videoUrl);
-      if (thumbnailUrl) revokeBlobURL(thumbnailUrl);
+    videos.forEach(video => {
+      if (video.videoUrl) revokeBlobURL(video.videoUrl);
+      if (video.thumbnailUrl) revokeBlobURL(video.thumbnailUrl);
     });
-    blobUrlRegistry.clear();
     onClose();
   }
 </script>
@@ -248,21 +215,11 @@
 
               <div class="video-right-section">
                 <div class="video-thumbnail-container" onclick={() => handlePlayVideo(video.id)}>
-                  {#if video.thumbnailUrl && !thumbnailLoadErrors.has(video.id)}
-                    <img
-                      src={video.thumbnailUrl}
-                      alt="Video thumbnail"
-                      class="video-thumbnail"
-                      loading="lazy"
-                      onerror={() => handleThumbnailError(video.id)}
-                    />
+                  {#if video.thumbnailUrl}
+                    <img src={video.thumbnailUrl} alt="Video thumbnail" class="video-thumbnail" />
                     <div class="play-overlay">▶</div>
                   {:else}
-                    <div class="video-placeholder">
-                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                      </svg>
-                    </div>
+                    <div class="video-placeholder">No Thumbnail</div>
                   {/if}
                 </div>
 
@@ -299,14 +256,7 @@
             <dialog id="video-modal-{video.id}" class="video-modal" onclick={(e) => { if (e.target.tagName === 'DIALOG') handleCloseModal(e, video.id); }}>
               <div class="modal-content">
                 <button class="modal-close" onclick={(e) => handleCloseModal(e, video.id)}>✕</button>
-                <video
-                  src={video.videoUrl}
-                  type={video.mimeType || 'video/webm'}
-                  controls
-                  playsinline
-                  preload="metadata"
-                  class="fullsize-video"
-                ></video>
+                <video src={video.videoUrl} controls playsinline class="fullsize-video" type={video.mimeType || 'video/webm'}></video>
                 <div class="modal-info">
                   <h3>{video.playerName} - {video.cardLabel}</h3>
                   <p class="modal-stats">

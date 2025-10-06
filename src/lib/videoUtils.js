@@ -7,42 +7,19 @@ export async function generateVideoThumbnail(videoBlob) {
     videoElement.preload = 'metadata';
     videoElement.muted = true;
     videoElement.playsInline = true;
-    videoElement.crossOrigin = 'anonymous';
 
     const videoURL = URL.createObjectURL(videoBlob);
     videoElement.src = videoURL;
 
-    const timeout = setTimeout(() => {
-      URL.revokeObjectURL(videoURL);
-      reject(new Error('Thumbnail generation timeout'));
-    }, 10000);
-
     videoElement.onloadedmetadata = () => {
-      const seekTime = Math.min(1, videoElement.duration * 0.1);
-      videoElement.currentTime = seekTime;
+      videoElement.currentTime = Math.min(1, videoElement.duration / 2);
     };
 
     videoElement.onseeked = () => {
-      clearTimeout(timeout);
+      canvas.width = videoElement.videoWidth;
+      canvas.height = videoElement.videoHeight;
 
-      const maxDimension = 640;
-      let width = videoElement.videoWidth;
-      let height = videoElement.videoHeight;
-
-      if (width > maxDimension || height > maxDimension) {
-        if (width > height) {
-          height = (height / width) * maxDimension;
-          width = maxDimension;
-        } else {
-          width = (width / height) * maxDimension;
-          height = maxDimension;
-        }
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-
-      ctx.drawImage(videoElement, 0, 0, width, height);
+      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
       canvas.toBlob((thumbnailBlob) => {
         URL.revokeObjectURL(videoURL);
@@ -52,11 +29,10 @@ export async function generateVideoThumbnail(videoBlob) {
         } else {
           reject(new Error('Failed to generate thumbnail'));
         }
-      }, 'image/jpeg', 0.8);
+      }, 'image/jpeg', 0.7);
     };
 
     videoElement.onerror = (error) => {
-      clearTimeout(timeout);
       URL.revokeObjectURL(videoURL);
       reject(error);
     };
@@ -123,27 +99,19 @@ export async function compileVideos(videoBlobs, options = {}) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  const ctx = canvas.getContext('2d', { alpha: false });
+  const ctx = canvas.getContext('2d');
 
   const stream = canvas.captureStream(fps);
 
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-  const supportedTypes = isIOS || isSafari
-    ? [
-        'video/mp4',
-        'video/mp4;codecs=avc1',
-        'video/webm'
-      ]
-    : [
-        'video/webm;codecs=vp9,opus',
-        'video/webm;codecs=vp8,opus',
-        'video/webm;codecs=h264',
-        'video/mp4;codecs=avc1',
-        'video/mp4',
-        'video/webm'
-      ];
+  // Select best supported MIME type for compilation
+  const supportedTypes = [
+    'video/mp4;codecs=avc1',
+    'video/mp4',
+    'video/webm;codecs=h264',
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm'
+  ];
 
   let selectedMimeType = 'video/webm';
   for (const type of supportedTypes) {
@@ -157,17 +125,10 @@ export async function compileVideos(videoBlobs, options = {}) {
 
   const recorderOptions = {
     mimeType: selectedMimeType,
-    videoBitsPerSecond: 3000000
+    videoBitsPerSecond: 2500000
   };
 
-  let mediaRecorder;
-  try {
-    mediaRecorder = new MediaRecorder(stream, recorderOptions);
-  } catch (error) {
-    console.warn('Failed with preferred options, using defaults:', error);
-    mediaRecorder = new MediaRecorder(stream);
-    selectedMimeType = mediaRecorder.mimeType || 'video/webm';
-  }
+  const mediaRecorder = new MediaRecorder(stream, recorderOptions);
 
   const chunks = [];
   mediaRecorder.ondataavailable = (e) => {
@@ -177,54 +138,32 @@ export async function compileVideos(videoBlobs, options = {}) {
   };
 
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error('Video compilation timeout'));
-    }, 300000);
-
     mediaRecorder.onstop = () => {
-      clearTimeout(timeout);
       const compiledBlob = new Blob(chunks, { type: selectedMimeType });
       resolve(compiledBlob);
     };
 
     mediaRecorder.onerror = (error) => {
-      clearTimeout(timeout);
       reject(error);
     };
 
-    mediaRecorder.start(1000);
+    mediaRecorder.start();
 
     const videoElements = [];
-    const urlsToRevoke = [];
-
     const promises = videoBlobs.map((blob) => {
-      return new Promise((resolveVideo, rejectVideo) => {
+      return new Promise((resolveVideo) => {
         const video = document.createElement('video');
         video.preload = 'auto';
         video.muted = true;
         video.playsInline = true;
-        video.crossOrigin = 'anonymous';
-
-        const url = URL.createObjectURL(blob.videoBlob);
-        urlsToRevoke.push(url);
-        video.src = url;
-
-        const loadTimeout = setTimeout(() => {
-          rejectVideo(new Error('Video load timeout'));
-        }, 10000);
+        video.src = URL.createObjectURL(blob.videoBlob);
 
         video.onloadedmetadata = () => {
-          clearTimeout(loadTimeout);
           videoElements.push({
             video,
             metadata: blob
           });
           resolveVideo();
-        };
-
-        video.onerror = (error) => {
-          clearTimeout(loadTimeout);
-          rejectVideo(error);
         };
       });
     });
@@ -246,26 +185,14 @@ export async function compileVideos(videoBlobs, options = {}) {
         await new Promise(resolve => setTimeout(resolve, transitionDuration * 1000));
 
         video.currentTime = 0;
-
-        try {
-          await video.play();
-        } catch (error) {
-          console.error('Failed to play video during compilation:', error);
-        }
-
-        let lastFrameTime = performance.now();
-        const frameDelay = 1000 / fps;
+        await video.play();
 
         const playVideo = () => {
           if (video.ended || video.paused) {
             return;
           }
 
-          const now = performance.now();
-          if (now - lastFrameTime >= frameDelay) {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            lastFrameTime = now;
-          }
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           requestAnimationFrame(playVideo);
         };
 
@@ -273,19 +200,14 @@ export async function compileVideos(videoBlobs, options = {}) {
 
         await new Promise(resolve => {
           video.onended = resolve;
-          setTimeout(resolve, (video.duration + 1) * 1000);
         });
 
         video.pause();
+        URL.revokeObjectURL(video.src);
       }
 
-      urlsToRevoke.forEach(url => URL.revokeObjectURL(url));
       mediaRecorder.stop();
-    }).catch((error) => {
-      clearTimeout(timeout);
-      urlsToRevoke.forEach(url => URL.revokeObjectURL(url));
-      reject(error);
-    });
+    }).catch(reject);
   });
 }
 
