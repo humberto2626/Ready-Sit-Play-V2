@@ -131,6 +131,30 @@
     }
   }
 
+  function handlePlayVideo(videoId) {
+    const modal = document.getElementById(`video-modal-${videoId}`);
+    if (modal) {
+      modal.showModal();
+      const video = modal.querySelector('video');
+      if (video) {
+        video.currentTime = 0;
+        video.play();
+      }
+    }
+  }
+
+  function handleCloseModal(event, videoId) {
+    const modal = document.getElementById(`video-modal-${videoId}`);
+    if (modal) {
+      const video = modal.querySelector('video');
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
+      modal.close();
+    }
+  }
+
   function handleCloseReview() {
     videos.forEach(video => {
       if (video.videoUrl) revokeBlobURL(video.videoUrl);
@@ -190,7 +214,7 @@
               </div>
 
               <div class="video-right-section">
-                <div class="video-thumbnail-container">
+                <div class="video-thumbnail-container" onclick={() => handlePlayVideo(video.id)}>
                   {#if video.thumbnailUrl}
                     <img src={video.thumbnailUrl} alt="Video thumbnail" class="video-thumbnail" />
                     <div class="play-overlay">▶</div>
@@ -229,9 +253,9 @@
               </div>
             </div>
 
-            <dialog id="video-modal-{video.id}" class="video-modal">
+            <dialog id="video-modal-{video.id}" class="video-modal" onclick={(e) => { if (e.target.tagName === 'DIALOG') handleCloseModal(e, video.id); }}>
               <div class="modal-content">
-                <button class="modal-close" onclick={(e) => e.target.closest('dialog').close()}>✕</button>
+                <button class="modal-close" onclick={(e) => handleCloseModal(e, video.id)}>✕</button>
                 <video src={video.videoUrl} controls playsinline class="fullsize-video" type={video.mimeType || 'video/webm'}></video>
                 <div class="modal-info">
                   <h3>{video.playerName} - {video.cardLabel}</h3>
@@ -441,6 +465,17 @@
     border-radius: 8px;
     overflow: hidden;
     background: #000;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .video-thumbnail-container:hover {
+    transform: scale(1.02);
+  }
+
+  .video-thumbnail-container:hover .play-overlay {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
   }
 
   .video-thumbnail {
@@ -456,8 +491,10 @@
     transform: translate(-50%, -50%);
     font-size: 3rem;
     color: white;
-    opacity: 0.8;
+    opacity: 0.9;
     pointer-events: none;
+    transition: all 0.2s ease;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   }
 
   .video-placeholder {
