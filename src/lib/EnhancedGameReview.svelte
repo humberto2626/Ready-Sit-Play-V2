@@ -107,7 +107,6 @@
     const shareLink = `${window.location.origin}/video/${shareVideoId}`;
     try {
       await copyToClipboard(shareLink);
-      alert('Link copied to clipboard!');
       closeShareModal();
     } catch (error) {
       console.error('Error copying link:', error);
@@ -166,45 +165,51 @@
               />
             </div>
 
-            <div class="video-thumbnail-container">
-              {#if video.thumbnailUrl}
-                <img src={video.thumbnailUrl} alt="Video thumbnail" class="video-thumbnail" />
-                <div class="play-overlay">▶</div>
-              {:else}
-                <div class="video-placeholder">No Thumbnail</div>
-              {/if}
-            </div>
-
-            <div class="video-info">
-              <div class="player-name">{video.playerName}</div>
-              <div class="card-name">{video.cardLabel}</div>
-              <div class="video-stats">
-                <span class="status" class:success={video.success} class:failed={!video.success}>
-                  {video.success ? '✓ Success' : '✗ Failed'}
-                </span>
-                <span class="duration">{video.completionTime}s</span>
+            <div class="video-main-content">
+              <div class="card-preview-left">
+                {#if video.cardImage}
+                  <img src={video.cardImage} alt={video.cardLabel} class="card-image-left" />
+                {/if}
               </div>
-            </div>
 
-            <div class="card-preview">
-              {#if video.cardImage}
-                <img src={video.cardImage} alt={video.cardLabel} class="card-image" />
-              {/if}
-            </div>
+              <div class="video-right-section">
+                <div class="video-thumbnail-container">
+                  {#if video.thumbnailUrl}
+                    <img src={video.thumbnailUrl} alt="Video thumbnail" class="video-thumbnail" />
+                    <div class="play-overlay">▶</div>
+                  {:else}
+                    <div class="video-placeholder">No Thumbnail</div>
+                  {/if}
+                </div>
 
-            <div class="video-actions">
-              <button class="action-btn view-btn" onclick={() => {
-                const modal = document.getElementById(`video-modal-${video.id}`);
-                if (modal) modal.showModal();
-              }}>
-                View
-              </button>
-              <button class="action-btn download-btn" onclick={() => handleDownloadVideo(video)}>
-                Download
-              </button>
-              <button class="action-btn share-btn" onclick={() => handleShare(video.id)}>
-                Share
-              </button>
+                <div class="video-info">
+                  <div class="player-name">{video.playerName}</div>
+                  <div class="card-name">{video.cardLabel}</div>
+                  <div class="video-stats">
+                    <span class="status" class:success={video.success} class:failed={!video.success}>
+                      {video.success ? '✓ Success' : '✗ Failed'}
+                    </span>
+                    <span class="duration">{video.completionTime}s</span>
+                  </div>
+                </div>
+
+                <div class="video-actions">
+                  <button class="action-btn download-btn" onclick={() => handleDownloadVideo(video)} title="Download">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </button>
+                  <button class="action-btn share-btn" onclick={() => handleShare(video.id)} title="Share">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                      <polyline points="16 6 12 2 8 6"></polyline>
+                      <line x1="12" y1="2" x2="12" y2="15"></line>
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <dialog id="video-modal-{video.id}" class="video-modal">
@@ -293,20 +298,21 @@
   }
 
   .close-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     border: none;
     color: white;
     width: 40px;
     height: 40px;
-    border-radius: 50%;
     cursor: pointer;
     font-size: 1.5rem;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .close-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.1);
+    opacity: 0.7;
   }
 
   .toolbar {
@@ -380,9 +386,6 @@
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
     transition: all 0.2s ease;
     position: relative;
   }
@@ -408,6 +411,32 @@
     width: 20px;
     height: 20px;
     cursor: pointer;
+  }
+
+  .video-main-content {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .card-preview-left {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .card-image-left {
+    height: 120px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+
+  .video-right-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
   .video-thumbnail-container {
@@ -491,60 +520,32 @@
     font-size: 0.85rem;
   }
 
-  .card-preview {
-    display: flex;
-    justify-content: center;
-    padding: 0.5rem 0;
-  }
-
-  .card-image {
-    height: 80px;
-    width: auto;
-    object-fit: contain;
-    border-radius: 4px;
-  }
-
   .video-actions {
     display: flex;
     gap: 0.5rem;
+    justify-content: flex-start;
   }
 
   .action-btn {
-    flex: 1;
-    padding: 0.5rem;
+    padding: 0.6rem;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
     transition: all 0.2s ease;
-  }
-
-  .view-btn {
-    background: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
     color: white;
   }
 
-  .view-btn:hover {
-    background: #2563eb;
+  .action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
   }
 
-  .download-btn {
-    background: #22c55e;
-    color: white;
-  }
-
-  .download-btn:hover {
-    background: #16a34a;
-  }
-
-  .share-btn {
-    background: #a855f7;
-    color: white;
-  }
-
-  .share-btn:hover {
-    background: #9333ea;
+  .action-btn svg {
+    display: block;
   }
 
   .video-modal {
