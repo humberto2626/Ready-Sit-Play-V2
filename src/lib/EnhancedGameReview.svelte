@@ -10,8 +10,6 @@
   let selectedVideos = $state(new Set());
   let isCompiling = $state(false);
   let compilationProgress = $state(0);
-  let showShareModal = $state(false);
-  let shareVideoId = $state(null);
 
   onMount(async () => {
     await loadVideos();
@@ -93,24 +91,39 @@
     }
   }
 
-  function handleShare(videoId) {
-    shareVideoId = videoId;
-    showShareModal = true;
-  }
+  async function handleShare(videoId) {
+    const video = videos.find(v => v.id === videoId);
+    if (!video) return;
 
-  function closeShareModal() {
-    showShareModal = false;
-    shareVideoId = null;
-  }
+    if (navigator.share && navigator.canShare) {
+      try {
+        const filename = generateVideoFilename(
+          video.playerName,
+          video.cardLabel,
+          video.success,
+          video.timestamp
+        );
 
-  async function copyShareLink() {
-    const shareLink = `${window.location.origin}/video/${shareVideoId}`;
-    try {
-      await copyToClipboard(shareLink);
-      closeShareModal();
-    } catch (error) {
-      console.error('Error copying link:', error);
-      alert('Failed to copy link');
+        const file = new File([video.videoBlob], filename, { type: 'video/webm' });
+        const shareData = {
+          title: `${video.playerName} - ${video.cardLabel}`,
+          text: `${video.success ? 'Success' : 'Failed'} in ${video.completionTime}s`,
+          files: [file]
+        };
+
+        if (navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+        } else {
+          handleDownloadVideo(video);
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing:', error);
+          handleDownloadVideo(video);
+        }
+      }
+    } else {
+      handleDownloadVideo(video);
     }
   }
 
@@ -226,28 +239,6 @@
             </dialog>
           </div>
         {/each}
-      </div>
-    {/if}
-
-    {#if showShareModal}
-      <div class="share-modal-overlay" onclick={closeShareModal}>
-        <div class="share-modal" onclick={(e) => e.stopPropagation()}>
-          <h3>Share Video</h3>
-          <p>Copy the link below to share this video:</p>
-          <div class="share-options">
-            <button class="share-option-btn" onclick={copyShareLink}>
-              📋 Copy Link
-            </button>
-            <button class="share-option-btn" onclick={() => {
-              const video = videos.find(v => v.id === shareVideoId);
-              if (video) handleDownloadVideo(video);
-              closeShareModal();
-            }}>
-              💾 Download & Share
-            </button>
-          </div>
-          <button class="cancel-btn" onclick={closeShareModal}>Cancel</button>
-        </div>
       </div>
     {/if}
   </div>
@@ -602,75 +593,6 @@
   .modal-stats {
     color: rgba(255, 255, 255, 0.7);
     margin: 0;
-  }
-
-  .share-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10001;
-  }
-
-  .share-modal {
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-  }
-
-  .share-modal h3 {
-    margin: 0 0 1rem 0;
-    color: white;
-  }
-
-  .share-modal p {
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0 0 1.5rem 0;
-  }
-
-  .share-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-
-  .share-option-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-  }
-
-  .share-option-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.02);
-  }
-
-  .cancel-btn {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    padding: 0.5rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-
-  .cancel-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
   }
 
   .loading-state,

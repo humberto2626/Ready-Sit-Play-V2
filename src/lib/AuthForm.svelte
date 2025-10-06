@@ -10,7 +10,6 @@
   let playerName = $state('');
   let loading = $state(false);
   let error = $state('');
-  let message = $state('');
 
   async function handleLogin() {
     if (!email || !password) {
@@ -109,7 +108,6 @@
 
           if (updateError) throw updateError;
           playerRecord = claimedPlayer;
-          message = 'Account created and previous games linked!';
         } else {
           const { data: newPlayer, error: createError } = await supabase
             .from('players')
@@ -128,12 +126,9 @@
 
           if (createError) throw createError;
           playerRecord = newPlayer;
-          message = 'Account created successfully!';
         }
 
-        setTimeout(() => {
-          onSuccess(data.user, playerRecord);
-        }, 1500);
+        onSuccess(data.user, playerRecord);
       }
     } catch (err) {
       console.error('Signup error:', err);
@@ -166,7 +161,6 @@
   function switchMode() {
     mode = mode === 'login' ? 'signup' : 'login';
     error = '';
-    message = '';
   }
 
   function handleSubmit(e) {
@@ -184,14 +178,14 @@
     <button
       class="auth-tab"
       class:active={mode === 'login'}
-      onclick={() => { mode = 'login'; error = ''; message = ''; }}
+      onclick={() => { mode = 'login'; error = ''; }}
     >
       Login
     </button>
     <button
       class="auth-tab"
       class:active={mode === 'signup'}
-      onclick={() => { mode = 'signup'; error = ''; message = ''; }}
+      onclick={() => { mode = 'signup'; error = ''; }}
     >
       Sign Up
     </button>
@@ -252,10 +246,6 @@
 
     {#if error}
       <div class="error-message">{error}</div>
-    {/if}
-
-    {#if message}
-      <div class="success-message">{message}</div>
     {/if}
 
     <button type="submit" class="submit-btn" disabled={loading}>
@@ -382,18 +372,6 @@
     border: 1px solid rgba(239, 68, 68, 0.5);
     border-radius: 6px;
     color: #fca5a5;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-  }
-
-  .success-message {
-    padding: 0.75rem;
-    background-color: rgba(34, 197, 94, 0.2);
-    border: 1px solid rgba(34, 197, 94, 0.5);
-    border-radius: 6px;
-    color: #86efac;
     font-size: 0.9rem;
     margin-bottom: 1rem;
     word-wrap: break-word;
