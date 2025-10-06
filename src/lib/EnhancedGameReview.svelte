@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import { getVideosByGameId, createBlobURL, revokeBlobURL } from './indexedDBStore.js';
   import { downloadVideo, generateVideoFilename, compileVideos, formatBytes, copyToClipboard } from './videoUtils.js';
+  import { getVideosWithUrls } from './videoUploadService.js';
+  import { getVideoPublicUrl, getThumbnailPublicUrl } from './videoStorage.js';
 
   let { gameId, onClose } = $props();
 
@@ -18,13 +20,54 @@
   async function loadVideos() {
     try {
       loading = true;
-      const videoData = await getVideosByGameId(gameId);
 
-      videos = videoData.map(video => ({
-        ...video,
-        videoUrl: createBlobURL(video.videoBlob),
-        thumbnailUrl: video.thumbnailBlob ? createBlobURL(video.thumbnailBlob) : null
-      }));
+      const cloudVideos = await getVideosWithUrls(gameId);
+      console.log('Cloud videos found:', cloudVideos.length);
+
+      const localVideos = await getVideosByGameId(gameId);
+      console.log('Local videos found:', localVideos.length);
+
+      const videoMap = new Map();
+
+      cloudVideos.forEach(cloudVideo => {
+        if (cloudVideo.video_url) {
+          videoMap.set(cloudVideo.card_id + '_' + cloudVideo.player_id, {
+            id: cloudVideo.id,
+            gameId: cloudVideo.game_id,
+            playerId: cloudVideo.player_id,
+            playerName: cloudVideo.card_label,
+            cardId: cloudVideo.card_id,
+            cardLabel: cloudVideo.card_label,
+            cardCategory: cloudVideo.card_category,
+            cardImage: null,
+            success: cloudVideo.success,
+            completionTime: cloudVideo.completion_time_seconds,
+            timestamp: new Date(cloudVideo.created_at).getTime(),
+            videoUrl: cloudVideo.video_url,
+            thumbnailUrl: cloudVideo.thumbnail_url,
+            videoBlob: null,
+            thumbnailBlob: null,
+            source: 'cloud',
+            uploadStatus: cloudVideo.upload_status
+          });
+        }
+      });
+
+      localVideos.forEach(localVideo => {
+        const key = localVideo.cardId + '_' + localVideo.playerId;
+        if (!videoMap.has(key)) {
+          videoMap.set(key, {
+            ...localVideo,
+            videoUrl: createBlobURL(localVideo.videoBlob),
+            thumbnailUrl: localVideo.thumbnailBlob ? createBlobURL(localVideo.thumbnailBlob) : null,
+            source: 'local',
+            uploadStatus: 'local_only'
+          });
+        }
+      });
+
+      videos = Array.from(videoMap.values()).sort((a, b) => a.timestamp - b.timestamp);
+      console.log('Total videos loaded:', videos.length);
 
       loading = false;
     } catch (error) {
@@ -33,14 +76,33 @@
     }
   }
 
-  function handleDownloadVideo(video) {
-    const filename = generateVideoFilename(
-      video.playerName,
-      video.cardLabel,
-      video.success,
-      video.timestamp
-    );
-    downloadVideo(video.videoBlob, filename);
+  async function handleDownloadVideo(video) {
+    if (video.source === 'cloud' && video.videoUrl) {
+      try {
+        const response = await fetch(video.videoUrl);
+        const blob = await response.blob();
+        const filename = generateVideoFilename(
+          video.playerName,
+          video.cardLabel,
+          video.success,
+          video.timestamp
+        );
+        downloadVideo(blob, filename);
+      } catch (error) {
+        console.error('Error downloading cloud video:', error);
+        alert('Failed to download video from cloud. Please try again.');
+      }
+    } else if (video.videoBlob) {
+      const filename = generateVideoFilename(
+        video.playerName,
+        video.cardLabel,
+        video.success,
+        video.timestamp
+      );
+      downloadVideo(video.videoBlob, filename);
+    } else {
+      alert('Video not available for download.');
+    }
   }
 
   function toggleVideoSelection(videoId) {
@@ -95,7 +157,17 @@
     const video = videos.find(v => v.id === videoId);
     if (!video) return;
 
-    if (navigator.share && navigator.canShare) {
+    if (video.source === 'cloud' && video.videoUrl) {
+      try {
+        await copyToClipboard(video.videoUrl);
+        alert('Video link copied to clipboard! You can now share this link.');
+        return;
+      } catch (error) {
+        console.error('Error copying link:', error);
+      }
+    }
+
+    if (navigator.share && video.videoBlob) {
       try {
         const filename = generateVideoFilename(
           video.playerName,
@@ -111,18 +183,33 @@
           files: [file]
         };
 
-        if (navigator.canShare(shareData)) {
+        if (navigator.canShare && navigator.canShare(shareData)) {
           await navigator.share(shareData);
         } else {
-          handleDownloadVideo(video);
+          await handleCopyLink(video);
         }
       } catch (error) {
         if (error.name !== 'AbortError') {
           console.error('Error sharing:', error);
-          handleDownloadVideo(video);
+          await handleCopyLink(video);
         }
       }
     } else {
+      await handleCopyLink(video);
+    }
+  }
+
+  async function handleCopyLink(video) {
+    if (video.videoUrl && video.source === 'cloud') {
+      try {
+        await copyToClipboard(video.videoUrl);
+        alert('Video link copied to clipboard!');
+      } catch (error) {
+        console.error('Error copying link:', error);
+        handleDownloadVideo(video);
+      }
+    } else {
+      alert('This video is only available locally. Download it to share.');
       handleDownloadVideo(video);
     }
   }
@@ -204,6 +291,11 @@
                     </span>
                     <span class="duration">{video.completionTime}s</span>
                   </div>
+                  {#if video.source === 'cloud'}
+                    <div class="cloud-badge" title="Stored in cloud - can be shared">☁️ Cloud</div>
+                  {:else if video.uploadStatus === 'local_only'}
+                    <div class="local-badge" title="Local only - download to share">📱 Local</div>
+                  {/if}
                 </div>
 
                 <div class="video-actions">
@@ -509,6 +601,26 @@
   .duration {
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.85rem;
+  }
+
+  .cloud-badge,
+  .local-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+  }
+
+  .cloud-badge {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+  }
+
+  .local-badge {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
   }
 
   .video-actions {

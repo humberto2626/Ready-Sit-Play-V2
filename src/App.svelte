@@ -15,6 +15,7 @@
     completeGame,
     getCurrentUser
   } from './lib/gameDatabase.js';
+  import { initializeStorageBuckets } from './lib/videoStorage.js';
 
   let showVideoRecorder = false;
   let showGameReview = false;
@@ -1090,6 +1091,8 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     };
 
     collapseAddressBar();
+
+    await initializeStorageBuckets();
 
     const { data: { session } } = await supabase.auth.getSession();
 
