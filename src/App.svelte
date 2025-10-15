@@ -2845,7 +2845,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
             class="review-videos-btn"
             onclick={(e) => { e.stopPropagation(); openGameReview(); }}
           >
-            📹 Review Videos
+            Review Videos
           </button>
           <p style="margin-top: 1rem;">Tap anywhere to play again.</p>
         </div>
