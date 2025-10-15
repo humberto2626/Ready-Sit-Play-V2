@@ -680,9 +680,9 @@
 
   .modal-close {
     position: absolute;
-    top: 1rem;
+    top: 4rem;
     right: 1rem;
-    background: transparent;
+    background: none;
     border: none;
     color: white;
     width: 40px;
@@ -694,10 +694,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: none;
   }
 
   .modal-close:hover {
     opacity: 0.7;
+    background: none;
+  }
+
+  .modal-close:focus {
+    outline: none;
+    background: none;
   }
 
   .fullsize-video {
