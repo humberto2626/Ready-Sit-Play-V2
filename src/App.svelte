@@ -2457,7 +2457,12 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
         <p>Congratulations! You both are amazing at communicating with your dog!</p>
         <p>To settle this game and declare a winner, make sure to be standing at the opposite sides of the room with {dogName || 'your dog'} in the middle, call their name at the same time.</p>
       </div>
-      
+       <button
+            class="review-videos-btn"
+            onclick={(e) => { e.stopPropagation(); openGameReview(); }}
+          >
+            Review Videos
+          </button>
       <div style="text-align: center;">
         <button class="start-button" onclick={animateShuffle}>
           Restart Game
