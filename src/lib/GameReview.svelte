@@ -22,13 +22,15 @@
                 controls
                 playsinline
                 webkit-playsinline
+                preload="metadata"
                 class="review-video"
-                type={action.mimeType || 'video/webm'}
                 onerror={(e) => {
                   console.error('Video playback error in GameReview:', {
                     error: e.target.error,
                     code: e.target.error?.code,
-                    message: e.target.error?.message
+                    message: e.target.error?.message,
+                    src: e.target.src,
+                    currentSrc: e.target.currentSrc
                   });
                 }}
               ></video>

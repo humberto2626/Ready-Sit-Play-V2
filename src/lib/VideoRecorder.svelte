@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { saveVideo } from './indexedDBStore.js';
-  import { generateVideoThumbnail, validateVideoBlob } from './videoUtils.js';
+  import { generateVideoThumbnail, validateVideoBlob, isSafari } from './videoUtils.js';
 
   const dispatch = createEventDispatcher();
 
@@ -176,10 +176,16 @@
         muted: track.muted
       })));
 
-      const supportedTypes = [
-        'video/webm;codecs=h264',
+      // Safari-specific MIME type handling
+      const isSafariBrowser = isSafari();
+      const supportedTypes = isSafariBrowser ? [
+        'video/mp4',
+        'video/mp4;codecs=avc1',
+        'video/webm;codecs=h264'
+      ] : [
         'video/mp4;codecs=avc1',
         'video/mp4',
+        'video/webm;codecs=h264',
         'video/webm;codecs=vp9',
         'video/webm;codecs=vp8',
         'video/webm'
@@ -195,8 +201,10 @@
 
       // Fallback to default if no explicit type is supported
       if (!selectedMimeType) {
-        selectedMimeType = 'video/webm';
+        selectedMimeType = isSafariBrowser ? 'video/mp4' : 'video/webm';
       }
+
+      console.log('Browser detected:', isSafariBrowser ? 'Safari' : 'Other');
 
       console.log('Selected MIME type:', selectedMimeType);
       console.log('Browser supports:', supportedTypes.filter(type => MediaRecorder.isTypeSupported(type)));
@@ -204,6 +212,10 @@
       // Set up MediaRecorder with optimal MIME type and timeslice for better reliability
       const recorderOptions = selectedMimeType ? { mimeType: selectedMimeType } : {};
       mediaRecorder = new MediaRecorder(videoStream, recorderOptions);
+
+      // Update selectedMimeType to actual MIME type used by MediaRecorder
+      selectedMimeType = mediaRecorder.mimeType || selectedMimeType;
+      console.log('MediaRecorder actual MIME type:', selectedMimeType);
         
       console.log('MediaRecorder created with state:', mediaRecorder.state);
       recordedChunks = [];
@@ -240,11 +252,18 @@
         }
 
         try {
-          const blob = new Blob(recordedChunks, { type: selectedMimeType });
+          // Use the actual MIME type from the chunks if available
+          const actualMimeType = recordedChunks[0]?.type || selectedMimeType;
+          const blob = new Blob(recordedChunks, { type: actualMimeType });
+
+          // Update selectedMimeType to match the actual blob type
+          selectedMimeType = blob.type || actualMimeType;
+
           console.log('Blob created:', {
             size: blob.size,
             type: blob.type,
-            chunks: recordedChunks.length
+            chunks: recordedChunks.length,
+            actualMimeType: actualMimeType
           });
 
           if (!validateVideoBlob(blob)) {
@@ -491,16 +510,17 @@
         controls
         playsinline
         webkit-playsinline
-        preload="auto"
+        preload="metadata"
         class="recorded-video"
-        type={selectedMimeType}
         onerror={(e) => {
           console.error('Recorded video playback error:', {
             error: e.target.error,
             code: e.target.error?.code,
             message: e.target.error?.message,
             mimeType: selectedMimeType,
-            blobSize: recordedVideoBlob?.size
+            blobSize: recordedVideoBlob?.size,
+            src: e.target.src,
+            currentSrc: e.target.currentSrc
           });
           alert('Unable to play recorded video. The format may be incompatible.');
         }}

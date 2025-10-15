@@ -14,14 +14,20 @@ export function validateVideoBlob(videoBlob) {
     return false;
   }
 
-  if (!videoBlob.type || !videoBlob.type.startsWith('video/')) {
-    console.error('Blob validation failed: invalid or missing MIME type', videoBlob.type);
-    return false;
+  // Relaxed MIME type validation - allow empty or missing MIME types if blob has data
+  // Some browsers may not set the MIME type correctly on blob retrieval from IndexedDB
+  if (videoBlob.type && !videoBlob.type.startsWith('video/') && !videoBlob.type.startsWith('application/')) {
+    console.warn('Blob validation warning: unusual MIME type', videoBlob.type);
+    // Still return true - let the browser decide if it can play it
+  }
+
+  if (!videoBlob.type || videoBlob.type === '') {
+    console.warn('Blob validation warning: missing MIME type, but blob has data. Allowing playback attempt.');
   }
 
   console.log('Blob validation passed:', {
     size: videoBlob.size,
-    type: videoBlob.type
+    type: videoBlob.type || 'empty/unknown'
   });
 
   return true;
@@ -319,6 +325,11 @@ export async function compileVideos(videoBlobs, options = {}) {
       mediaRecorder.stop();
     }).catch(reject);
   });
+}
+
+export function isSafari() {
+  const ua = navigator.userAgent.toLowerCase();
+  return ua.indexOf('safari') > -1 && ua.indexOf('chrome') === -1 && ua.indexOf('android') === -1;
 }
 
 export function copyToClipboard(text) {

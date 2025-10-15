@@ -26,9 +26,22 @@
           console.warn('Invalid video blob detected for video ID:', video.id);
         }
 
+        let videoUrl = null;
+        if (isValid) {
+          // Ensure blob has proper MIME type before creating URL
+          let blob = video.videoBlob;
+          if (!blob.type || blob.type === '') {
+            // Re-create blob with proper MIME type for Safari compatibility
+            const mimeType = video.mimeType || 'video/mp4';
+            blob = new Blob([blob], { type: mimeType });
+            console.log(`Re-created blob for video ${video.id} with MIME type:`, mimeType);
+          }
+          videoUrl = createBlobURL(blob);
+        }
+
         return {
           ...video,
-          videoUrl: isValid ? createBlobURL(video.videoBlob) : null,
+          videoUrl: videoUrl,
           thumbnailUrl: video.thumbnailBlob ? createBlobURL(video.thumbnailBlob) : null,
           hasError: !isValid
         };
@@ -284,15 +297,17 @@
                     controls
                     playsinline
                     webkit-playsinline
+                    preload="metadata"
                     class="fullsize-video"
-                    type={video.mimeType || 'video/webm'}
                     onerror={(e) => {
                       console.error('Video playback error:', {
                         error: e.target.error,
                         code: e.target.error?.code,
                         message: e.target.error?.message,
                         videoId: video.id,
-                        mimeType: video.mimeType
+                        mimeType: video.mimeType,
+                        src: e.target.src,
+                        currentSrc: e.target.currentSrc
                       });
                       e.target.style.display = 'none';
                       const errorMsg = e.target.parentElement.querySelector('.video-error-message');
