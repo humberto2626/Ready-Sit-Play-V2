@@ -2368,7 +2368,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       {#if currentStep === 6}
         <h1 class="instructions-title">Mini-Game Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>Randomized 30 second contests that give you special advantages</strong></p>
+          <p><strong>Randomized 30 second contests that give the winner special advantages</strong></p>
            <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/19.png" class="card-image" />
           </div>
