@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { getVideosByGameId, createBlobURL, revokeBlobURL } from './indexedDBStore.js';
-  import { downloadVideo, generateVideoFilename, compileVideos, formatBytes, copyToClipboard } from './videoUtils.js';
+  import { downloadVideo, generateVideoFilename, compileVideos, formatBytes, copyToClipboard, validateVideoBlob } from './videoUtils.js';
 
   let { gameId, onClose } = $props();
 
@@ -20,11 +20,19 @@
       loading = true;
       const videoData = await getVideosByGameId(gameId);
 
-      videos = videoData.map(video => ({
-        ...video,
-        videoUrl: createBlobURL(video.videoBlob),
-        thumbnailUrl: video.thumbnailBlob ? createBlobURL(video.thumbnailBlob) : null
-      }));
+      videos = videoData.map(video => {
+        const isValid = validateVideoBlob(video.videoBlob);
+        if (!isValid) {
+          console.warn('Invalid video blob detected for video ID:', video.id);
+        }
+
+        return {
+          ...video,
+          videoUrl: isValid ? createBlobURL(video.videoBlob) : null,
+          thumbnailUrl: video.thumbnailBlob ? createBlobURL(video.thumbnailBlob) : null,
+          hasError: !isValid
+        };
+      });
 
       loading = false;
     } catch (error) {
@@ -132,13 +140,22 @@
   }
 
   function handlePlayVideo(videoId) {
+    const video = videos.find(v => v.id === videoId);
+    if (video && video.hasError) {
+      alert('This video cannot be played due to corruption or incompatibility.');
+      return;
+    }
+
     const modal = document.getElementById(`video-modal-${videoId}`);
     if (modal) {
       modal.showModal();
-      const video = modal.querySelector('video');
-      if (video) {
-        video.currentTime = 0;
-        video.play();
+      const videoElement = modal.querySelector('video');
+      if (videoElement) {
+        videoElement.currentTime = 0;
+        videoElement.play().catch(error => {
+          console.error('Error playing video:', error);
+          alert('Unable to play video. It may be corrupted or in an unsupported format.');
+        });
       }
     }
   }
@@ -215,7 +232,12 @@
 
               <div class="video-right-section">
                 <div class="video-thumbnail-container" onclick={() => handlePlayVideo(video.id)}>
-                  {#if video.thumbnailUrl}
+                  {#if video.hasError}
+                    <div class="video-placeholder error-placeholder">
+                      <span>⚠</span>
+                      <span>Video Error</span>
+                    </div>
+                  {:else if video.thumbnailUrl}
                     <img src={video.thumbnailUrl} alt="Video thumbnail" class="video-thumbnail" />
                     <div class="play-overlay">▶</div>
                   {:else}
@@ -256,7 +278,37 @@
             <dialog id="video-modal-{video.id}" class="video-modal" onclick={(e) => { if (e.target.tagName === 'DIALOG') handleCloseModal(e, video.id); }}>
               <div class="modal-content">
                 <button class="modal-close" onclick={(e) => handleCloseModal(e, video.id)}>✕</button>
-                <video src={video.videoUrl} controls playsinline class="fullsize-video" type={video.mimeType || 'video/webm'}></video>
+                {#if video.videoUrl}
+                  <video
+                    src={video.videoUrl}
+                    controls
+                    playsinline
+                    webkit-playsinline
+                    class="fullsize-video"
+                    type={video.mimeType || 'video/webm'}
+                    onerror={(e) => {
+                      console.error('Video playback error:', {
+                        error: e.target.error,
+                        code: e.target.error?.code,
+                        message: e.target.error?.message,
+                        videoId: video.id,
+                        mimeType: video.mimeType
+                      });
+                      e.target.style.display = 'none';
+                      const errorMsg = e.target.parentElement.querySelector('.video-error-message');
+                      if (errorMsg) errorMsg.style.display = 'block';
+                    }}
+                  ></video>
+                  <div class="video-error-message" style="display: none;">
+                    <p>⚠ Unable to play this video</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">The video format may be incompatible with your browser.</p>
+                  </div>
+                {:else}
+                  <div class="video-error-message">
+                    <p>⚠ Video unavailable</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">This video is corrupted or cannot be loaded.</p>
+                  </div>
+                {/if}
                 <div class="modal-info">
                   <h3>{video.playerName} - {video.cardLabel}</h3>
                   <p class="modal-stats">
@@ -505,6 +557,31 @@
     justify-content: center;
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.9rem;
+  }
+
+  .error-placeholder {
+    flex-direction: column;
+    gap: 0.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 2px dashed rgba(239, 68, 68, 0.3);
+  }
+
+  .error-placeholder span:first-child {
+    font-size: 2rem;
+  }
+
+  .video-error-message {
+    text-align: center;
+    padding: 2rem;
+    color: white;
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+  }
+
+  .video-error-message p {
+    margin: 0.5rem 0;
   }
 
   .video-info {

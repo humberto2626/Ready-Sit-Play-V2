@@ -17,7 +17,21 @@
               {/if}
             </div>
             <div class="video-display">
-              <video src={action.videoUrl} controls playsinline class="review-video" type={action.mimeType || 'video/webm'}></video>
+              <video
+                src={action.videoUrl}
+                controls
+                playsinline
+                webkit-playsinline
+                class="review-video"
+                type={action.mimeType || 'video/webm'}
+                onerror={(e) => {
+                  console.error('Video playback error in GameReview:', {
+                    error: e.target.error,
+                    code: e.target.error?.code,
+                    message: e.target.error?.message
+                  });
+                }}
+              ></video>
             </div>
           </div>
         {/each}

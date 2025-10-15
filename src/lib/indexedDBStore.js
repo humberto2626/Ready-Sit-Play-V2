@@ -51,6 +51,25 @@ function openDatabase() {
 
 export async function saveVideo(videoData) {
   try {
+    if (!videoData.videoBlob) {
+      throw new Error('Video blob is required');
+    }
+
+    if (!(videoData.videoBlob instanceof Blob)) {
+      throw new Error('Invalid video blob: not a Blob instance');
+    }
+
+    if (videoData.videoBlob.size === 0) {
+      throw new Error('Invalid video blob: size is 0');
+    }
+
+    console.log('Saving video to IndexedDB:', {
+      blobSize: videoData.videoBlob.size,
+      blobType: videoData.videoBlob.type,
+      mimeType: videoData.mimeType,
+      hasThumbnail: !!videoData.thumbnailBlob
+    });
+
     const db = await openDatabase();
     const transaction = db.transaction([VIDEO_STORE], 'readwrite');
     const store = transaction.objectStore(VIDEO_STORE);
@@ -64,8 +83,8 @@ export async function saveVideo(videoData) {
       cardCategory: videoData.cardCategory,
       cardImage: videoData.cardImage,
       videoBlob: videoData.videoBlob,
-      thumbnailBlob: videoData.thumbnailBlob,
-      mimeType: videoData.mimeType || 'video/webm',
+      thumbnailBlob: videoData.thumbnailBlob || null,
+      mimeType: videoData.mimeType || videoData.videoBlob.type || 'video/webm',
       success: videoData.success,
       completionTime: videoData.completionTime,
       timestamp: Date.now()
@@ -73,8 +92,14 @@ export async function saveVideo(videoData) {
 
     return new Promise((resolve, reject) => {
       const request = store.add(video);
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        console.log('Video saved successfully with ID:', request.result);
+        resolve(request.result);
+      };
+      request.onerror = () => {
+        console.error('IndexedDB save error:', request.error);
+        reject(request.error);
+      };
     });
   } catch (error) {
     console.error('Error saving video to IndexedDB:', error);
@@ -91,7 +116,21 @@ export async function getVideosByGameId(gameId) {
 
     return new Promise((resolve, reject) => {
       const request = index.getAll(gameId);
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => {
+        const videos = request.result;
+        console.log(`Retrieved ${videos.length} videos for game ${gameId}`);
+
+        const validatedVideos = videos.map(video => {
+          if (!video.videoBlob) {
+            console.warn('Video missing videoBlob:', video.id);
+          } else if (video.videoBlob.size === 0) {
+            console.warn('Video has empty blob:', video.id);
+          }
+          return video;
+        });
+
+        resolve(validatedVideos);
+      };
       request.onerror = () => reject(request.error);
     });
   } catch (error) {
@@ -179,7 +218,26 @@ export async function getStorageEstimate() {
 }
 
 export function createBlobURL(blob) {
-  return URL.createObjectURL(blob);
+  if (!blob) {
+    console.error('Cannot create URL: blob is null or undefined');
+    return null;
+  }
+
+  if (!(blob instanceof Blob)) {
+    console.error('Cannot create URL: not a Blob instance');
+    return null;
+  }
+
+  if (blob.size === 0) {
+    console.warn('Creating URL for empty blob');
+  }
+
+  try {
+    return URL.createObjectURL(blob);
+  } catch (error) {
+    console.error('Error creating blob URL:', error);
+    return null;
+  }
 }
 
 export function revokeBlobURL(url) {

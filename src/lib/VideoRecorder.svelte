@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { saveVideo } from './indexedDBStore.js';
-  import { generateVideoThumbnail } from './videoUtils.js';
+  import { generateVideoThumbnail, validateVideoBlob } from './videoUtils.js';
 
   const dispatch = createEventDispatcher();
 
@@ -176,12 +176,10 @@
         muted: track.muted
       })));
 
-      // Determine best supported MIME type for better mobile compatibility
-      // Priority: H.264 (MP4) > H.264 (WebM) > VP9 > VP8 > Default WebM
       const supportedTypes = [
+        'video/webm;codecs=h264',
         'video/mp4;codecs=avc1',
         'video/mp4',
-        'video/webm;codecs=h264',
         'video/webm;codecs=vp9',
         'video/webm;codecs=vp8',
         'video/webm'
@@ -212,44 +210,77 @@
 
       mediaRecorder.ondataavailable = (event) => {
         console.log('Data available, chunk size:', event.data.size);
-        if (event.data.size > 0) {
+        if (event.data && event.data.size > 0) {
+          console.log('Valid chunk received:', {
+            size: event.data.size,
+            type: event.data.type
+          });
           recordedChunks.push(event.data);
+        } else {
+          console.warn('Received empty or invalid chunk');
         }
       };
 
       mediaRecorder.onstop = () => {
         console.log('Recording stopped, total chunks:', recordedChunks.length);
-        console.log('Total data size:', recordedChunks.reduce((sum, chunk) => sum + chunk.size, 0));
+        const totalSize = recordedChunks.reduce((sum, chunk) => sum + chunk.size, 0);
+        console.log('Total data size:', totalSize);
 
         if (isSwitchingCamera) {
           console.log('Recording stopped due to camera switch, discarding chunks.');
-          isSwitchingCamera = false; // Reset flag
-          // No blob creation or recordedVideoUrl assignment needed
-          // The recordedChunks are already cleared by selectCamera()
-          // The recordingStatus will be set to 'recording' again by startRecording()
+          isSwitchingCamera = false;
           return;
         }
 
-        // Use the actual MIME type that was used for recording
-        const blob = new Blob(recordedChunks, { type: selectedMimeType });
-        console.log('Blob created:', blob.size, 'bytes, type:', blob.type);
+        if (recordedChunks.length === 0 || totalSize === 0) {
+          console.error('No valid chunks recorded');
+          alert('Recording failed: No data captured. Please try again.');
+          resetRecording();
+          return;
+        }
 
-        recordedVideoBlob = blob;
-        recordedVideoUrl = URL.createObjectURL(blob);
-        console.log('Video URL created:', recordedVideoUrl);
-        recordingStatus = 'recorded';
-        
-        // Stop all tracks
-        if (videoStream) {
-          videoStream.getTracks().forEach(track => track.stop());
-          videoStream = null;
+        try {
+          const blob = new Blob(recordedChunks, { type: selectedMimeType });
+          console.log('Blob created:', {
+            size: blob.size,
+            type: blob.type,
+            chunks: recordedChunks.length
+          });
+
+          if (!validateVideoBlob(blob)) {
+            console.error('Created blob failed validation');
+            alert('Recording failed: Invalid video data. Please try again.');
+            resetRecording();
+            return;
+          }
+
+          recordedVideoBlob = blob;
+          recordedVideoUrl = URL.createObjectURL(blob);
+          console.log('Video URL created:', recordedVideoUrl);
+          recordingStatus = 'recorded';
+
+          if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+          }
+        } catch (error) {
+          console.error('Error creating blob or URL:', error);
+          alert('Recording failed: Could not process video. Please try again.');
+          resetRecording();
         }
       };
 
       // Start recording with timeslice for better reliability (1 second chunks)
+      mediaRecorder.onerror = (event) => {
+        console.error('MediaRecorder error:', event.error);
+        alert('Recording error: ' + (event.error?.message || 'Unknown error'));
+        resetRecording();
+      };
+
       mediaRecorder.start(1000);
       console.log('Recording started, status:', recordingStatus);
       console.log('Using MIME type:', selectedMimeType);
+      console.log('MediaRecorder state:', mediaRecorder.state);
       countdown = 30;
 
       // Start countdown
@@ -302,9 +333,21 @@
   async function handleVideoCompleted() {
     console.log('Video completed, saving to IndexedDB...');
 
+    if (!validateVideoBlob(recordedVideoBlob)) {
+      console.error('Cannot save video: blob validation failed');
+      alert('Failed to save video: Invalid video data');
+      resetRecording();
+      return;
+    }
+
     try {
       const thumbnailBlob = await generateVideoThumbnail(recordedVideoBlob);
-      console.log('Thumbnail generated:', thumbnailBlob.size, 'bytes');
+
+      if (thumbnailBlob) {
+        console.log('Thumbnail generated:', thumbnailBlob.size, 'bytes');
+      } else {
+        console.warn('Thumbnail generation failed, continuing without thumbnail');
+      }
 
       const videoId = await saveVideo({
         gameId: currentGameId,
@@ -330,6 +373,7 @@
       });
     } catch (error) {
       console.error('Error saving video:', error);
+      alert('Failed to save video: ' + error.message);
       dispatch('videoAction', {
         status: 'completed',
         cardImage: activeCardImage
@@ -342,8 +386,21 @@
   async function handleVideoFailed() {
     console.log('Video failed, saving to IndexedDB...');
 
+    if (!validateVideoBlob(recordedVideoBlob)) {
+      console.error('Cannot save video: blob validation failed');
+      alert('Failed to save video: Invalid video data');
+      resetRecording();
+      return;
+    }
+
     try {
       const thumbnailBlob = await generateVideoThumbnail(recordedVideoBlob);
+
+      if (thumbnailBlob) {
+        console.log('Thumbnail generated:', thumbnailBlob.size, 'bytes');
+      } else {
+        console.warn('Thumbnail generation failed, continuing without thumbnail');
+      }
 
       const videoId = await saveVideo({
         gameId: currentGameId,
@@ -368,6 +425,7 @@
       });
     } catch (error) {
       console.error('Error saving failed video:', error);
+      alert('Failed to save video: ' + error.message);
       dispatch('videoAction', {
         status: 'failed'
       });
@@ -392,7 +450,7 @@
 
 <div class="video-recorder">
   {#if recordingStatus === 'idle'}
-    <button class="record-btn" on:click={startRecording}>
+    <button class="record-btn" onclick={startRecording}>
      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" zoomAndPan="magnify" viewBox="0 0 172.5 172.499994" height="15" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><clipPath id="13371a7e95"><path d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="dd1b12291b"><path d="M 81 0.558594 C 36.574219 0.558594 0.558594 36.574219 0.558594 81 C 0.558594 125.429688 36.574219 161.445312 81 161.445312 C 125.429688 161.445312 161.445312 125.429688 161.445312 81 C 161.445312 36.574219 125.429688 0.558594 81 0.558594 Z M 81 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="81397aa8c6"><path d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="23e127d511"><path d="M 81 0.558594 C 36.574219 0.558594 0.558594 36.574219 0.558594 81 C 0.558594 125.429688 36.574219 161.445312 81 161.445312 C 125.429688 161.445312 161.445312 125.429688 161.445312 81 C 161.445312 36.574219 125.429688 0.558594 81 0.558594 Z M 81 0.558594 " clip-rule="nonzero"/></clipPath><clipPath id="fcc2fc2742"><rect x="0" width="162" y="0" height="162"/></clipPath><clipPath id="4a44626ab5"><rect x="0" width="162" y="0" height="162"/></clipPath></defs><g transform="matrix(1, 0, 0, 1, 5, 5)"><g clip-path="url(#4a44626ab5)"><g clip-path="url(#13371a7e95)"><g clip-path="url(#dd1b12291b)"><g transform="matrix(1, 0, 0, 1, 0, 0.000000000000000888)"><g clip-path="url(#fcc2fc2742)"><g clip-path="url(#81397aa8c6)"><g clip-path="url(#23e127d511)"><path fill="#ffffff" d="M 0.558594 0.558594 L 161.445312 0.558594 L 161.445312 161.445312 L 0.558594 161.445312 Z M 0.558594 0.558594 " fill-opacity="1" fill-rule="nonzero"/></g></g></g></g></g></g></g></g></svg>
     </button>
   {:else if recordingStatus === 'recording'}
@@ -406,7 +464,7 @@
       ></video>
       <div class="recording-controls">
         <div class="camera-selection">
-          <button class="camera-switch-btn" on:click={selectCamera}>
+          <button class="camera-switch-btn" onclick={selectCamera}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M16 3l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M20 7H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -418,7 +476,7 @@
         <div class="countdown-display">
           {countdown}s
         </div>
-        <button class="stop-btn-container" on:click={stopRecording}>
+        <button class="stop-btn-container" onclick={stopRecording}>
           <div class="stop-btn-circle">
             <div class="stop-btn-square"></div>
           </div>
@@ -427,18 +485,31 @@
     </div>
   {:else if recordingStatus === 'recorded'}
     <div class="recorded-container fullscreen-recording">
-      <video 
+      <video
         bind:this={recordedVideoElement}
         src={recordedVideoUrl}
         controls
         playsinline
+        webkit-playsinline
+        preload="auto"
         class="recorded-video"
+        type={selectedMimeType}
+        onerror={(e) => {
+          console.error('Recorded video playback error:', {
+            error: e.target.error,
+            code: e.target.error?.code,
+            message: e.target.error?.message,
+            mimeType: selectedMimeType,
+            blobSize: recordedVideoBlob?.size
+          });
+          alert('Unable to play recorded video. The format may be incompatible.');
+        }}
       ></video>
       <div class="recorded-controls">
-        <button class="action-completed-btn" on:click={handleVideoCompleted}>
+        <button class="action-completed-btn" onclick={handleVideoCompleted}>
           ✓
         </button>
-        <button class="action-failed-btn" on:click={handleVideoFailed}>
+        <button class="action-failed-btn" onclick={handleVideoFailed}>
           ✗
         </button>
       </div>

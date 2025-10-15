@@ -1,5 +1,40 @@
-export async function generateVideoThumbnail(videoBlob) {
+export function validateVideoBlob(videoBlob) {
+  if (!videoBlob) {
+    console.error('Blob validation failed: blob is null or undefined');
+    return false;
+  }
+
+  if (!(videoBlob instanceof Blob)) {
+    console.error('Blob validation failed: not a Blob instance', typeof videoBlob);
+    return false;
+  }
+
+  if (videoBlob.size === 0) {
+    console.error('Blob validation failed: blob size is 0');
+    return false;
+  }
+
+  if (!videoBlob.type || !videoBlob.type.startsWith('video/')) {
+    console.error('Blob validation failed: invalid or missing MIME type', videoBlob.type);
+    return false;
+  }
+
+  console.log('Blob validation passed:', {
+    size: videoBlob.size,
+    type: videoBlob.type
+  });
+
+  return true;
+}
+
+export async function generateVideoThumbnail(videoBlob, timeoutMs = 10000) {
   return new Promise((resolve, reject) => {
+    if (!validateVideoBlob(videoBlob)) {
+      console.error('Cannot generate thumbnail: invalid video blob');
+      resolve(null);
+      return;
+    }
+
     const videoElement = document.createElement('video');
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -7,34 +42,110 @@ export async function generateVideoThumbnail(videoBlob) {
     videoElement.preload = 'metadata';
     videoElement.muted = true;
     videoElement.playsInline = true;
+    videoElement.setAttribute('webkit-playsinline', 'true');
+    videoElement.crossOrigin = 'anonymous';
 
-    const videoURL = URL.createObjectURL(videoBlob);
-    videoElement.src = videoURL;
+    let videoURL = null;
+    let timeoutId = null;
+    let hasResolved = false;
+
+    const cleanup = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (videoURL) {
+        try {
+          URL.revokeObjectURL(videoURL);
+        } catch (e) {
+          console.error('Error revoking URL:', e);
+        }
+      }
+    };
+
+    const safeResolve = (value) => {
+      if (!hasResolved) {
+        hasResolved = true;
+        cleanup();
+        resolve(value);
+      }
+    };
+
+    timeoutId = setTimeout(() => {
+      console.warn('Thumbnail generation timed out after', timeoutMs, 'ms');
+      safeResolve(null);
+    }, timeoutMs);
+
+    try {
+      videoURL = URL.createObjectURL(videoBlob);
+      videoElement.src = videoURL;
+    } catch (error) {
+      console.error('Error creating video URL:', error);
+      safeResolve(null);
+      return;
+    }
 
     videoElement.onloadedmetadata = () => {
-      videoElement.currentTime = Math.min(1, videoElement.duration / 2);
+      console.log('Thumbnail: video metadata loaded', {
+        duration: videoElement.duration,
+        videoWidth: videoElement.videoWidth,
+        videoHeight: videoElement.videoHeight
+      });
+
+      if (videoElement.duration === 0 || isNaN(videoElement.duration)) {
+        console.error('Invalid video duration:', videoElement.duration);
+        safeResolve(null);
+        return;
+      }
+
+      if (videoElement.videoWidth === 0 || videoElement.videoHeight === 0) {
+        console.error('Invalid video dimensions:', videoElement.videoWidth, 'x', videoElement.videoHeight);
+        safeResolve(null);
+        return;
+      }
+
+      try {
+        videoElement.currentTime = Math.min(1, videoElement.duration / 2);
+      } catch (error) {
+        console.error('Error setting currentTime:', error);
+        safeResolve(null);
+      }
     };
 
     videoElement.onseeked = () => {
-      canvas.width = videoElement.videoWidth;
-      canvas.height = videoElement.videoHeight;
+      console.log('Thumbnail: video seeked, capturing frame');
 
-      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      try {
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
 
-      canvas.toBlob((thumbnailBlob) => {
-        URL.revokeObjectURL(videoURL);
-
-        if (thumbnailBlob) {
-          resolve(thumbnailBlob);
-        } else {
-          reject(new Error('Failed to generate thumbnail'));
+        if (canvas.width === 0 || canvas.height === 0) {
+          console.error('Cannot create thumbnail: invalid canvas dimensions');
+          safeResolve(null);
+          return;
         }
-      }, 'image/jpeg', 0.7);
+
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob((thumbnailBlob) => {
+          if (thumbnailBlob && thumbnailBlob.size > 0) {
+            console.log('Thumbnail generated successfully:', thumbnailBlob.size, 'bytes');
+            safeResolve(thumbnailBlob);
+          } else {
+            console.error('Failed to generate thumbnail blob');
+            safeResolve(null);
+          }
+        }, 'image/jpeg', 0.7);
+      } catch (error) {
+        console.error('Error during thumbnail capture:', error);
+        safeResolve(null);
+      }
     };
 
     videoElement.onerror = (error) => {
-      URL.revokeObjectURL(videoURL);
-      reject(error);
+      console.error('Video element error during thumbnail generation:', {
+        error: videoElement.error,
+        code: videoElement.error?.code,
+        message: videoElement.error?.message
+      });
+      safeResolve(null);
     };
   });
 }
@@ -103,11 +214,10 @@ export async function compileVideos(videoBlobs, options = {}) {
 
   const stream = canvas.captureStream(fps);
 
-  // Select best supported MIME type for compilation
   const supportedTypes = [
+    'video/webm;codecs=h264',
     'video/mp4;codecs=avc1',
     'video/mp4',
-    'video/webm;codecs=h264',
     'video/webm;codecs=vp9',
     'video/webm;codecs=vp8',
     'video/webm'
