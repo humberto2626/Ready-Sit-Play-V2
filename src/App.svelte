@@ -2268,7 +2268,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
     <div class="instructions-content">
       <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
       <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-        Balancedog
+        BalanceDog
       </div>
       
       {#if currentStep === 1}
@@ -2330,9 +2330,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       {/if}
 
       {#if currentStep === 3}
-        <h1 class="instructions-title">How to Play</h1>
+        <h1 class="instructions-title">How to Win</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>In order to win, be the first player to collect {player3Name.trim() ? 'four' : 'six'} Action Cards by successfully completing dog training tasks.</strong></p>
+          <p><strong>Guide {dogName || 'your dog'} to perform and collect {player3Name.trim() ? 'four' : 'six'} Action Cards.</strong></p>
           <p>Your turn begins by picking up the card facing down at the top of the deck.</p>
         </div>
       {/if}
@@ -2340,7 +2340,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       {#if currentStep === 4}
         <h1 class="instructions-title">Action Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>Training commands to perform with your dog</strong></p>
+          <p><strong>Training skills to perform with your dog</strong></p>
           <div class="card small-card edge-action" style="margin: 1rem auto;">
             <img src="/card-images/6.png" class="card-image" />
           </div>
@@ -2348,6 +2348,9 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
           <p><strong>Success:</strong> Reward {dogName || 'your dog'} with a treat and keep the card.</p>
           <p><strong>Fail:</strong> The card is placed at the bottom of the deck.</p>
         </div>
+         <div style="text-align: center; font-size: 0.7rem; color: white; margin-bottom: 1rem; margin-top: -1rem;">
+        Tap on the card for detailed instructions anytime during the game.
+      </div> 
       {/if}
 
       {#if currentStep === 5}
@@ -2365,13 +2368,17 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       {#if currentStep === 6}
         <h1 class="instructions-title">Mini-Game Cards</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p><strong>Competitive challenges that give you special advantages</strong></p>
+          <p><strong>Randomized 30 second contests that give you special advantages</strong></p>
            <div class="card small-card edge-mini-game" style="margin: 1rem auto;">
             <img src="/card-images/19.png" class="card-image" />
           </div>
           <p>Once a Mini-Game card is revealed, all players compete following the unique rules of that card. The winner earns a special advantage.</p>
           <p>From your reserve, tap on it to trigger its effect.</p>
         </div>
+         <div style="text-align: center; font-size: 0.7rem; color: white; margin-bottom: 1rem; margin-top: -1rem;">
+        Tap on the card for the specific rules of each Mini-Game anytime during the game.
+      </div> 
+        
       {/if}
 
          {#if currentStep === 7}
@@ -2398,14 +2405,14 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       {#if currentStep === 8}
         <h1 class="instructions-title">You're All Set!</h1>
         <div class="instructions-section" style="--delay: 0.5s">
-          <p>Remember: The goal is to have fun training with your dog while playing a competitive game.</p>
-          <p>Good luck, and may the best trainer win!</p>
+          <p><strong>Have fun while training with {dogName || 'your dog'}.</strong></p>
+          <p><strong>Get your treats ready and may the best trainer win!</strong></p>
           </div>
           <div style="text-align: center; font-size: 3rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
         Ready, Sit, Play!
       </div>
          <div style="text-align: center; font-size: 0.7rem; color: white; margin-bottom: 1rem; margin-top: -1rem;">
-        Need Help? Use the "Review Instructions" button anytime during the game.
+        Need Help? Tap on the Pause button (top left) anytime during the game.
       </div> 
         {/if}
         
@@ -2442,7 +2449,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
   <div class="instructions-overlay">
     <div class="instructions-content">
       <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
-      Balancedog
+      BalanceDog
       <div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);">
         Ready, Sit, Play!
       </div> <h1 class="instructions-title">It's a Tie!</h1>
@@ -2826,7 +2833,7 @@ Each player asks the canine player to "Give me" for 1 point, "Drop it" 2 points 
       <div class="instructions-content">
         <img src="/BalanceDog Logo.png" alt="BalanceDog Logo" class="overlay-logo" />
         <div style="text-align: center; font-size: 0.9rem; font-weight: bold; color: white; margin-bottom: 1rem; margin-top: -1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-          Balancedog
+          BalanceDog
         </div>
          <div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);">
         Ready, Sit, Play!
