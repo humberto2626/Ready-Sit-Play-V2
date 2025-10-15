@@ -605,15 +605,22 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: rgba(255, 255, 255, 0.2);
+    background: transparent;
     border: none;
     color: white;
     width: 40px;
     height: 40px;
-    border-radius: 50%;
     cursor: pointer;
     font-size: 1.5rem;
     z-index: 10;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-close:hover {
+    opacity: 0.7;
   }
 
   .fullsize-video {
